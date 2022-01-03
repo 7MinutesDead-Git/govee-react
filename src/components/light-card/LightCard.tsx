@@ -120,13 +120,13 @@ export const LightCard = (props: LightCardProps) => {
             }
             const response = await sendLightCommand(light, inputBrightness)
             if (response.status === statusCodes.success) {
-                updateIllumination(inputBrightness)
-                flashCardOnSuccess()
+                updateIllumination(setIlluminating, inputBrightness)
+                flashCardOnSuccess(setCardFetchStyle)
                 setRateLimited(false)
             }
             else if (response.status === statusCodes.rateLimited) {
-                updateIllumination(inputBrightness)
-                flashCardOnFailure()
+                updateIllumination(setIlluminating, inputBrightness)
+                flashCardOnFailure(setCardFetchStyle)
                 setRateLimited(true)
                 throw new Error(messages.rateLimited)
             }
@@ -163,11 +163,11 @@ export const LightCard = (props: LightCardProps) => {
             const response = await sendLightCommand(light, inputTemperature)
             if (response.status === statusCodes.success) {
                 setColor("#fff")
-                flashCardOnSuccess()
+                flashCardOnSuccess(setCardFetchStyle)
                 setRateLimited(false)
             }
             else if (response.status === statusCodes.rateLimited) {
-                flashCardOnFailure()
+                flashCardOnFailure(setCardFetchStyle)
                 setRateLimited(true)
                 throw new Error(messages.rateLimited)
             }
@@ -218,15 +218,15 @@ export const LightCard = (props: LightCardProps) => {
             const response = await sendLightCommand(light, inputColor)
             if (response.status === statusCodes.success) {
                 // Sending black as a color request to their API turns the light off lol.
-                inputColor === "#000000" ? updateIllumination(0) : updateIllumination(light.status.brightness)
-                flashCardOnSuccess()
-                setRateLimited(false)
-                setColorTemperature(temperatures.middle)
-                setColor(inputColor)
+                inputColor === "#000000" ?
+                    updateIllumination(setIlluminating, 0) :
+                    updateIllumination(setIlluminating, light.status.brightness)
+                flashCardOnSuccess(setCardFetchStyle)
+                updateColorState(inputColor)
             }
             else if (response.status === statusCodes.rateLimited) {
                 setColor(color)
-                flashCardOnFailure()
+                flashCardOnFailure(setCardFetchStyle)
                 setRateLimited(true)
                 throw new Error(messages.rateLimited)
             }

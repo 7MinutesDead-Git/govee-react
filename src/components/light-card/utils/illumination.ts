@@ -1,4 +1,5 @@
-import { goveeDeviceWithState } from "../../../interfaces/interfaces";
+import { goveeDeviceWithState } from "../../../interfaces/interfaces"
+import { Dispatch } from "react"
 
 export function getIlluminationStatus(light: goveeDeviceWithState) {
     // When the brightness is set to 0, the external API will instead reflect that as powerState "off".
@@ -7,4 +8,9 @@ export function getIlluminationStatus(light: goveeDeviceWithState) {
     return light.status.powerState === "on" &&
         light.status.brightness > 0 &&
         light.status.color !== {r: 0, g: 0, b: 0}
+}
+
+// Change illumination status based on brightness.
+export function updateIllumination(setIlluminating: Dispatch<boolean>, brightness: number) {
+    brightness > 0 ? setIlluminating(true) : setIlluminating(false)
 }
