@@ -1,4 +1,7 @@
-# Mantine create-react-app template
+# Govee React
+A work in progress to let my partner control my wifi LED lights from across the globe.
+![image](https://user-images.githubusercontent.com/50963144/192930341-7eb095f7-598e-46b9-8fc8-5b989ba04e93.png)
+
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app) and [Mantine](https//mantine.dev).
 
