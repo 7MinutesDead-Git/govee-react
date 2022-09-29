@@ -1,0 +1,22 @@
+body {
+    transition: background-color 0.2s ease-in-out;
+}
+.btn-lights-status {
+    transition: all 0.2s ease-in-out;
+}
+.btn-lights-status:hover {
+    background-color: #e11d6d;
+}
+.table-lights-status td {
+    transition: all 0.2s ease-in-out;
+}
+.table-lights-status tr {
+    transition: all 1s ease-in-out;
+}
+.table-lights-status tr:hover {
+    transition: all 0.1s ease-in-out;
+    color: #fff;
+}
+.hidden {
+    opacity: 0;
+}
