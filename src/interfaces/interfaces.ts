@@ -14,22 +14,37 @@ export interface goveeCommandRequest {
     }
 }
 
-export interface goveeCommandResponse {
+interface goveeResponse {
     code: number,
-    message: string,
-    data: {}
+    message: string
 }
 
-export interface goveeDevicesResponse {
-    code: number,
-    message: string,
+export interface goveeCommandResponse extends goveeResponse {}
+
+export interface goveeDevicesResponse extends goveeResponse {
     data: {
         devices: goveeDevice[]
     }
 }
 
-export interface goveeDevice {
-    device: string,
+export interface goveeStateResponse extends goveeResponse {
+    data: {
+        device: string,
+        model: string,
+        properties: [
+            { online: boolean },
+            { powerState: "on" | "off" },
+            { brightness: number },
+            { color: { r: number, g: number, b: number } }
+        ]
+    }
+}
+
+interface goveeDeviceID {
+    device: string
+}
+
+interface goveeDeviceDetails {
     model: string,
     deviceName: string,
     controllable: boolean,
@@ -43,4 +58,32 @@ export interface goveeDevice {
             }
         }
     }
+}
+// Used for initial fetching of details from devices API.
+// It was necessary to split out device key (ID) from the rest of the object details,
+// so that later the device key (ID) could be used as the primary key for
+// this data as well as subsequent state retrieved and stored as goveeDeviceState.
+export interface goveeDevice extends goveeDeviceID, goveeDeviceDetails {}
+
+// Used for storing subsequent fetching of device state from the state API,
+// once the device ID has been determined.
+export interface goveeDeviceWithState {
+    id: string,
+    details: goveeDeviceDetails,
+    status: {
+        online: boolean,
+        powerState: "on" | "off",
+        brightness: number,
+        color?: {
+            r: number,
+            g: number,
+            b: number
+        },
+        colorTem?: number,
+        colorTemInKelvin?: number
+    }
+}
+
+export interface goveeDevicesMap {
+    [id: string]: goveeDeviceWithState
 }
