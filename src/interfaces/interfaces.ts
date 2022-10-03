@@ -87,3 +87,10 @@ export interface goveeDeviceWithState {
 export interface goveeDevicesMap {
     [id: string]: goveeDeviceWithState
 }
+
+// Useful for sorting lights alphabetically by name.
+export interface goveeDeviceNameOnly {
+    details: {
+        deviceName: string
+    }
+}
