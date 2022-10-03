@@ -10,18 +10,16 @@ body {
     .btn-lights-status:hover {
         background-color: #e11d6d;
     }
-
 .btn-lights-status.fetching {
     background-color: darkgray;
 }
     .btn-lights-status.fetching:hover {
         background-color: darkgray;
     }
-
 .table-lights-status td {
+    padding: 0.3rem 0 !important;
     transition: all 0.2s ease-in-out;
 }
-
 .table-lights-status tr {
     transition: all 1s ease-in-out;
 }
@@ -29,6 +27,51 @@ body {
         transition: all 0.1s ease-in-out;
         color: #fff;
     }
+.table-lights-status tr.fetch-success {
+    animation: success 1s ease-in-out;
+    animation-fill-mode: forwards;
+}
+.table-lights-status tr.fetch-failure {
+    animation: failure 2s ease-in-out;
+    animation-fill-mode: forwards;
+}
+
 .hidden {
     opacity: 0;
+}
+
+@keyframes blink {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes success {
+    0% {
+        background-color: #25262b;
+    }
+    50% {
+        background-color: rgba(79,255,175,0.15);
+    }
+    100% {
+        background-color: #25262b;
+    }
+}
+
+@keyframes failure {
+    0% {
+        background-color: #25262b;
+    }
+    50% {
+        background-color: rgba(225,29,109,0.35);
+    }
+    100% {
+        background-color: #25262b;
+    }
 }
