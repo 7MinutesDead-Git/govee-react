@@ -1,6 +1,6 @@
 # Govee React
 A work in progress to let my partner control my wifi LED lights from across the globe.
-![image](https://user-images.githubusercontent.com/50963144/193521315-40bcc60f-e805-4189-bc56-d3ca3415a44e.png)
+![image](https://user-images.githubusercontent.com/50963144/193521478-936219e8-c5b0-4a17-96ba-d9ea43461872.png)
 
 ## Available Scripts
 
