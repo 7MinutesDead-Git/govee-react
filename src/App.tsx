@@ -1,14 +1,13 @@
 import { MantineProvider, createStyles, Text, Button, Stack, Divider } from "@mantine/core"
 import { theme } from "./theme"
 import { TableOfLights } from "./components/ProgressTable"
-import {MouseEventHandler, SyntheticEvent, useEffect, useState} from "react"
-import {goveeDevice, goveeDevicesMap, goveeDeviceWithState, goveeStateResponse} from "./interfaces/interfaces";
+import {SyntheticEvent, useState} from "react"
+import {goveeDevice, goveeDevicesMap, goveeDeviceWithState, goveeStateResponse} from "./interfaces/interfaces"
+import { RefreshIcon } from "./components/Icons"
 
 const initialDevices: goveeDeviceWithState[] = []
 const devicesURL = "http://localhost:3001/devices"
 const stateURL = "http://localhost:3001/devices/state"
-const cyberPink = "#ff0051"
-const oceanGreen = "#04E184"
 const backgroundColor = "#1A1B1E"
 const backgroundFlashColor = "#2A2B2E"
 
@@ -25,7 +24,7 @@ const useStyles = createStyles((theme) => ({
 
 export default function App() {
     const [connectedLights, setConnectedLights] = useState(initialDevices)
-    const [buttonColor, setButtonColor] = useState(oceanGreen)
+    const [buttonColor, setButtonColor] = useState("teal")
     const [rateLimit, setRateLimit] = useState(0)
     const [buttonText, setButtonText] = useState("Connect to 7MD Lights")
     const { classes } = useStyles()
@@ -111,8 +110,7 @@ export default function App() {
                         className="btn-lights-status">
                     {buttonText}
                 </Button>
-                <Divider my="sm" variant="dashed" />
-                <TableOfLights data={connectedLights}/>
+                <TableOfLights lights={connectedLights}/>
             </Stack>
         </MantineProvider>
     );
