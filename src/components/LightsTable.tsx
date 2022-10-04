@@ -1,15 +1,14 @@
-import { createStyles, Table, Slider, ColorPicker, Text } from '@mantine/core'
+import { createStyles, Table, Slider, ColorPicker, Text, Loader, Center } from '@mantine/core'
 import { goveeDeviceNameOnly, goveeDeviceWithState,} from '../interfaces/interfaces'
-import { useEffect, useRef, useState} from 'react'
+import React, { useEffect, useRef, useState} from 'react'
 import { BadgeNetworkStatus, BadgeIlluminationStatus } from "./Badges"
-import { BulbIcon } from "./Icons"
-
 interface LightTableRowProps {
     light: goveeDeviceWithState
 }
 
 interface LightTableProps {
-    lights: goveeDeviceWithState[]
+    lights: goveeDeviceWithState[] | undefined,
+    isLoading: boolean,
 }
 
 
@@ -77,14 +76,30 @@ function rgbToHex(r: number, g: number, b: number) {
 }
 
 
-export function TableOfLights(props: LightTableProps) {
-    const rowsSorted = props.lights.sort((a: goveeDeviceNameOnly, b: goveeDeviceNameOnly) => {
-        return a.details.deviceName.toLowerCase().localeCompare(b.details.deviceName.toLowerCase())
-    })
+export const TableOfLights = (props: LightTableProps) => {
+    let tableContent: React.ReactNode
 
-    const rows = rowsSorted.map((light: goveeDeviceWithState) => {
-        return (<LightTableRow light={light} key={light.id}/>)
-    })
+    if (props.isLoading) {
+        tableContent = (
+            <Center style={{minHeight: "80vh"}}>
+                <Loader color="violet" size="xl"/>
+            </Center>
+        )
+    }
+    else if (!props.lights) {
+        console.error("No lights provided to TableOfLights")
+        tableContent = <span>No lights found</span>
+    }
+    else {
+        const rowsSorted = props.lights.sort((a: goveeDeviceNameOnly, b: goveeDeviceNameOnly) => {
+            return a.details.deviceName.toLowerCase().localeCompare(b.details.deviceName.toLowerCase())
+        })
+
+        tableContent = rowsSorted.map((light: goveeDeviceWithState) => {
+            return (<LightTableRow light={light} key={light.id}/>)
+        })
+    }
+
 
     return (
         <Table sx={{ maxWidth: '1000px' }}
@@ -102,7 +117,7 @@ export function TableOfLights(props: LightTableProps) {
                 </tr>
             </thead>
             <tbody>
-                {rows}
+                {tableContent}
             </tbody>
         </Table>
     )
@@ -115,8 +130,6 @@ const LightTableRow = (props: LightTableRowProps) => {
     const makingLight = light.status.powerState === "on"
         && light.status.brightness > 0
         && light.status.color !== blackColor
-
-    const { classes, theme } = useStyles()
 
     const [ brightness, setBrightness ] = useState(light.status.brightness)
     const [ online, setOnline ] = useState(light.status.online)
@@ -264,7 +277,6 @@ const LightTableRow = (props: LightTableRowProps) => {
                     size="xl"
                     thumbSize={32}
                     step={10}
-                    thumbChildren={<BulbIcon/>}
                     color="dark"
                     precision={0}
                     defaultValue={light.status.powerState === "on" ? light.status.brightness : 0}

@@ -1,4 +1,5 @@
 import { Badge } from "@mantine/core"
+import React from "react"
 
 const badgeStyles = {
     badge: {
@@ -14,20 +15,27 @@ const badgeStyles = {
         animation: "none",
         color: "#5a5c61",
         backgroundColor: "#242528"
-    }
+    },
+    // https://stackoverflow.com/a/69161332/13627106
+    connectionStatus: {
+        animation: "blink 4s linear infinite",
+        margin: "0 0.5rem",
+    } as React.CSSProperties,
 }
 
 enum BadgeColors {
     green = "green",
     red = "red",
     teal = "teal",
-    dark = "dark"
+    dark = "dark",
+    violet = "violet",
 }
 
 interface BadgeProps {
     online?: boolean,
     illuminating?: boolean,
     rateLimited?: boolean,
+    error?: boolean,
 }
 
 
@@ -77,5 +85,17 @@ export const BadgeIlluminationStatus = (props: BadgeProps) => {
         <Badge color={getColor()} variant="outline" style={getStyle()}>
             {getFetchStatus()}
         </Badge>
+    )
+}
+
+export const BadgeConnectionStatus = (props: BadgeProps) => {
+    if (props.error) {
+        return <Badge color={BadgeColors.red} size="md" variant="outline" style={badgeStyles.connectionStatus}/>
+    }
+    if (props.online) {
+        return <Badge color={BadgeColors.green} size="md" variant="outline" style={badgeStyles.connectionStatus}>Connected</Badge>
+    }
+    return (
+        <Badge color={BadgeColors.violet} size="md" variant="outline" style={badgeStyles.connectionStatus}>Connecting</Badge>
     )
 }
