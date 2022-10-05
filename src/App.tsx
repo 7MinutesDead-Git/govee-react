@@ -1,7 +1,7 @@
 import { MantineProvider, Stack } from "@mantine/core"
 import { theme } from "./theme"
 import { useState } from "react"
-import { goveeDevice, goveeDevicesMap, goveeStateResponse } from "./interfaces/interfaces"
+import { goveeDevice, goveeDevicesMap, goveeStateResponse, intervals } from "./interfaces/interfaces"
 import { useQuery } from "@tanstack/react-query"
 
 import { BadgeConnectionStatus } from "./components/Badges"
@@ -82,11 +82,24 @@ async function getStateOfLights(onlineDevices: goveeDevice[] | undefined) {
 export default function App() {
     // ----------------------------------------
     // Hooks
-    const { error, data: lights, refetch } = useQuery(["lights"], getAvailableLights)
+    const { error, data: lights } = useQuery(
+        ["lights"],
+        () => getAvailableLights(),
+        {
+            staleTime: intervals.oneMinute,
+            refetchOnWindowFocus: true,
+            refetchInterval: intervals.fiveMinutes
+        }
+    )
     const { isLoading, data: lightsWithState } = useQuery(
         ["lightsWithState"],
         () => getStateOfLights(lights),
-        { enabled: !!lights }
+        {
+            enabled: !!lights,
+            staleTime: intervals.thirtySeconds,
+            refetchOnWindowFocus: true,
+            refetchInterval: intervals.oneMinute
+        }
     )
 
     // ----------------------------------------

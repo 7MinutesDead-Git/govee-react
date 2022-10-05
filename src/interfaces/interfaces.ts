@@ -1,8 +1,17 @@
-enum h6003SupportedCommands {
+export enum h6003SupportedCommands {
     turn = "turn",
     brightness = "brightness",
     color = "color",
     colorTem = "colorTem"
+}
+
+export enum intervals {
+    fiveSeconds = 5000,
+    tenSeconds = 10000,
+    thirtySeconds = 30000,
+    oneMinute = 60000,
+    fiveMinutes = 300000,
+    tenMinutes = 600000,
 }
 
 export interface goveeCommandRequest {
