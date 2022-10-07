@@ -1,6 +1,5 @@
 import { MantineProvider, Stack } from "@mantine/core"
 import { theme } from "./theme"
-import { useState } from "react"
 import { goveeDevice, goveeDevicesMap, goveeStateResponse, intervals } from "./interfaces/interfaces"
 import { useQuery } from "@tanstack/react-query"
 
@@ -8,13 +7,8 @@ import { BadgeConnectionStatus } from "./components/Badges"
 import { TableOfLights } from "./components/LightsTable"
 import { LightsHeader } from "./components/LightsHeader"
 
+import { devicesURL, stateURL } from "./config"
 
-let baseURL = `${process.env.REACT_APP_SERVER_URL}:${process.env.REACT_APP_PORT}`
-if (process.env.NODE_ENV === "development") {
-    baseURL = "http://localhost:3001"
-}
-const devicesURL = `${baseURL}/devices`
-const stateURL = `${devicesURL}/state`
 
 
 async function getAvailableLights() {

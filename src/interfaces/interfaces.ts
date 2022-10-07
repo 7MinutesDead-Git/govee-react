@@ -103,3 +103,11 @@ export interface goveeDeviceNameOnly {
         deviceName: string
     }
 }
+
+export interface LightTableRowProps {
+    light: goveeDeviceWithState
+}
+export interface LightTableProps {
+    lights: goveeDeviceWithState[] | undefined,
+    isLoading: boolean,
+}

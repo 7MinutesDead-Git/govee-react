@@ -2,53 +2,8 @@ import { createStyles, Table, Slider, ColorPicker, Text, Loader, Center } from '
 import { goveeDeviceNameOnly, goveeDeviceWithState,} from '../interfaces/interfaces'
 import React, { useEffect, useRef, useState} from 'react'
 import { BadgeNetworkStatus, BadgeIlluminationStatus } from "./Badges"
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-interface LightTableRowProps {
-    light: goveeDeviceWithState
-}
-
-interface LightTableProps {
-    lights: goveeDeviceWithState[] | undefined,
-    isLoading: boolean,
-}
-
-
-const useStyles = createStyles((theme) => ({
-    progressBar: {
-        '&:not(:first-of-type)': {
-            borderLeft: `3px solid ${theme.colorScheme === 'dark' ? theme.colors.dark[7] : theme.white}`,
-        },
-    },
-    label: {
-        top: 0,
-        height: 28,
-        lineHeight: '28px',
-        width: 34,
-        padding: 0,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        fontWeight: 700,
-        backgroundColor: 'transparent',
-    },
-    thumb: {
-        backgroundColor: theme.colors[theme.primaryColor][6],
-        height: 28,
-        width: 34,
-        border: 'none',
-    },
-    dragging: {
-        transform: 'translate(-50%, -50%)',
-    },
-    hidden: {
-        opacity: 0,
-        transition: 'opacity 1s ease-in-out',
-    },
-    visible: {
-        opacity: 1,
-        transition: 'opacity 1s ease-in-out',
-    }
-}));
+import { devicesURL } from "../config"
+import { LightTableProps, LightTableRowProps} from "../interfaces/interfaces";
 
 const rowStyles = {
     controlSurface: {
@@ -145,14 +100,12 @@ const LightTableRow = (props: LightTableRowProps) => {
         && light.status.color !== blackColor
 
     const [ brightness, setBrightness ] = useState(light.status.brightness)
-    const [ online, setOnline ] = useState(light.status.online)
+    const online = light.status.online
     const [ rateLimited, setRateLimited ] = useState(false)
     const [ illuminating, setIlluminating ] = useState(makingLight)
     const [ color, setColor ] = useState("")
     const [rowFetchStyle, setRowFetchStyle] = useState(rowStyles.fetchReset)
     const colorChangeDebounceTimer = useRef(setTimeout(() => {}, 0))
-
-    const queryClient = useQueryClient()
 
     async function changeBrightness(device: string, model: string, inputBrightness: number) {
         const commandBody = {
@@ -163,7 +116,7 @@ const LightTableRow = (props: LightTableRowProps) => {
                 "value": inputBrightness
             }
         }
-        const response = await fetch(`http://localhost:3001/devices`, {
+        const response = await fetch(devicesURL, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -221,7 +174,7 @@ const LightTableRow = (props: LightTableRowProps) => {
                     }
                 }
             }
-            const response = await fetch(`http://localhost:3001/devices`, {
+            const response = await fetch(devicesURL, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -258,7 +211,7 @@ const LightTableRow = (props: LightTableRowProps) => {
             const blue = light.status.color.b
             setColor(rgbToHex(red, green, blue))
         }
-    },[])
+    },[light.status.color, light.status.colorTem])
 
     return (
         <tr style={rowFetchStyle}>
