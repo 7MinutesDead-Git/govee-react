@@ -2,6 +2,7 @@ import { createStyles, Table, Slider, ColorPicker, Text, Loader, Center } from '
 import { goveeDeviceNameOnly, goveeDeviceWithState,} from '../interfaces/interfaces'
 import React, { useEffect, useRef, useState} from 'react'
 import { BadgeNetworkStatus, BadgeIlluminationStatus } from "./Badges"
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 interface LightTableRowProps {
     light: goveeDeviceWithState
 }
@@ -81,14 +82,26 @@ export const TableOfLights = (props: LightTableProps) => {
 
     if (props.isLoading) {
         tableContent = (
-            <Center style={{minHeight: "80vh"}}>
-                <Loader color="violet" size="xl"/>
-            </Center>
+            <tr>
+                <td colSpan={4}>
+                    <Center style={{minHeight: "80vh"}}>
+                        <Loader color="violet" size="xl"/>
+                    </Center>
+                </td>
+            </tr>
         )
     }
     else if (!props.lights) {
         console.error("No lights provided to TableOfLights")
-        tableContent = <span>No lights found</span>
+        tableContent = (
+            <tr>
+                <td colSpan={4}>
+                    <Center style={{minHeight: "80vh"}}>
+                        No lights found
+                    </Center>
+                </td>
+            </tr>
+        )
     }
     else {
         const rowsSorted = props.lights.sort((a: goveeDeviceNameOnly, b: goveeDeviceNameOnly) => {
@@ -138,6 +151,8 @@ const LightTableRow = (props: LightTableRowProps) => {
     const [ color, setColor ] = useState("")
     const [rowFetchStyle, setRowFetchStyle] = useState(rowStyles.fetchReset)
     const colorChangeDebounceTimer = useRef(setTimeout(() => {}, 0))
+
+    const queryClient = useQueryClient()
 
     async function changeBrightness(device: string, model: string, inputBrightness: number) {
         const commandBody = {
@@ -251,7 +266,7 @@ const LightTableRow = (props: LightTableRowProps) => {
                 <Text component="span"
                       align="center"
                       variant="gradient"
-                      gradient={{ from: 'indigo', to: 'pink', deg: 45 }}
+                      gradient={{ from: '#FFFFFF', to: '#FAFAFA', deg: 45 }}
                       size="xl"
                       weight={700}
                       style={{ fontFamily: 'Greycliff CF, sans-serif' }}>
@@ -275,7 +290,7 @@ const LightTableRow = (props: LightTableRowProps) => {
                 />
                 <Slider
                     size="xl"
-                    thumbSize={32}
+                    thumbSize={25}
                     step={10}
                     color="dark"
                     precision={0}
