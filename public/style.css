@@ -35,6 +35,30 @@ body {
     animation: failure 2s ease-in-out;
     animation-fill-mode: forwards;
 }
+.mantine-Slider-bar {
+    transition: all 0.5s ease-in-out;
+}
+.mantine-Slider-track:hover .mantine-Slider-bar {
+    transition: all 0.15s ease-in-out;
+    box-shadow: 0 0 0 2px #4f575a;
+}
+.mantine-Slider-thumb {
+    transition: box-shadow 0.5s ease-in-out;
+    box-shadow: 0 0 0 0 #53ffb4;
+}
+.mantine-Slider-dragging {
+    transition: box-shadow 0.1s ease-in-out, left 0.1s ease-in-out;
+    box-shadow: 0 0 1px 5px #e11d6d;
+}
+.mantine-ColorPicker-thumb {
+    transition: transform 0.7s ease-in-out;
+    box-shadow: 0 0 0 0 #53ffb4;
+    transform: scale(2);
+}
+.mantine-ColorPicker-thumb:hover {
+    transition: transform 0.1s ease-in-out;
+    transform: scale(2.5);
+}
 
 .hidden {
     opacity: 0;
@@ -54,9 +78,6 @@ body {
 
 @keyframes success {
     0% {
-        background-color: #25262b;
-    }
-    50% {
         background-color: rgba(79,255,175,0.15);
     }
     100% {
