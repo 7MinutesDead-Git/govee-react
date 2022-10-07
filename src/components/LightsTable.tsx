@@ -1,4 +1,4 @@
-import { createStyles, Table, Slider, ColorPicker, Text, Loader, Center } from '@mantine/core'
+import { Table, Slider, ColorPicker, Text, Loader, Center } from '@mantine/core'
 import { goveeDeviceNameOnly, goveeDeviceWithState,} from '../interfaces/interfaces'
 import React, { useEffect, useRef, useState} from 'react'
 import { BadgeNetworkStatus, BadgeIlluminationStatus } from "./Badges"
