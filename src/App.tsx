@@ -9,10 +9,12 @@ import { TableOfLights } from "./components/LightsTable"
 import { LightsHeader } from "./components/LightsHeader"
 
 
-const devicesURL = "http://localhost:3001/devices"
-const stateURL = "http://localhost:3001/devices/state"
-const backgroundColor = "#1A1B1E"
-const backgroundFlashColor = "#2A2B2E"
+let baseURL = `${process.env.REACT_APP_SERVER_URL}:${process.env.REACT_APP_PORT}`
+if (process.env.NODE_ENV === "development") {
+    baseURL = "http://localhost:3001"
+}
+const devicesURL = `${baseURL}/devices`
+const stateURL = `${devicesURL}/state`
 
 
 async function getAvailableLights() {
@@ -102,15 +104,6 @@ export default function App() {
         }
     )
 
-    // ----------------------------------------
-    // Methods
-    function flashBackground() {
-        const body = document.querySelector("body")
-        body!.style.backgroundColor = backgroundFlashColor
-        setTimeout(() => {
-            body!.style.backgroundColor = backgroundColor
-        }, 200)
-    }
 
     // ----------------------------------------
     // Render
