@@ -176,6 +176,7 @@ const LightTableRow = (props: LightTableRowProps) => {
     }
 
     // Sends a debounced request to the server to change the color of the light.
+    // This is necessary since the color picker doesn't have an onChangeEnd() event like the slider does.
     async function changeColor(device: string, model: string, inputColor: string) {
         clearTimeout(colorChangeDebounceTimer.current)
         colorChangeDebounceTimer.current = setTimeout(sendColorChange, 500)
