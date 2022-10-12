@@ -78,26 +78,22 @@ async function getStateOfLights(onlineDevices: goveeDevice[] | undefined) {
 export default function App() {
     // ----------------------------------------
     // Hooks
-    const { error, data: lights } = useQuery(
+    const { error, data: connectedLights } = useQuery(
+        ["connected"],
+        () => getAvailableLights()
+    )
+    // https://tanstack.com/query/v4/docs/guides/disabling-queries#isinitialloading
+    const { isInitialLoading, data: lights } = useQuery(
         ["lights"],
-        () => getAvailableLights(),
+        () => getStateOfLights(connectedLights),
         {
-            staleTime: intervals.oneMinute,
+            enabled: !!connectedLights,
             refetchOnWindowFocus: true,
-            refetchInterval: intervals.fiveMinutes
+            refetchInterval: intervals.refetchInterval,
+            refetchIntervalInBackground: false,
+            staleTime: intervals.staleTime,
         }
     )
-    const { isLoading, data: lightsWithState } = useQuery(
-        ["lightsWithState"],
-        () => getStateOfLights(lights),
-        {
-            enabled: !!lights,
-            staleTime: intervals.thirtySeconds,
-            refetchOnWindowFocus: true,
-            refetchInterval: intervals.oneMinute
-        }
-    )
-
 
     // ----------------------------------------
     // Render
@@ -105,7 +101,7 @@ export default function App() {
         return (
             <MantineProvider theme={theme} withGlobalStyles withNormalizeCSS>
                 <LightsHeader>
-                    <BadgeConnectionStatus online={!isLoading} error={true}/>
+                    <BadgeConnectionStatus online={!isInitialLoading} error={true}/>
                 </LightsHeader>
             </MantineProvider>
         )
@@ -114,10 +110,10 @@ export default function App() {
     return (
         <MantineProvider theme={theme} withGlobalStyles withNormalizeCSS>
             <LightsHeader>
-                <BadgeConnectionStatus online={!isLoading} />
+                <BadgeConnectionStatus online={!isInitialLoading} />
             </LightsHeader>
             <Stack align="center" justify="center" spacing="xl">
-                <TableOfLights lights={lightsWithState} isLoading={isLoading}/>
+                <TableOfLights lights={lights} isLoading={isInitialLoading}/>
             </Stack>
         </MantineProvider>
     );
