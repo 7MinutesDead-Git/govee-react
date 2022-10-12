@@ -1,9 +1,10 @@
 import { Table, Slider, ColorPicker, Text, Loader, Center } from '@mantine/core'
 import { goveeDeviceNameOnly, goveeDeviceWithState,} from '../interfaces/interfaces'
-import React, { useEffect, useRef, useState} from 'react'
+import { useEffect, useRef, useState} from 'react'
 import { BadgeNetworkStatus, BadgeIlluminationStatus } from "./Badges"
 import { devicesURL } from "../config"
-import { LightTableProps, LightTableRowProps} from "../interfaces/interfaces";
+import { LightTableProps, LightTableRowProps} from "../interfaces/interfaces"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 const rowStyles = {
     controlSurface: {
@@ -15,6 +16,10 @@ const rowStyles = {
     },
     fetchFailure: {
         animation: "failure 2s ease-in-out infinite",
+        animationFillMode: "forwards",
+    },
+    fetchNewSync: {
+        animation: "newSync 0.5s ease-in-out",
         animationFillMode: "forwards",
     },
     fetchReset: {
@@ -91,23 +96,38 @@ export const TableOfLights = (props: LightTableProps) => {
     )
 }
 
-
+// TODO: react query has keepPreviousData and isPreviousData for some extra config to play with.
+//  https://tanstack.com/query/v4/docs/guides/paginated-queries#better-paginated-queries-with-keeppreviousdata
+//  "rather display the previous data on refreshes rather than that initial no-data spinner"
 const LightTableRow = (props: LightTableRowProps) => {
+    const queryClient = useQueryClient()
     const { light } = props
-    const blackColor = {r: 0, g: 0, b: 0}
-    const makingLight = light.status.powerState === "on"
-        && light.status.brightness > 0
-        && light.status.color !== blackColor
-
-    const [ brightness, setBrightness ] = useState(light.status.brightness)
     const online = light.status.online
+    const isIlluminating = light.status.powerState === "on" &&
+        light.status.brightness > 0 &&
+        light.status.color !== {r: 0, g: 0, b: 0}
+
     const [ rateLimited, setRateLimited ] = useState(false)
-    const [ illuminating, setIlluminating ] = useState(makingLight)
+    const [ illuminating, setIlluminating ] = useState(isIlluminating)
+
+    // Color hooks
+    // TODO: Change color state hooks to useMutation.
     const [ color, setColor ] = useState("")
-    const [rowFetchStyle, setRowFetchStyle] = useState(rowStyles.fetchReset)
     const colorChangeDebounceTimer = useRef(setTimeout(() => {}, 0))
 
-    async function changeBrightness(device: string, model: string, inputBrightness: number) {
+    // Brightness hooks
+    const brightnessSliderChanging = useRef(false)
+    const [ brightnessSliderValue, setBrightnessSliderValue] = useState(light.status.brightness)
+    const lastBrightnessFetched = useRef(light.status.brightness)
+    const brightnessMutation = useMutation((value: number) => changeBrightness(value))
+
+    // Flashes background of row to indicate various state updates.
+    const [ rowFetchStyle, setRowFetchStyle ] = useState(rowStyles.fetchReset)
+
+    async function changeBrightness(inputBrightness: number) {
+        brightnessSliderChanging.current = false
+        const device = light.id
+        const model = light.details.model
         const commandBody = {
             "device": device,
             "model": model,
@@ -124,20 +144,20 @@ const LightTableRow = (props: LightTableRowProps) => {
             body: JSON.stringify(commandBody)
         })
         if (response.status === 200) {
-            setBrightness(inputBrightness)
             updateIllumination(inputBrightness)
             flashRowOnSuccess()
             setRateLimited(false)
         }
         else if (response.status === 429) {
             console.log(response)
-            setBrightness(light.status.brightness)
             updateIllumination(inputBrightness)
             flashRowOnFailure()
             setRateLimited(true)
+            throw new Error("Rate limited")
         }
         else {
             console.log("Hmm, something went wrong.", response)
+            throw new Error("Something went wrong")
         }
     }
 
@@ -147,7 +167,6 @@ const LightTableRow = (props: LightTableRowProps) => {
             setRowFetchStyle(rowStyles.fetchReset)
         }, 1000)
     }
-
     function flashRowOnFailure() {
         setRowFetchStyle(rowStyles.fetchFailure)
     }
@@ -184,7 +203,7 @@ const LightTableRow = (props: LightTableRowProps) => {
             if (response.status === 200) {
                 setColor(inputColor)
                 // Sending black as a color request to their API turns the light off lol.
-                inputColor === "#000000" ? updateIllumination(0) : updateIllumination(brightness)
+                inputColor === "#000000" ? updateIllumination(0) : updateIllumination(light.status.brightness)
                 flashRowOnSuccess()
                 setRateLimited(false)
             }
@@ -212,6 +231,32 @@ const LightTableRow = (props: LightTableRowProps) => {
             setColor(rgbToHex(red, green, blue))
         }
     },[light.status.color, light.status.colorTem])
+
+
+    // Setting the value of the slider to the light.status.brightness props
+    // would lock the slider animation in place since the props wouldn't change
+    // until the next sync. That meant the value resetting as you dragged the slider,
+    // since dragging the slider means a re-render.
+    // So, this function allows the slider value to update freely based on the value
+    // being returned from onChange() within the slider component,
+    // and will also update the brightness value when the parent refetching finds updated data
+    // and causes a re-render.
+    function handleBrightnessSliderValue() {
+        if (brightnessSliderChanging.current) {
+            return brightnessSliderValue
+        }
+        else if (lastBrightnessFetched.current !== light.status.brightness) {
+            lastBrightnessFetched.current = light.status.brightness
+            return light.status.brightness
+        }
+    }
+    // Set our display brightness value to the slider value returned from the onChange() function,
+    // and sets a reference boolean flag to indicate the value is currently changing.
+    function handleBrightnessSliderChange(sliderValue: number) {
+        brightnessSliderChanging.current = true
+        setBrightnessSliderValue(sliderValue)
+    }
+
 
     return (
         <tr style={rowFetchStyle}>
@@ -247,9 +292,11 @@ const LightTableRow = (props: LightTableRowProps) => {
                     step={10}
                     color="dark"
                     precision={0}
+                    value={handleBrightnessSliderValue()}
                     defaultValue={light.status.powerState === "on" ? light.status.brightness : 0}
                     style={rowStyles.controlSurface}
-                    onChangeEnd={(currentValue) => changeBrightness(light.id, light.details.model, currentValue)}
+                    onChange={(currentValue) => handleBrightnessSliderChange(currentValue)}
+                    onChangeEnd={(chosenValue) => brightnessMutation.mutate(chosenValue)}
                     marks={[
                         { value: 10, label: "Dim" },
                         { value: 50, label: "Moody" },

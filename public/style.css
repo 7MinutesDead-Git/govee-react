@@ -96,3 +96,12 @@ body {
         background-color: #25262b;
     }
 }
+
+@keyframes newSync {
+    0% {
+        background-color: rgba(76,161,255,0.48);
+    }
+    100% {
+        background-color: #25262b;
+    }
+}
