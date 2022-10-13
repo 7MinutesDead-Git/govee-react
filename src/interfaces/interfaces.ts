@@ -106,7 +106,7 @@ export interface goveeDeviceNameOnly {
     }
 }
 
-export interface LightTableRowProps {
+export interface LightsRowProps {
     light: goveeDeviceWithState
 }
 export interface LightTableProps {
