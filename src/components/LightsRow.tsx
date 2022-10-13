@@ -3,7 +3,7 @@ import { useEffect, useRef, useState} from 'react'
 import { BadgeNetworkStatus, BadgeIlluminationStatus } from "./Badges"
 import { devicesURL } from "../config"
 import { LightsRowProps } from "../interfaces/interfaces"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation } from "@tanstack/react-query"
 
 
 const rowStyles = {
@@ -40,7 +40,6 @@ function rgbToHex(r: number, g: number, b: number) {
 //  https://tanstack.com/query/v4/docs/guides/paginated-queries#better-paginated-queries-with-keeppreviousdata
 //  "rather display the previous data on refreshes rather than that initial no-data spinner"
 export const LightsRow = (props: LightsRowProps) => {
-    const queryClient = useQueryClient()
     const { light } = props
     const online = light.status.online
     const isIlluminating = light.status.powerState === "on" &&
