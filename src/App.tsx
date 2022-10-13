@@ -2,13 +2,10 @@ import { MantineProvider, Stack } from "@mantine/core"
 import { theme } from "./theme"
 import { goveeDevice, goveeDevicesMap, goveeStateResponse, intervals } from "./interfaces/interfaces"
 import { useQuery } from "@tanstack/react-query"
-
 import { BadgeConnectionStatus } from "./components/Badges"
-import { TableOfLights } from "./components/LightsTable"
+import { LightsTable } from "./components/LightsTable"
 import { LightsHeader } from "./components/LightsHeader"
-
 import { devicesURL, stateURL } from "./config"
-
 
 
 async function getAvailableLights() {
@@ -76,7 +73,6 @@ async function getStateOfLights(onlineDevices: goveeDevice[] | undefined) {
 
 
 export default function App() {
-    // ----------------------------------------
     // Hooks
     const { error, data: connectedLights } = useQuery(
         ["connected"],
@@ -95,7 +91,6 @@ export default function App() {
         }
     )
 
-    // ----------------------------------------
     // Render
     if (error) {
         return (
@@ -106,14 +101,13 @@ export default function App() {
             </MantineProvider>
         )
     }
-
     return (
         <MantineProvider theme={theme} withGlobalStyles withNormalizeCSS>
             <LightsHeader>
                 <BadgeConnectionStatus online={!isInitialLoading} />
             </LightsHeader>
             <Stack align="center" justify="center" spacing="xl">
-                <TableOfLights lights={lights} isLoading={isInitialLoading}/>
+                <LightsTable lights={lights} isLoading={isInitialLoading}/>
             </Stack>
         </MantineProvider>
     );
