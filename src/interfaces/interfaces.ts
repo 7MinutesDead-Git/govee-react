@@ -5,17 +5,6 @@ export enum h6003SupportedCommands {
     colorTem = "colorTem"
 }
 
-export enum intervals {
-    fiveSeconds = 5000,
-    tenSeconds = 10000,
-    thirtySeconds = 30000,
-    oneMinute = 60000,
-    fiveMinutes = 300000,
-    tenMinutes = 600000,
-    staleTime = fiveSeconds,
-    refetchInterval = 8000
-}
-
 export interface goveeCommandRequest {
     device: string,
     model: string,

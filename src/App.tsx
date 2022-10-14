@@ -1,12 +1,12 @@
 import { MantineProvider, Stack, Center, Loader, Text } from "@mantine/core"
 import { theme } from "./theme"
-import { goveeDevice, goveeDevicesMap, goveeStateResponse, intervals } from "./interfaces/interfaces"
+import { goveeDevice, goveeDevicesMap, goveeStateResponse } from "./interfaces/interfaces"
 import { useQuery } from "@tanstack/react-query"
 import { BadgeConnectionStatus } from "./components/Badges"
 import { LightsTable } from "./components/LightsTable"
 import { LightsHeader } from "./components/LightsHeader"
 import { Toasty } from "./components/Toasty"
-import { devicesURL, stateURL } from "./config"
+import { devicesURL, stateURL, intervals } from "./config"
 
 
 async function getAvailableLights() {
