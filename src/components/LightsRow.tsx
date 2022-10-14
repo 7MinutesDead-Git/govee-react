@@ -171,10 +171,10 @@ export const LightsRow = (props: LightsRowProps) => {
                 setColor(color)
                 flashRowOnFailure()
                 setRateLimited(true)
-                console.log("Rate limit exceeded.")
+                throw new Error("Rate limit exceeded.")
             }
             else {
-                console.log("Hmm, something went wrong.", response)
+                throw new Error("Something went wrong when setting color.")
             }
         }
     }
