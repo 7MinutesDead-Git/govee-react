@@ -7,7 +7,9 @@ const badgeStyles = {
         margin: "0 0.5rem",
     },
     networkOnline: {},
-    networkOffline: {},
+    networkOffline: {
+        animation: "none",
+    },
     illuminationLight: {
         animation: "blink 2s linear infinite"
     },
@@ -36,6 +38,7 @@ interface BadgeProps {
     illuminating?: boolean,
     rateLimited?: boolean,
     error?: boolean,
+    errorMessage?: string,
 }
 
 
@@ -90,12 +93,23 @@ export const BadgeIlluminationStatus = (props: BadgeProps) => {
 
 export const BadgeConnectionStatus = (props: BadgeProps) => {
     if (props.error) {
-        return <Badge color={BadgeColors.red} size="md" variant="outline" style={badgeStyles.connectionStatus}/>
+        return (
+            <Badge color={BadgeColors.red} size="md" variant="outline" style={badgeStyles.networkOffline}>
+                Connection Error
+            </Badge>
+        )
     }
     if (props.online) {
-        return <Badge color={BadgeColors.green} size="md" variant="outline" style={badgeStyles.connectionStatus}>Connected</Badge>
+        return (
+            <Badge color={BadgeColors.green} size="md" variant="outline" style={badgeStyles.connectionStatus}>
+                Connected
+            </Badge>
+        )
     }
+
     return (
-        <Badge color={BadgeColors.violet} size="md" variant="outline" style={badgeStyles.connectionStatus}>Connecting</Badge>
+        <Badge color={BadgeColors.violet} size="md" variant="outline" style={badgeStyles.connectionStatus}>
+            Connecting
+        </Badge>
     )
 }

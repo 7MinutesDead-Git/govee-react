@@ -1,21 +1,23 @@
-import { MantineProvider, Stack } from "@mantine/core"
+import { MantineProvider, Stack, Center, Loader, Text } from "@mantine/core"
 import { theme } from "./theme"
 import { goveeDevice, goveeDevicesMap, goveeStateResponse, intervals } from "./interfaces/interfaces"
 import { useQuery } from "@tanstack/react-query"
 import { BadgeConnectionStatus } from "./components/Badges"
 import { LightsTable } from "./components/LightsTable"
 import { LightsHeader } from "./components/LightsHeader"
+import { Toasty } from "./components/Toasty"
 import { devicesURL, stateURL } from "./config"
 
 
 async function getAvailableLights() {
-    try {
-        const response = await fetch(devicesURL);
+    const response = await fetch(devicesURL)
+    if (response.ok) {
         const onlineDevices: goveeDevice[] = await response.json()
         return onlineDevices
     }
-    catch (error) {
-        throw new Error("There was an error when fetching initial available lights.")
+    if (response.status === 429) {
+        // TODO: Get the retry-after header and use that to set the interval.
+        throw new Error(`Rate limited by Govee's restrictive API. 😔 Try again tomorrow.`)
     }
 }
 
@@ -74,7 +76,7 @@ async function getStateOfLights(onlineDevices: goveeDevice[] | undefined) {
 
 export default function App() {
     // Hooks
-    const { error, data: connectedLights } = useQuery(
+    const { error, data: connectedLights, isError, isLoading } = useQuery(
         ["connected"],
         () => getAvailableLights()
     )
@@ -92,17 +94,47 @@ export default function App() {
     )
 
     // Render
-    if (error) {
+    if (isError) {
         return (
             <MantineProvider theme={theme} withGlobalStyles withNormalizeCSS>
+                <Toasty />
                 <LightsHeader>
-                    <BadgeConnectionStatus online={!isInitialLoading} error={true}/>
+                    <BadgeConnectionStatus
+                        online={!isInitialLoading}
+                        error={true}
+                        errorMessage={"TODO: Rate limit time remaining"}/>
                 </LightsHeader>
+                <Center>
+                    <Text>{(
+                        // It is incredibly complicated to assert the type of "error"
+                        // destructured from useQuery, because we can't assert type with angled brackets
+                        // while destructuring since this is a TSX file.
+                        // So, error is of type "unknown" for now.
+                        // @ts-ignore
+                        error.message
+                    )}</Text>
+                </Center>
             </MantineProvider>
         )
     }
+
+    if (isLoading) {
+        return (
+            <MantineProvider theme={theme} withGlobalStyles withNormalizeCSS>
+                <Toasty />
+                <LightsHeader>
+                    <BadgeConnectionStatus online={!isLoading} error={false}/>
+                </LightsHeader>
+                <Center>
+                    <Loader size="lg" />
+                </Center>
+            </MantineProvider>
+        )
+    }
+
     return (
         <MantineProvider theme={theme} withGlobalStyles withNormalizeCSS>
+            <Toasty />
             <LightsHeader>
                 <BadgeConnectionStatus online={!isInitialLoading} />
             </LightsHeader>
