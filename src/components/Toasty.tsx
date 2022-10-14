@@ -8,7 +8,7 @@ const toastStyles = {
             background: '#333',
             color: '#fff',
         },
-        duration: intervals.tenSeconds,
+        duration: intervals.fiveSeconds,
     },
     error: {
         style: {

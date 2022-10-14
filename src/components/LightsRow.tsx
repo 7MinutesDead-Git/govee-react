@@ -4,6 +4,7 @@ import { BadgeNetworkStatus, BadgeIlluminationStatus } from "./Badges"
 import { devicesURL } from "../config"
 import { LightsRowProps } from "../interfaces/interfaces"
 import { useMutation } from "@tanstack/react-query"
+import toast from 'react-hot-toast'
 
 
 const rowStyles = {
@@ -75,29 +76,39 @@ export const LightsRow = (props: LightsRowProps) => {
                 "value": inputBrightness
             }
         }
-        const response = await fetch(devicesURL, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(commandBody)
-        })
-        if (response.status === 200) {
-            updateIllumination(inputBrightness)
-            flashRowOnSuccess()
-            setRateLimited(false)
+        async function brightnessFetch() {
+            const response = await fetch(devicesURL, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(commandBody)
+            })
+            if (response.status === 200) {
+                updateIllumination(inputBrightness)
+                flashRowOnSuccess()
+                setRateLimited(false)
+            }
+            else if (response.status === 429) {
+                console.log(response)
+                updateIllumination(inputBrightness)
+                flashRowOnFailure()
+                setRateLimited(true)
+                throw new Error("Rate limited")
+            }
+            else {
+                console.log("Hmm, something went wrong.", response)
+                throw new Error("Something went wrong")
+            }
         }
-        else if (response.status === 429) {
-            console.log(response)
-            updateIllumination(inputBrightness)
-            flashRowOnFailure()
-            setRateLimited(true)
-            throw new Error("Rate limited")
-        }
-        else {
-            console.log("Hmm, something went wrong.", response)
-            throw new Error("Something went wrong")
-        }
+        await toast.promise(
+            brightnessFetch(),
+            {
+                loading: `Sending ${inputBrightness}% brightness to ${light.details.deviceName}`,
+                success: `${light.details.deviceName} brightness now at ${inputBrightness}%!`,
+                error: "Brightness change failed! Wait a bit before retrying."
+            }
+        )
     }
 
     function flashRowOnSuccess() {
@@ -118,7 +129,16 @@ export const LightsRow = (props: LightsRowProps) => {
     // This is necessary since the color picker doesn't have an onChangeEnd() event like the slider does.
     async function changeColor(device: string, model: string, inputColor: string) {
         clearTimeout(colorChangeDebounceTimer.current)
-        colorChangeDebounceTimer.current = setTimeout(sendColorChange, 500)
+        colorChangeDebounceTimer.current = setTimeout(async () => {
+            await toast.promise(
+                sendColorChange(),
+                {
+                    loading: `Sending color to ${light.details.deviceName}`,
+                    success: `${light.details.deviceName} color set to ${inputColor}!`,
+                    error: "Color change failed! Wait a bit before retrying."
+                }
+            )
+        }, 500)
 
         async function sendColorChange() {
             const commandBody = {
