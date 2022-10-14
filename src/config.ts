@@ -13,6 +13,6 @@ export enum intervals {
     oneMinute = 60000,
     fiveMinutes = 300000,
     tenMinutes = 600000,
-    staleTime = fiveMinutes,
-    refetchInterval = tenMinutes
+    staleTime = tenMinutes,
+    refetchInterval = tenMinutes * 3
 }
