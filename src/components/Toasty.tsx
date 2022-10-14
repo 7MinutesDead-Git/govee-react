@@ -1,4 +1,5 @@
 import { Toaster } from "react-hot-toast"
+import { intervals } from "../config"
 
 const toastStyles = {
     default: {
@@ -6,7 +7,8 @@ const toastStyles = {
             borderRadius: '10px',
             background: '#333',
             color: '#fff',
-        }
+        },
+        duration: intervals.tenSeconds,
     },
     error: {
         style: {
@@ -17,6 +19,6 @@ const toastStyles = {
 }
 export const Toasty = () => {
     return (
-        <Toaster position="bottom-center" toastOptions={toastStyles.default}/>
+        <Toaster position="top-center" toastOptions={toastStyles.default}/>
     )
 }

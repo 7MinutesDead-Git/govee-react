@@ -81,6 +81,8 @@ export default function App() {
         () => getAvailableLights()
     )
     // https://tanstack.com/query/v4/docs/guides/disabling-queries#isinitialloading
+    // Because we can't establish a socket or webhook from the limited external Govee API,
+    // we'll just have to refetch at an arbitrary interval that also keeps us from hitting their daily rate limit.
     const { isInitialLoading, data: lights } = useQuery(
         ["lights"],
         () => getStateOfLights(connectedLights),
