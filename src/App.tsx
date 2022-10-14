@@ -1,13 +1,19 @@
-import { MantineProvider, Stack, Center, Loader, Text } from "@mantine/core"
-import { theme } from "./theme"
-import { goveeDevice, goveeDevicesMap, goveeStateResponse } from "./interfaces/interfaces"
-import { useQuery } from "@tanstack/react-query"
-import { BadgeConnectionStatus } from "./components/Badges"
-import { LightsTable } from "./components/LightsTable"
-import { LightsHeader } from "./components/LightsHeader"
-import { Toasty } from "./components/Toasty"
-import { devicesURL, stateURL, intervals } from "./config"
+import {Center, Loader, MantineProvider, Stack, Text} from "@mantine/core"
+import {theme} from "./theme"
+import {goveeDevice, goveeDevicesMap, goveeStateResponse} from "./interfaces/interfaces"
+import {useQuery} from "@tanstack/react-query"
+import {BadgeConnectionStatus} from "./components/Badges"
+import {LightsTable} from "./components/LightsTable"
+import {LightsHeader} from "./components/LightsHeader"
+import {Toasty} from "./components/Toasty"
+import {devicesURL, intervals, rateLimitExpireURL, stateURL} from "./config"
 
+
+async function getRateLimitExpireDate() {
+    const response = await fetch(rateLimitExpireURL)
+    const data = await response.json()
+    return data.date
+}
 
 async function getAvailableLights() {
     const response = await fetch(devicesURL)
@@ -16,8 +22,12 @@ async function getAvailableLights() {
         return onlineDevices
     }
     if (response.status === 429) {
-        // TODO: Get the retry-after header and use that to set the interval.
-        throw new Error(`Rate limited by Govee's restrictive API. 😔 Try again tomorrow.`)
+        const date = await getRateLimitExpireDate()
+        const messagePrefix = "Govee's restrictive API rate limit has been exceeded"
+        const errorMessage = date === "Invalid Date" ?
+            `${messagePrefix}. We aren't sure when it'll be back because they didn't tell us.. Try again?` :
+            `${messagePrefix}. Please try again after ${date}.`
+        throw new Error(errorMessage)
     }
 }
 

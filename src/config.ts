@@ -5,6 +5,7 @@ if (process.env.NODE_ENV === "development") {
 
 export const devicesURL = `${baseURL}devices`
 export const stateURL = `${devicesURL}/state`
+export const rateLimitExpireURL = `${baseURL}rate-limit`
 export enum intervals {
     fiveSeconds = 5000,
     tenSeconds = 10000,
