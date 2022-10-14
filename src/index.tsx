@@ -1,11 +1,21 @@
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import toast from 'react-hot-toast'
 
 
-const queryClient = new QueryClient()
+// https://tkdodo.eu/blog/react-query-error-handling#putting-it-all-together
+const queryClient = new QueryClient({
+    queryCache: new QueryCache({
+        onError: (error, query) => {
+            if (query.state.error) {
+                toast.error("An error occurred while fetching data. 😔")
+            }
+        }
+    })
+})
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement)
 
 root.render(
