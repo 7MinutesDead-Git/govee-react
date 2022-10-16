@@ -100,7 +100,7 @@ export default function App() {
             enabled: !!connectedLights,
             refetchOnWindowFocus: true,
             refetchInterval: intervals.refetchInterval,
-            refetchIntervalInBackground: false,
+            refetchIntervalInBackground: true,
             staleTime: intervals.staleTime,
         }
     )
