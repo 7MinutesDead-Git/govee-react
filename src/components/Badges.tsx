@@ -1,5 +1,7 @@
 import { Badge } from "@mantine/core"
 import React from "react"
+import { useQueryClient } from "@tanstack/react-query"
+
 
 const badgeStyles = {
     badge: {
@@ -44,6 +46,8 @@ interface BadgeProps {
 
 // ----------------------------------------------------------------
 export const BadgeNetworkStatus = (props: BadgeProps) => {
+    const queryClient = useQueryClient()
+
     // Functions
     function getColor() {
         return props.online ? BadgeColors.green : BadgeColors.red
@@ -52,6 +56,9 @@ export const BadgeNetworkStatus = (props: BadgeProps) => {
         return props.online ? badgeStyles.networkOnline : badgeStyles.networkOffline
     }
     function getText() {
+        if (queryClient.isFetching(["lights"])) {
+            return "Updating"
+        }
         return props.online ? "Online" : "Offline"
     }
 
@@ -92,10 +99,12 @@ export const BadgeIlluminationStatus = (props: BadgeProps) => {
 }
 
 export const BadgeConnectionStatus = (props: BadgeProps) => {
+    const queryClient = useQueryClient()
+
     if (props.error) {
         return (
             <Badge color={BadgeColors.red} size="md" variant="outline" style={badgeStyles.networkOffline}>
-                Connection Error
+                Wait {props.errorMessage}
             </Badge>
         )
     }
@@ -103,6 +112,14 @@ export const BadgeConnectionStatus = (props: BadgeProps) => {
         return (
             <Badge color={BadgeColors.green} size="md" variant="outline" style={badgeStyles.connectionStatus}>
                 Connected
+            </Badge>
+        )
+    }
+
+    if (queryClient.isFetching(["lights"])) {
+        return (
+            <Badge color={BadgeColors.teal} size="md" variant="outline" style={badgeStyles.connectionStatus}>
+                Updating
             </Badge>
         )
     }

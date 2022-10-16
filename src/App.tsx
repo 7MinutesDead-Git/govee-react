@@ -15,6 +15,17 @@ async function getRateLimitExpireDate() {
     return data.date
 }
 
+async function getRateLimitTimeRemaining() {
+    try {
+        const response = await fetch(rateLimitExpireURL)
+        const data = await response.json()
+        return (data.date - Date.now()).toLocaleString()
+    }
+    catch (e) {
+        throw new Error("Error getting rate limit time remaining")
+    }
+}
+
 async function getAvailableLights() {
     const response = await fetch(devicesURL)
     if (response.ok) {
@@ -88,8 +99,11 @@ export default function App() {
     // Hooks
     const { error, data: connectedLights, isError, isLoading } = useQuery(
         ["connected"],
-        () => getAvailableLights()
-    )
+        () => getAvailableLights(),
+        {
+            staleTime: intervals.staleTime,
+        })
+
     // https://tanstack.com/query/v4/docs/guides/disabling-queries#isinitialloading
     // Because we can't establish a socket or webhook from the limited external Govee API,
     // we'll just have to refetch at an arbitrary interval that also keeps us from hitting their daily rate limit.
@@ -102,8 +116,12 @@ export default function App() {
             refetchInterval: intervals.refetchInterval,
             refetchIntervalInBackground: true,
             staleTime: intervals.staleTime,
-        }
-    )
+        })
+
+    const { data: rateLimitTimeRemaining } = useQuery(
+        ["rateLimitTimeRemaining"],
+        () => getRateLimitTimeRemaining(),
+        { enabled: isError })
 
     // Render
     if (isError) {
@@ -114,14 +132,13 @@ export default function App() {
                     <BadgeConnectionStatus
                         online={!isInitialLoading}
                         error={true}
-                        errorMessage={"TODO: Rate limit time remaining"}/>
+                        errorMessage={rateLimitTimeRemaining}/>
                 </LightsHeader>
                 <Center>
                     <Text>{(
-                        // It is incredibly complicated to assert the type of "error"
-                        // destructured from useQuery, because we can't assert type with angled brackets
-                        // while destructuring since this is a TSX file.
-                        // So, error is of type "unknown" for now.
+                        // It is complicated to assert the type of "error" destructured from useQuery,
+                        // because we can't assert type with angled brackets while destructuring since
+                        // this is a TSX file. So, error is of type "unknown" for now.
                         // @ts-ignore
                         error.message
                     )}</Text>
@@ -148,7 +165,7 @@ export default function App() {
         <MantineProvider theme={theme} withGlobalStyles withNormalizeCSS>
             <Toasty />
             <LightsHeader>
-                <BadgeConnectionStatus online={!isInitialLoading} />
+                <BadgeConnectionStatus online={!isInitialLoading}/>
             </LightsHeader>
             <Stack align="center" justify="center" spacing="xl">
                 <LightsTable lights={lights} isLoading={isInitialLoading}/>

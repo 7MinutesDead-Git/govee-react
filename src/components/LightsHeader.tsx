@@ -32,8 +32,7 @@ export const LightsHeader = (props: LightsHeaderProps) => {
             height={height}
             withBorder={true}
             fixed={true}
-            style={styles.lightsHeader}
-        >
+            style={styles.lightsHeader}>
             {props.children}
         </Header>
     )
