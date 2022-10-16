@@ -19,6 +19,6 @@ const toastStyles = {
 }
 export const Toasty = () => {
     return (
-        <Toaster position="top-center" toastOptions={toastStyles.default}/>
+        <Toaster position="bottom-right" toastOptions={toastStyles.default}/>
     )
 }
