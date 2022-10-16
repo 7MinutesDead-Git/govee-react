@@ -3,7 +3,7 @@ import { useEffect, useRef, useState} from 'react'
 import { BadgeNetworkStatus, BadgeIlluminationStatus } from "./Badges"
 import { devicesURL } from "../config"
 import { LightsRowProps } from "../interfaces/interfaces"
-import { useMutation } from "@tanstack/react-query"
+import {useMutation, useQueryClient} from "@tanstack/react-query"
 import toast from 'react-hot-toast'
 import {rgbToHex} from "../utils/helpers"
 
@@ -35,6 +35,7 @@ const rowStyles = {
 //  https://tanstack.com/query/v4/docs/guides/paginated-queries#better-paginated-queries-with-keeppreviousdata
 //  "rather display the previous data on refreshes rather than that initial no-data spinner"
 export const LightsRow = (props: LightsRowProps) => {
+    const queryClient = useQueryClient()
     const { light } = props
     const isIlluminating = light.status.powerState === "on" &&
         light.status.brightness > 0 &&
@@ -57,6 +58,15 @@ export const LightsRow = (props: LightsRowProps) => {
     // Flashes background of row to indicate various state updates.
     const [ rowFetchStyle, setRowFetchStyle ] = useState(rowStyles.fetchReset)
 
+    async function onlineCheck() {
+        if (!light.status.online) {
+            toast.error(`${light.details.deviceName} is offline!`)
+            await queryClient.invalidateQueries(["lights"])
+            return false
+        }
+        return true
+    }
+
     async function changeBrightness(inputBrightness: number) {
         brightnessSliderChanging.current = false
         const device = light.id
@@ -70,6 +80,9 @@ export const LightsRow = (props: LightsRowProps) => {
             }
         }
         async function brightnessFetch() {
+            if (!await onlineCheck()) {
+                throw new Error("Device offline")
+            }
             const response = await fetch(devicesURL, {
                 method: 'PUT',
                 headers: {
@@ -99,7 +112,7 @@ export const LightsRow = (props: LightsRowProps) => {
             {
                 loading: `Sending ${inputBrightness}% brightness to ${light.details.deviceName}`,
                 success: `${light.details.deviceName} brightness now at ${inputBrightness}%!`,
-                error: "Brightness change failed! Wait a bit before retrying."
+                error: "Brightness change failed!"
             }
         )
     }
@@ -128,12 +141,15 @@ export const LightsRow = (props: LightsRowProps) => {
                 {
                     loading: `Sending color to ${light.details.deviceName}`,
                     success: `${light.details.deviceName} color set to ${inputColor}!`,
-                    error: "Color change failed! Wait a bit before retrying."
+                    error: "Color change failed!"
                 }
             )
         }, 500)
 
         async function sendColorChange() {
+            if (!await onlineCheck()) {
+                throw new Error("Device offline")
+            }
             const commandBody = {
                 "device": device,
                 "model": model,
