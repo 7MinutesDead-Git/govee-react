@@ -10,12 +10,13 @@ interface HeaderLinkButtonProps {
 const styles = {
     button: () => ({
         root: {
-            margin: "0 0.5rem",
+            margin: "0 0.3rem",
+            padding: "0 0.5rem 0 0",
             transition: "all 1s ease-in-out",
             "&:hover": {
                 transition: "all 0.1s ease-in-out",
                 backgroundColor: "#17a985",
-                color: "#cdd9e5",
+                color: "#121111",
             }
         }
     })

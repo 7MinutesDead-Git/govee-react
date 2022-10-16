@@ -49,10 +49,17 @@ export const LightsHeader = (props: LightsHeaderProps) => {
                         style={styles.socialIcons}
                         fgColor="#cdd9e5"
                         bgColor="transparent"/>
-                    Github
+                    github
                 </HeaderLinkButton>
                 <HeaderLinkButton href="https://7minutes.dev/?referrer=govee">
-                    7 Minutes Dev
+                    <SocialIcon
+                        url="https://7minutes.dev/?referrer=govee"
+                        target="_blank"
+                        className="social-icon"
+                        style={styles.socialIcons}
+                        fgColor="#cdd9e5"
+                        bgColor="transparent"/>
+                    7minutes.dev
                 </HeaderLinkButton>
             </Center>
             {props.children}
