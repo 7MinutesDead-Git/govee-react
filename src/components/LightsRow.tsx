@@ -5,6 +5,7 @@ import { devicesURL } from "../config"
 import { LightsRowProps } from "../interfaces/interfaces"
 import { useMutation } from "@tanstack/react-query"
 import toast from 'react-hot-toast'
+import {rgbToHex} from "../utils/helpers"
 
 
 const rowStyles = {
@@ -27,13 +28,6 @@ const rowStyles = {
         animation: "",
         animationFillMode: ""
     }
-}
-
-function rgbToHex(r: number, g: number, b: number) {
-    return "#" + [r, g, b].map(x => {
-        const hex = x.toString(16)
-        return hex.length === 1 ? "0" + hex : hex
-    }).join("")
 }
 
 
