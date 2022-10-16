@@ -15,8 +15,8 @@ const styles = {
             transition: "all 1s ease-in-out",
             "&:hover": {
                 transition: "all 0.1s ease-in-out",
-                backgroundColor: "#17a985",
-                color: "#121111",
+                backgroundColor: "#6a0dff",
+                color: "white",
             }
         }
     })
@@ -30,7 +30,7 @@ export const HeaderLinkButton = (props: HeaderLinkButtonProps) => {
             target="_blank"
             rel="noopener noreferrer"
             styles={styles.button}
-            color="teal"
+            color="indigo"
             variant="subtle"
             radius="xs"
             size="sm">
