@@ -8,13 +8,17 @@ interface HeaderLinkButtonProps {
 }
 
 const styles = {
-    button: {
-        margin: "0 0.5rem",
-        transition: "all 0.2s ease-in-out",
-        "&:hover": {
-            transform: "translateY(-2px) !important",
+    button: () => ({
+        root: {
+            margin: "0 0.5rem",
+            transition: "all 1s ease-in-out",
+            "&:hover": {
+                transition: "all 0.1s ease-in-out",
+                backgroundColor: "#17a985",
+                color: "#cdd9e5",
+            }
         }
-    }
+    })
 }
 
 export const HeaderLinkButton = (props: HeaderLinkButtonProps) => {
@@ -24,8 +28,8 @@ export const HeaderLinkButton = (props: HeaderLinkButtonProps) => {
             href={props.href}
             target="_blank"
             rel="noopener noreferrer"
-            style={styles.button}
-            color={props.color}
+            styles={styles.button}
+            color="teal"
             variant="subtle"
             radius="xs"
             size="sm">

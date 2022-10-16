@@ -41,7 +41,7 @@ export const LightsHeader = (props: LightsHeaderProps) => {
             fixed={true}
             style={styles.lightsHeader}>
             <Center>
-                <HeaderLinkButton href="https://7minutes.dev/?referrer=govee" color="">
+                <HeaderLinkButton href="https://github.com/7MinutesDead-Git/govee-react">
                     <SocialIcon
                         url="https://github.com/7MinutesDead-Git/govee-react"
                         target="_blank"
@@ -51,9 +51,7 @@ export const LightsHeader = (props: LightsHeaderProps) => {
                         bgColor="transparent"/>
                     Github
                 </HeaderLinkButton>
-                <HeaderLinkButton
-                    href="https://7minutes.dev/?referrer=govee"
-                    color="">
+                <HeaderLinkButton href="https://7minutes.dev/?referrer=govee">
                     7 Minutes Dev
                 </HeaderLinkButton>
             </Center>
