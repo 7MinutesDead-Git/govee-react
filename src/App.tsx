@@ -68,24 +68,33 @@ async function getStateOfLights(onlineDevices: goveeDevice[] | undefined) {
         const deviceStatsPromise = fetch(`${stateURL}?device=${device.device}&model=${device.model}`)
         deviceStatsPromises.push(deviceStatsPromise)
     }
-    const deviceStatsResponses = await Promise.allSettled(deviceStatsPromises)
+    const deviceStateResponses = await Promise.allSettled(deviceStatsPromises)
 
-    for (const deviceStatsResponse of deviceStatsResponses) {
-        if (deviceStatsResponse.status === "fulfilled") {
-            const deviceFetchedStats: goveeStateResponse = await deviceStatsResponse.value.json()
+    for (const deviceState of deviceStateResponses) {
+        if (deviceState.status === "fulfilled") {
+            const deviceFetchedStats: goveeStateResponse = await deviceState.value.json()
             const extractedStatusProperties = {}
+
             for (const propertyObject of deviceFetchedStats.data.properties) {
                 const propertyKey = Object.keys(propertyObject)[0]
-                // TODO: Properly type this temporary object.
+                // TODO: Use generics to preserve type safety
                 // @ts-ignore
-                extractedStatusProperties[propertyKey] = propertyObject[propertyKey]
+                let propertyValue = propertyObject[propertyKey]
+                // External Govee API returns light's online status as a string for "false",
+                // but as a boolean for true. Very frustrating.
+                if (propertyValue === "false") {
+                    propertyValue = false
+                }
+                // TODO: Use generics to preserve type safety
+                // @ts-ignore
+                extractedStatusProperties[propertyKey] = propertyValue
             }
-            // TODO: Properly type this temporary object.
+            // TODO: Use generics to preserve type safety
             // @ts-ignore
             completeDevices[deviceFetchedStats.data.device].status = extractedStatusProperties
         }
         else {
-            console.error(`Couldn't get device stats for a light: `, deviceStatsResponse.reason)
+            console.error(`Couldn't get device stats for a light: `, deviceState.reason)
         }
     }
     for (const device in completeDevices) {

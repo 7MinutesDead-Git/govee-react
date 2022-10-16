@@ -42,7 +42,6 @@ function rgbToHex(r: number, g: number, b: number) {
 //  "rather display the previous data on refreshes rather than that initial no-data spinner"
 export const LightsRow = (props: LightsRowProps) => {
     const { light } = props
-    const online = light.status.online
     const isIlluminating = light.status.powerState === "on" &&
         light.status.brightness > 0 &&
         light.status.color !== {r: 0, g: 0, b: 0}
@@ -217,7 +216,6 @@ export const LightsRow = (props: LightsRowProps) => {
         setBrightnessSliderValue(sliderValue)
     }
 
-
     return (
         <tr style={rowFetchStyle}>
             <td>
@@ -233,8 +231,9 @@ export const LightsRow = (props: LightsRowProps) => {
             </td>
             <td>{light.details.model}</td>
             <td className="status-td">
-                <BadgeNetworkStatus online={online}/>
+                <BadgeNetworkStatus online={light.status.online}/>
                 <BadgeIlluminationStatus
+                    online={light.status.online}
                     illuminating={illuminating}
                     rateLimited={rateLimited}/>
             </td>

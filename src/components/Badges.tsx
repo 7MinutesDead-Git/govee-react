@@ -91,6 +91,16 @@ export const BadgeIlluminationStatus = (props: BadgeProps) => {
     }
 
     // Render
+    if (!props.online) {
+        return (
+            <Badge color={BadgeColors.red}
+                   variant="outline"
+                   style={{ ...badgeStyles.badge, ...badgeStyles.illuminationDark }}>
+                No Power
+            </Badge>
+        )
+    }
+
     return (
         <Badge color={getColor()} variant="outline" style={getStyle()}>
             {getFetchStatus()}
@@ -103,14 +113,20 @@ export const BadgeConnectionStatus = (props: BadgeProps) => {
 
     if (props.error) {
         return (
-            <Badge color={BadgeColors.red} size="md" variant="outline" style={badgeStyles.networkOffline}>
+            <Badge color={BadgeColors.red}
+                   size="md"
+                   variant="outline"
+                   style={badgeStyles.networkOffline}>
                 Wait {props.errorMessage}
             </Badge>
         )
     }
     if (props.online) {
         return (
-            <Badge color={BadgeColors.green} size="md" variant="outline" style={badgeStyles.connectionStatus}>
+            <Badge color={BadgeColors.green}
+                   size="md"
+                   variant="outline"
+                   style={badgeStyles.connectionStatus}>
                 Connected
             </Badge>
         )
@@ -118,14 +134,20 @@ export const BadgeConnectionStatus = (props: BadgeProps) => {
 
     if (queryClient.isFetching(["lights"])) {
         return (
-            <Badge color={BadgeColors.teal} size="md" variant="outline" style={badgeStyles.connectionStatus}>
+            <Badge color={BadgeColors.teal}
+                   size="md"
+                   variant="outline"
+                   style={badgeStyles.connectionStatus}>
                 Updating
             </Badge>
         )
     }
 
     return (
-        <Badge color={BadgeColors.violet} size="md" variant="outline" style={badgeStyles.connectionStatus}>
+        <Badge color={BadgeColors.violet}
+               size="md"
+               variant="outline"
+               style={badgeStyles.connectionStatus}>
             Connecting
         </Badge>
     )
