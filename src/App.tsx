@@ -2,11 +2,11 @@ import {Center, Loader, MantineProvider, Stack, Text} from "@mantine/core"
 import {theme} from "./theme"
 import {useQuery} from "@tanstack/react-query"
 import {BadgeConnectionStatus} from "./components/Badges"
-import {LightsTable} from "./components/LightsTable"
 import {LightsHeader} from "./components/LightsHeader"
 import {Toasty} from "./components/Toasty"
 import {intervals} from "./config"
 import {getAvailableLights, getRateLimitTimeRemaining, getStateOfLights} from "./api/fetch-utilities"
+import {LightsGrid} from "./components/LightsGrid";
 
 
 export default function App() {
@@ -82,7 +82,7 @@ export default function App() {
                 <BadgeConnectionStatus online={!isInitialLoading}/>
             </LightsHeader>
             <Stack align="center" justify="center" spacing="xl">
-                <LightsTable lights={lights} isLoading={isInitialLoading}/>
+                <LightsGrid lights={lights} isLoading={isInitialLoading}/>
             </Stack>
         </MantineProvider>
     );

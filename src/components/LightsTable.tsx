@@ -1,8 +1,8 @@
 import { Table, Loader, Center } from '@mantine/core'
 import { goveeDeviceNameOnly, goveeDeviceWithState,} from '../interfaces/interfaces'
 import { LightTableProps } from "../interfaces/interfaces"
-import { LightsRow } from "./LightsRow"
 import React from "react"
+import { LightCard } from "./LightCard"
 
 
 export const LightsTable = (props: LightTableProps) => {
@@ -36,7 +36,7 @@ export const LightsTable = (props: LightTableProps) => {
         })
 
         tableContent = rowsSorted.map((light: goveeDeviceWithState) => {
-            return (<LightsRow light={light} key={light.id}/>)
+            return (<LightCard light={light} key={light.id}/>)
         })
     }
 
@@ -46,8 +46,7 @@ export const LightsTable = (props: LightTableProps) => {
                verticalSpacing="xs"
                striped={true}
                horizontalSpacing="xs"
-               highlightOnHover={true}
-               className="table-lights-status">
+               highlightOnHover={true}>
             <thead>
                 <tr>
                     <th>Light Location</th>
