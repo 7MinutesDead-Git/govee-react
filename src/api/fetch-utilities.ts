@@ -11,6 +11,9 @@ export async function getRateLimitTimeRemaining() {
     try {
         const response = await fetch(rateLimitExpireURL)
         const data = await response.json()
+        if (data.date === "Invalid Date") {
+            return "a bit"
+        }
         return (data.date - Date.now()).toLocaleString()
     }
     catch (e) {
