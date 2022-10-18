@@ -37,7 +37,7 @@ const styles = {
 }
 
 const initialEffectArrayWidth = Math.floor(window.innerWidth / 110)
-const emptyEffectButtonArray = Array(initialEffectArrayWidth).fill(<></>)
+const emptyEffectButtonArray = Array(initialEffectArrayWidth).fill(null)
 
 export const LightsHeader = (props: LightsHeaderProps) => {
     const [ animationButtons, setAnimationButtons ] = React.useState(emptyEffectButtonArray)
@@ -51,10 +51,10 @@ export const LightsHeader = (props: LightsHeaderProps) => {
             // TODO: Remove this inline style when mousing out somehow.
             e.target.style.animation = styles.headerButtonNoAnimation
         }
-        const buttons: JSX.Element[] = Array(effectArrayWidth).fill(<EffectButton animationDelay={0}/>)
+        const buttons = Array(effectArrayWidth).fill(null)
         const staggeredDelayButtons = buttons.map((button, index) => {
             const delay = 0.05 * (buttons.length - index)
-            return <EffectButton animationDelay={0.05 * (buttons.length - index)} key={`effectButton${delay}`}/>
+            return <EffectButton animationDelay={0.05 * (buttons.length - index)} key={`effect-button-${index}-${delay}`}/>
         })
         headerAnimationCompleteDelay.current = buttons.length * 0.05
         setHeaderButtonAnimation(() => styles.headerButtonAnimationNoHover(headerAnimationCompleteDelay.current))
