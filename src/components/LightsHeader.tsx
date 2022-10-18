@@ -1,4 +1,4 @@
-import {Header, Center, Group} from "@mantine/core"
+import {Header, Center} from "@mantine/core"
 import React, {useEffect, useRef} from "react"
 import { HeaderLinkButton } from "./HeaderLinkButton"
 import { SocialIcon } from "react-social-icons"
@@ -13,7 +13,6 @@ interface LightsHeaderProps {
 const height = "3rem"
 
 const styles = {
-    headerButtonAnimation: (delay: number) => `headerButtonComplete 1s ease-in-out ${delay}s`,
     headerButtonAnimationNoHover: (delay: number) => `headerButtonCompleteNoHover 1s ease-in-out ${delay}s`,
     headerButtonNoAnimation: "none",
     lightsHeader: {
@@ -61,7 +60,7 @@ export const LightsHeader = (props: LightsHeaderProps) => {
         setAnimationButtons(staggeredDelayButtons)
     }
     // Removes the EffectButtons from the header.
-    function handleMouseOut(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+    function handleMouseOut() {
         setAnimationButtons(emptyEffectButtonArray)
         setHeaderButtonAnimation("none")
 
@@ -75,7 +74,7 @@ export const LightsHeader = (props: LightsHeaderProps) => {
         }
         window.addEventListener("resize", handleResize)
         return () => window.removeEventListener("resize", handleResize)
-    }, [window.innerWidth])
+    })
 
     return (
         <Header
