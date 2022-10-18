@@ -53,7 +53,8 @@ export const LightsHeader = (props: LightsHeaderProps) => {
         }
         const buttons: JSX.Element[] = Array(effectArrayWidth).fill(<EffectButton animationDelay={0}/>)
         const staggeredDelayButtons = buttons.map((button, index) => {
-            return <EffectButton animationDelay={0.05 * (buttons.length - index)}/>
+            const delay = 0.05 * (buttons.length - index)
+            return <EffectButton animationDelay={0.05 * (buttons.length - index)} key={`effectButton${delay}`}/>
         })
         headerAnimationCompleteDelay.current = buttons.length * 0.05
         setHeaderButtonAnimation(() => styles.headerButtonAnimationNoHover(headerAnimationCompleteDelay.current))
