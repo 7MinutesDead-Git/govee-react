@@ -59,6 +59,13 @@ body {
     transition: transform 0.1s ease-in-out;
     transform: scale(2.5);
 }
+.effect-button {
+    user-select: none;
+    cursor: default;
+    margin: 0.5rem;
+}
+.hover-effect {
+}
 
 .hidden {
     opacity: 0;
@@ -73,6 +80,38 @@ body {
     }
     100% {
         opacity: 1;
+    }
+}
+
+@keyframes headerEffect {
+    0% {
+        opacity: 1;
+        background-color: #6a0dff;
+        color: white;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes headerButtonComplete {
+    0% {
+        background-color: white;
+        color:  #6a0dff;
+    }
+    100% {
+        background-color: #6a0dff;
+        color: white;
+    }
+}
+
+@keyframes headerButtonCompleteNoHover {
+    0% {
+        background-color: #6a0dff;
+        color: white;
+    }
+    100% {
+        background-color: #121111;
     }
 }
 
