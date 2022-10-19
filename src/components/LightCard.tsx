@@ -57,6 +57,7 @@ export const LightCard = (props: LightsRowProps) => {
     // Brightness hooks
     const brightnessSliderChanging = useRef(false)
     const [ brightnessSliderValue, setBrightnessSliderValue] = useState(light.status.brightness)
+    const lastBrightnessSliderValue = useRef(light.status.brightness)
     const lastBrightnessFetched = useRef(light.status.brightness)
     const brightnessMutation = useMutation(
         (value: number) => changeBrightness(value),
@@ -96,12 +97,16 @@ export const LightCard = (props: LightsRowProps) => {
     }
 
     async function changeBrightness(inputBrightness: number) {
+        // Ensure we don't send a request to set an identical brightness.
+        if (inputBrightness === lastBrightnessSliderValue.current) {
+            return
+        }
+        lastBrightnessSliderValue.current = inputBrightness
         brightnessSliderChanging.current = false
-        const device = light.id
-        const model = light.details.model
+
         const commandBody = {
-            "device": device,
-            "model": model,
+            "device": light.id,
+            "model": light.details.model,
             "cmd": {
                 "name": "brightness",
                 "value": inputBrightness
