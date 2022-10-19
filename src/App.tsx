@@ -1,12 +1,13 @@
 import {Center, Loader, MantineProvider, Stack, Text} from "@mantine/core"
 import {theme} from "./theme"
-import {useQuery} from "@tanstack/react-query"
+import {useQueries, useQuery, UseQueryResult} from "@tanstack/react-query"
 import {BadgeConnectionStatus} from "./components/Badges"
 import {LightsHeader} from "./components/LightsHeader"
 import {Toasty} from "./components/Toasty"
 import {intervals} from "./config"
-import {getAvailableLights, getRateLimitTimeRemaining, getStateOfLights} from "./api/fetch-utilities"
-import {LightsGrid} from "./components/LightsGrid";
+import {getAvailableLights, getRateLimitTimeRemaining, getStateOfLight, getStateOfLights} from "./api/fetch-utilities"
+import {LightsGrid} from "./components/LightsGrid"
+import {goveeDeviceWithState} from "./interfaces/interfaces"
 
 
 export default function App() {
@@ -32,10 +33,43 @@ export default function App() {
             staleTime: intervals.staleTime,
         })
 
+    const newLights: UseQueryResult<goveeDeviceWithState>[] = useQueries({queries: getLightsQueries()})
+    console.log("newLights", newLights)
+    console.log("connectedLights", connectedLights)
+
     const { data: rateLimitTimeRemaining } = useQuery(
         ["rateLimitTimeRemaining"],
         () => getRateLimitTimeRemaining(),
         { enabled: isError })
+
+
+    function getLightsQueries() {
+        if (!connectedLights) {
+            return []
+        }
+        return connectedLights.map((light) => {
+            return {
+                queryKey: ["lights", light.deviceName, light.device],
+                queryFn: () => getStateOfLight(light, connectedLights),
+                enabled: !!connectedLights,
+                refetchOnWindowFocus: true,
+                refetchInterval: intervals.refetchInterval,
+                refetchIntervalInBackground: true,
+                staleTime: intervals.staleTime,
+            }
+        })
+    }
+
+    // To replace "lights" isInitialLoading
+    function lightsAreLoading() {
+        for (const light of newLights) {
+            if (light.isLoading) {
+                return true
+            }
+        }
+        return false
+    }
+
 
     // Render
     if (isError) {
