@@ -34,8 +34,6 @@ export default function App() {
         })
 
     const newLights: UseQueryResult<goveeDeviceWithState>[] = useQueries({queries: getLightsQueries()})
-    console.log("newLights", newLights)
-    console.log("connectedLights", connectedLights)
 
     const { data: rateLimitTimeRemaining } = useQuery(
         ["rateLimitTimeRemaining"],
@@ -61,14 +59,14 @@ export default function App() {
     }
 
     // To replace "lights" isInitialLoading
-    function lightsAreLoading() {
-        for (const light of newLights) {
-            if (light.isLoading) {
-                return true
-            }
-        }
-        return false
-    }
+    // function lightsAreLoading() {
+    //     for (const light of newLights) {
+    //         if (light.isLoading) {
+    //             return true
+    //         }
+    //     }
+    //     return false
+    // }
 
 
     // Render
