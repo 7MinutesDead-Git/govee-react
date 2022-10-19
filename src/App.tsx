@@ -1,13 +1,12 @@
 import {Center, Loader, MantineProvider, Stack, Text} from "@mantine/core"
 import {theme} from "./theme"
-import {useQueries, useQuery, UseQueryResult} from "@tanstack/react-query"
+import {useQuery} from "@tanstack/react-query"
 import {BadgeConnectionStatus} from "./components/Badges"
 import {LightsHeader} from "./components/LightsHeader"
 import {Toasty} from "./components/Toasty"
 import {intervals} from "./config"
-import {getAvailableLights, getRateLimitTimeRemaining, getStateOfLight, getStateOfLights} from "./api/fetch-utilities"
+import {getAvailableLights, getRateLimitTimeRemaining, getStateOfLights} from "./api/fetch-utilities"
 import {LightsGrid} from "./components/LightsGrid"
-import {goveeDeviceWithState} from "./interfaces/interfaces"
 
 
 export default function App() {
@@ -33,7 +32,7 @@ export default function App() {
             staleTime: intervals.staleTime,
         })
 
-    const newLights: UseQueryResult<goveeDeviceWithState>[] = useQueries({queries: getLightsQueries()})
+    // const newLights: UseQueryResult<goveeDeviceWithState>[] = useQueries({queries: getLightsQueries()})
 
     const { data: rateLimitTimeRemaining } = useQuery(
         ["rateLimitTimeRemaining"],
@@ -41,24 +40,24 @@ export default function App() {
         { enabled: isError })
 
 
-    function getLightsQueries() {
-        if (!connectedLights) {
-            return []
-        }
-        return connectedLights.map((light) => {
-            return {
-                queryKey: ["lights", light.deviceName, light.device],
-                queryFn: () => getStateOfLight(light, connectedLights),
-                enabled: !!connectedLights,
-                refetchOnWindowFocus: true,
-                refetchInterval: intervals.refetchInterval,
-                refetchIntervalInBackground: true,
-                staleTime: intervals.staleTime,
-            }
-        })
-    }
-
-    // To replace "lights" isInitialLoading
+    // function getLightsQueries() {
+    //     if (!connectedLights) {
+    //         return []
+    //     }
+    //     return connectedLights.map((light) => {
+    //         return {
+    //             queryKey: ["lights", light.deviceName, light.device],
+    //             queryFn: () => getStateOfLight(light, connectedLights),
+    //             enabled: !!connectedLights,
+    //             refetchOnWindowFocus: true,
+    //             refetchInterval: intervals.refetchInterval,
+    //             refetchIntervalInBackground: true,
+    //             staleTime: intervals.staleTime,
+    //         }
+    //     })
+    // }
+    //
+    // // To replace "lights" isInitialLoading
     // function lightsAreLoading() {
     //     for (const light of newLights) {
     //         if (light.isLoading) {
