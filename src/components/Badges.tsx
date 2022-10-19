@@ -41,22 +41,25 @@ interface BadgeProps {
     rateLimited?: boolean,
     error?: boolean,
     errorMessage?: string,
+    updating?: boolean,
 }
 
 
 // ----------------------------------------------------------------
 export const BadgeNetworkStatus = (props: BadgeProps) => {
-    const queryClient = useQueryClient()
 
     // Functions
     function getColor() {
+        if (props.updating) {
+            return BadgeColors.violet
+        }
         return props.online ? BadgeColors.green : BadgeColors.red
     }
     function getStyle() {
         return props.online ? badgeStyles.networkOnline : badgeStyles.networkOffline
     }
     function getText() {
-        if (queryClient.isFetching(["lights"])) {
+        if (props.updating) {
             return "Updating"
         }
         return props.online ? "Online" : "Offline"
@@ -84,10 +87,10 @@ export const BadgeIlluminationStatus = (props: BadgeProps) => {
             { ...badgeStyles.badge, ...badgeStyles.illuminationDark }
     }
     function getText() {
+        if (props.rateLimited) {
+            return "Rate Limited"
+        }
         return props.illuminating ? "Illuminating" : "Dark"
-    }
-    function getFetchStatus() {
-        return props.rateLimited ? "Rate Limited" : getText()
     }
 
     // Render
@@ -103,7 +106,7 @@ export const BadgeIlluminationStatus = (props: BadgeProps) => {
 
     return (
         <Badge color={getColor()} variant="outline" style={getStyle()}>
-            {getFetchStatus()}
+            {getText()}
         </Badge>
     )
 }
