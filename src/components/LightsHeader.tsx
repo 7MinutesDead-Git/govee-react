@@ -63,7 +63,6 @@ export const LightsHeader = (props: LightsHeaderProps) => {
     function handleMouseOut() {
         setAnimationButtons(emptyEffectButtonArray)
         setHeaderButtonAnimation("none")
-
     }
 
     // Updates the number of EffectButtons in the header when the window is resized.
@@ -85,25 +84,35 @@ export const LightsHeader = (props: LightsHeaderProps) => {
             fixed={true}
             style={styles.lightsHeader}>
             <Center>
-                <HeaderLinkButton href="https://github.com/7MinutesDead-Git/govee-react" animation={headerButtonAnimation}>
-                    <SocialIcon
-                        url="https://github.com/7MinutesDead-Git/govee-react"
-                        target="_blank"
-                        className="social-icon"
-                        style={styles.socialIcons}
-                        fgColor="#cdd9e5"
-                        bgColor="transparent"/>
-                    github
-                </HeaderLinkButton>
                 <HeaderLinkButton href="https://7minutes.dev/?referrer=govee" animation={headerButtonAnimation}>
                     <SocialIcon
-                        url="https://7minutes.dev/?referrer=govee"
+                        network=""
                         target="_blank"
                         className="social-icon"
                         style={styles.socialIcons}
                         fgColor="#cdd9e5"
                         bgColor="transparent"/>
                     7minutes.dev
+                </HeaderLinkButton>
+                <HeaderLinkButton href="https://www.linkedin.com/in/alex-gulikers-28256a219/" animation={headerButtonAnimation}>
+                    <SocialIcon
+                        network="linkedin"
+                        target="_blank"
+                        className="social-icon"
+                        style={styles.socialIcons}
+                        fgColor="#cdd9e5"
+                        bgColor="transparent"/>
+                    contact
+                </HeaderLinkButton>
+                <HeaderLinkButton href="https://github.com/7MinutesDead-Git/govee-react" animation={headerButtonAnimation}>
+                    <SocialIcon
+                        network="github"
+                        target="_blank"
+                        className="social-icon"
+                        style={styles.socialIcons}
+                        fgColor="#cdd9e5"
+                        bgColor="transparent"/>
+                    repo
                 </HeaderLinkButton>
                 <div className="hover-effect">
                     { animationButtons }
