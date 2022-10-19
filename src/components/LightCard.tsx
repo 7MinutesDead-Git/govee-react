@@ -58,7 +58,16 @@ export const LightCard = (props: LightsRowProps) => {
     const brightnessSliderChanging = useRef(false)
     const [ brightnessSliderValue, setBrightnessSliderValue] = useState(light.status.brightness)
     const lastBrightnessFetched = useRef(light.status.brightness)
-    const brightnessMutation = useMutation((value: number) => changeBrightness(value))
+    const brightnessMutation = useMutation(
+        (value: number) => changeBrightness(value),
+        {
+            onSuccess: () => {
+                // TODO: Break up "lights" query into individual queries with ids
+                //  so we can be more atomic here.
+                queryClient.invalidateQueries(["lights", light.id])
+            }
+        }
+    )
 
     // Flashes background of row to indicate various state updates.
     const [ cardFetchStyle, setCardFetchStyle ] = useState(cardStyles.fetchReset)
@@ -251,7 +260,7 @@ export const LightCard = (props: LightsRowProps) => {
             </Group>
 
             <Group position="apart" mt="xs" mb="xs" spacing="xs" align="center">
-                <BadgeNetworkStatus online={light.status.online}/>
+                <BadgeNetworkStatus online={light.status.online} updating={brightnessMutation.isLoading}/>
             </Group>
 
             <ColorPicker
