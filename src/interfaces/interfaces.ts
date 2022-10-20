@@ -95,8 +95,14 @@ export interface goveeDeviceNameOnly {
     }
 }
 
+export interface newBroadcast {
+    device: string,
+    type: string,
+    value: string
+}
+
 export interface LightsRowProps {
-    light: goveeDeviceWithState
+    light: goveeDeviceWithState,
 }
 export interface LightTableProps {
     lights: goveeDeviceWithState[] | undefined,
