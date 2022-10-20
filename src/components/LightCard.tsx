@@ -1,11 +1,13 @@
+import { multiplayer } from "../api/websocket-utilities"
+import { websocketURL } from "../config"
 import { Card, Text, Group, Slider, ColorPicker } from '@mantine/core'
-import { useEffect, useRef, useState} from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { BadgeNetworkStatus, BadgeIlluminationStatus } from "./Badges"
 import { devicesURL } from "../config"
-import { LightsRowProps } from "../interfaces/interfaces"
-import {useMutation, useQueryClient} from "@tanstack/react-query"
+import {LightsRowProps, newBroadcast} from "../interfaces/interfaces"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import toast from 'react-hot-toast'
-import {rgbToHex} from "../utils/helpers"
+import { rgbToHex } from "../utils/helpers"
 
 const cardStyles = {
     controlSurface: {
@@ -20,7 +22,7 @@ const cardStyles = {
         animationFillMode: "forwards",
     },
     fetchNewSync: {
-        animation: "newSync 0.5s ease-in-out",
+        animation: "newSync 4s ease-in-out infinite",
         animationFillMode: "forwards",
     },
     fetchReset: {
@@ -28,14 +30,14 @@ const cardStyles = {
         animationFillMode: ""
     },
     card: {
-        // width: "350px",
         transition: "all 1s ease-in-out",
+        backgroundColor: "#25262b",
         "&:hover": {
             transition: "all 0.1s ease-in-out",
             backgroundColor: "#6a0dff",
             color: "white",
         }
-    }
+    },
 }
 
 
@@ -72,6 +74,7 @@ export const LightCard = (props: LightsRowProps) => {
 
     // Flashes background of row to indicate various state updates.
     const [ cardFetchStyle, setCardFetchStyle ] = useState(cardStyles.fetchReset)
+    const [ cardStyle, setCardStyle ] = useState(cardStyles.card)
 
     async function onlineCheck() {
         if (!light.status.online) {
@@ -129,7 +132,6 @@ export const LightCard = (props: LightsRowProps) => {
                 setRateLimited(false)
             }
             else if (response.status === 429) {
-                console.log(response)
                 updateIllumination(inputBrightness)
                 flashRowOnFailure()
                 setRateLimited(true)
@@ -153,6 +155,7 @@ export const LightCard = (props: LightsRowProps) => {
     // Sends a debounced request to the server to change the color of the light.
     // This is necessary since the color picker doesn't have an onChangeEnd() event like the slider does.
     async function changeColor(device: string, model: string, inputColor: string) {
+        multiplayer.broadcastColorChange(device, inputColor)
         clearTimeout(colorChangeDebounceTimer.current)
         colorChangeDebounceTimer.current = setTimeout(async () => {
             await toast.promise(
@@ -207,20 +210,6 @@ export const LightCard = (props: LightsRowProps) => {
         }
     }
 
-    useEffect(() => {
-        // This can happen when setting the lights to a bulb color and brightness, rather than an RGB one.
-        if (light.status.colorTem) {
-            setColor("#ffffff")
-        }
-        else if (light.status.color) {
-            const red = light.status.color.r
-            const green = light.status.color.g
-            const blue = light.status.color.b
-            setColor(rgbToHex(red, green, blue))
-        }
-    },[light.status.color, light.status.colorTem])
-
-
     // Setting the value of the slider to the light.status.brightness props
     // would lock the slider animation in place since the props wouldn't change
     // until the next sync. That meant the value resetting as you dragged the slider,
@@ -237,13 +226,83 @@ export const LightCard = (props: LightsRowProps) => {
             lastBrightnessFetched.current = light.status.brightness
             return light.status.brightness
         }
+        else {
+            return brightnessSliderValue
+        }
     }
     // Set our display brightness value to the slider value returned from the onChange() function,
     // and sets a reference boolean flag to indicate the value is currently changing.
     function handleBrightnessSliderChange(sliderValue: number) {
+        multiplayer.broadcastBrightnessChange(light.id, sliderValue)
         brightnessSliderChanging.current = true
         setBrightnessSliderValue(sliderValue)
     }
+
+
+    useEffect(() => {
+        // This can happen when setting the lights to a bulb color and brightness, rather than an RGB one.
+        if (light.status.colorTem) {
+            setColor("#ffffff")
+        }
+        else if (light.status.color) {
+            const red = light.status.color.r
+            const green = light.status.color.g
+            const blue = light.status.color.b
+            setColor(rgbToHex(red, green, blue))
+        }
+    },[light.status.color, light.status.colorTem])
+
+    // Effect for managing UI sync with websocket updates from other users.
+    // Throttles the updates to 120fps, or 8.35ms.
+    // https://stackoverflow.com/a/66616016/13627106
+    useEffect(() => {
+        const ws = new WebSocket(websocketURL!)
+        const data: Set<newBroadcast> = new Set()
+        let styleTimer = setTimeout(() => {}, 0)
+
+        function flush() {
+            if (data.size === 0) {
+                return
+            }
+            for (const update of data) {
+                if (update.device === light.id) {
+                    // Begin a blue glow on the card when a change is received.
+                    if (cardFetchStyle !== cardStyles.fetchNewSync) {
+                        clearTimeout(styleTimer)
+                        setCardFetchStyle(cardStyles.fetchNewSync)
+                        styleTimer = setTimeout(() => setCardFetchStyle(cardStyles.fetchReset), 4000)
+                    }
+                    if (update.type === "brightness") {
+                        const num = Number(update.value)
+                        setBrightnessSliderValue(num)
+                        updateIllumination(num)
+                    }
+                    else if (update.type === "color") {
+                        setColor(update.value)
+                    }
+                }
+            }
+            data.clear()
+        }
+        const timer = setInterval(flush, 8.35)
+
+        ws.onmessage = (event) => {
+            const update = JSON.parse(event.data)
+            data.add(update)
+        }
+        ws.onclose = () => {
+            ws.close()
+        }
+
+        return () => {
+            clearInterval(timer)
+            // In development, since effects will mount then remount, this will cause a WebSocket warning
+            // saying "WebSocket is closed before the connection is established.". This goes away in prod.
+            ws.close()
+            flush()
+        }
+    }, [brightnessSliderValue, color, light.id])
+
 
     return (
         <Card
@@ -252,7 +311,7 @@ export const LightCard = (props: LightsRowProps) => {
             radius="xs"
             withBorder
             component="section"
-            style={{...cardFetchStyle, ...cardStyles.card}}>
+            style={{...cardFetchStyle, ...cardStyle}}>
 
             <Group position="apart" mt="xs" mb="xs" spacing="xs" align="center">
                 <Text weight={800} color="white" size="lg">
