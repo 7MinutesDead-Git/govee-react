@@ -5,9 +5,18 @@ import {BadgeConnectionStatus} from "./components/Badges"
 import {LightsHeader} from "./components/LightsHeader"
 import {Toasty} from "./components/Toasty"
 import {intervals} from "./config"
-import {getAvailableLights, getRateLimitTimeRemaining, getStateOfLights} from "./api/fetch-utilities"
+import {
+    getAvailableLights,
+    getRateLimitTimeRemaining,
+    getStateOfLights
+} from "./api/fetch-utilities"
 import {LightsGrid} from "./components/LightsGrid"
+import { multiplayer } from "./api/websocket-utilities"
 
+
+multiplayer.client.onopen = () => {
+    console.log("Websocket connected")
+}
 
 export default function App() {
     // Hooks
@@ -32,13 +41,12 @@ export default function App() {
             staleTime: intervals.staleTime,
         })
 
-    // const newLights: UseQueryResult<goveeDeviceWithState>[] = useQueries({queries: getLightsQueries()})
-
     const { data: rateLimitTimeRemaining } = useQuery(
         ["rateLimitTimeRemaining"],
         () => getRateLimitTimeRemaining(),
         { enabled: isError })
 
+    // const newLights: UseQueryResult<goveeDeviceWithState>[] = useQueries({queries: getLightsQueries()})
 
     // function getLightsQueries() {
     //     if (!connectedLights) {
@@ -56,7 +64,7 @@ export default function App() {
     //         }
     //     })
     // }
-    //
+
     // // To replace "lights" isInitialLoading
     // function lightsAreLoading() {
     //     for (const light of newLights) {
