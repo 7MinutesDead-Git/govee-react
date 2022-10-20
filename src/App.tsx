@@ -16,6 +16,9 @@ import { multiplayer } from "./api/websocket-utilities"
 
 multiplayer.client.onopen = () => {
     console.log("Websocket connected")
+    setInterval(() => {
+        multiplayer.client.send("ping")
+    }, 5000)
 }
 multiplayer.client.onclose = () => {
     console.log("Websocket closed. Reconnecting...")
