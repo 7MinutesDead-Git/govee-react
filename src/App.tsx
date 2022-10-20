@@ -17,6 +17,21 @@ import { multiplayer } from "./api/websocket-utilities"
 multiplayer.client.onopen = () => {
     console.log("Websocket connected")
 }
+multiplayer.client.onclose = () => {
+    console.log("Websocket closed. Reconnecting...")
+    setTimeout(() => {
+        multiplayer.reconnect()
+    }, 1000)
+}
+multiplayer.client.onerror = (error) => {
+    console.error("There was a websocket error for the multiplayer connection: ", error)
+    multiplayer.client.close()
+    console.log("Attempting to reconnect..")
+    setTimeout(() => {
+        multiplayer.reconnect()
+    }, 1000)
+}
+
 
 export default function App() {
     // Hooks
@@ -45,35 +60,6 @@ export default function App() {
         ["rateLimitTimeRemaining"],
         () => getRateLimitTimeRemaining(),
         { enabled: isError })
-
-    // const newLights: UseQueryResult<goveeDeviceWithState>[] = useQueries({queries: getLightsQueries()})
-
-    // function getLightsQueries() {
-    //     if (!connectedLights) {
-    //         return []
-    //     }
-    //     return connectedLights.map((light) => {
-    //         return {
-    //             queryKey: ["lights", light.deviceName, light.device],
-    //             queryFn: () => getStateOfLight(light, connectedLights),
-    //             enabled: !!connectedLights,
-    //             refetchOnWindowFocus: true,
-    //             refetchInterval: intervals.refetchInterval,
-    //             refetchIntervalInBackground: true,
-    //             staleTime: intervals.staleTime,
-    //         }
-    //     })
-    // }
-
-    // // To replace "lights" isInitialLoading
-    // function lightsAreLoading() {
-    //     for (const light of newLights) {
-    //         if (light.isLoading) {
-    //             return true
-    //         }
-    //     }
-    //     return false
-    // }
 
 
     // Render

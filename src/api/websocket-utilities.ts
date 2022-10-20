@@ -2,7 +2,9 @@ import { websocketURL } from "../config"
 
 export const multiplayer = {
     client: new WebSocket(websocketURL!),
-
+    reconnect() {
+        this.client = new WebSocket(websocketURL!)
+    },
     broadcastBrightnessChange(id: string, sliderValue: number): void {
         const message = JSON.stringify({
             device: id,
