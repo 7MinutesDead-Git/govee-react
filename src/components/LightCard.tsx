@@ -282,6 +282,9 @@ export const LightCard = (props: LightsRowProps) => {
         const timer = setInterval(flush, 16.7)
 
         ws.onmessage = (event) => {
+            if (event.data === "ping") {
+                return
+            }
             const update = JSON.parse(event.data)
             data.add(update)
         }
