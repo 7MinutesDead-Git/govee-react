@@ -74,7 +74,6 @@ export const LightCard = (props: LightsRowProps) => {
 
     // Flashes background of row to indicate various state updates.
     const [ cardFetchStyle, setCardFetchStyle ] = useState(cardStyles.fetchReset)
-    const [ cardStyle, setCardStyle ] = useState(cardStyles.card)
 
     async function onlineCheck() {
         if (!light.status.online) {
@@ -301,7 +300,7 @@ export const LightCard = (props: LightsRowProps) => {
             ws.close()
             flush()
         }
-    }, [brightnessSliderValue, color, light.id])
+    }, [brightnessSliderValue, color, light.id, cardFetchStyle])
 
 
     return (
@@ -311,7 +310,7 @@ export const LightCard = (props: LightsRowProps) => {
             radius="xs"
             withBorder
             component="section"
-            style={{...cardFetchStyle, ...cardStyle}}>
+            style={{...cardFetchStyle, ...cardStyles.card}}>
 
             <Group position="apart" mt="xs" mb="xs" spacing="xs" align="center">
                 <Text weight={800} color="white" size="lg">
