@@ -15,19 +15,15 @@ const cardStyles = {
     },
     fetchSuccess: {
         animation: "success 0.5s ease-in-out",
-        animationFillMode: "forwards",
     },
     fetchFailure: {
         animation: "failure 2s ease-in-out infinite",
-        animationFillMode: "forwards",
     },
     fetchNewSync: {
         animation: "newSync 4s ease-in-out infinite",
-        animationFillMode: "forwards",
     },
     fetchReset: {
         animation: "",
-        animationFillMode: ""
     },
     card: {
         transition: "all 1s ease-in-out",
@@ -283,7 +279,7 @@ export const LightCard = (props: LightsRowProps) => {
             }
             data.clear()
         }
-        const timer = setInterval(flush, 8.35)
+        const timer = setInterval(flush, 16.7)
 
         ws.onmessage = (event) => {
             const update = JSON.parse(event.data)
