@@ -299,7 +299,7 @@ export const LightCard = (props: LightsRowProps) => {
             ws.close()
             flush()
         }
-    }, [])
+    }, [cardFetchStyle, light.id])
 
 
     return (
