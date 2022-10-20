@@ -285,8 +285,8 @@ export const LightCard = (props: LightsRowProps) => {
             if (event.data === "ping") {
                 return
             }
-            const update = JSON.parse(event.data)
-            data.add(update)
+            const command: newBroadcast = JSON.parse(event.data)
+            data.add(command)
         }
         ws.onclose = () => {
             ws.close()
