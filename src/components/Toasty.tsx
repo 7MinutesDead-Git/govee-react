@@ -8,7 +8,7 @@ const toastStyles = {
             background: '#333',
             color: '#fff',
         },
-        duration: intervals.fiveSeconds,
+        duration: intervals.twoSeconds,
     },
     error: {
         style: {
@@ -19,6 +19,6 @@ const toastStyles = {
 }
 export const Toasty = () => {
     return (
-        <Toaster position="bottom-right" toastOptions={toastStyles.default}/>
+        <Toaster position="top-center" toastOptions={toastStyles.default}/>
     )
 }
