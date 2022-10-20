@@ -138,12 +138,12 @@ body {
 
 @keyframes newSync {
     0% {
-        background-color: rgba(76,161,255,0.1);
+        background-color: rgba(76,161,255,0.25);
     }
     50% {
-        background-color: #25262b;
+        background-color: rgba(76,161,255,0.10);
     }
     100% {
-        background-color: rgba(76,161,255,0.1);
+        background-color: rgba(76,161,255,0.25);
     }
 }
