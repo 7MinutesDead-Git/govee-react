@@ -2,8 +2,8 @@ import { websocketURL } from "../config"
 import {v4 as uuid} from "uuid"
 
 export const multiplayer = {
-    // generate unique ID per client so that a client doesn't listen for messages originating from itself.
-    // This should eliminate flickering when interacting with the UI with higher latency.
+    // We use a unique ID per client so that a client won't respond to messages originating from itself (eg, updating the UI).
+    // This should eliminate flickering, particularly when interacting with the UI with higher latency to the server.
     id: uuid(),
     client: new WebSocket(websocketURL!),
     reconnect() {

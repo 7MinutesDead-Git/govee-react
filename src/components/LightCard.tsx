@@ -205,13 +205,11 @@ export const LightCard = (props: LightsRowProps) => {
         }
     }
 
-    // Setting the value of the slider to the light.status.brightness props
-    // would lock the slider animation in place since the props wouldn't change
-    // until the next sync. That meant the value resetting as you dragged the slider,
-    // since dragging the slider means a re-render.
-    // So, this function allows the slider value to update freely based on the value
-    // being returned from onChange() within the slider component,
-    // and will also update the brightness value when the parent refetching finds updated data
+    // Setting the value of the slider to the light.status.brightness props would lock the slider animation in place
+    // since the props wouldn't change until the next sync. That meant the value would reset as you dragged the slider,
+    // since dragging the slider triggers a re-render.
+    // So, this function allows the slider value to update freely based on the value being returned from onChange()
+    // within the slider component, and will also update the brightness value when the parent refetching finds updated data
     // and causes a re-render.
     function handleBrightnessSliderValue() {
         if (brightnessSliderChanging.current) {
@@ -233,7 +231,8 @@ export const LightCard = (props: LightsRowProps) => {
         setBrightnessSliderValue(sliderValue)
     }
 
-
+    // TODO: This may not need to be an effect since the only dependencies are props,
+    //  and this is not syncing state with an external system.
     useEffect(() => {
         // This can happen when setting the lights to a bulb color and brightness, rather than an RGB one.
         if (light.status.colorTem) {
@@ -248,25 +247,30 @@ export const LightCard = (props: LightsRowProps) => {
     },[light.status.color, light.status.colorTem])
 
     // Effect for managing UI sync with websocket updates from other users.
-    // Throttles the updates to 120fps, or 8.35ms.
+    // Throttles the updates to 60fps (16.7ms).
     // https://stackoverflow.com/a/66616016/13627106
     useEffect(() => {
         const ws = new WebSocket(websocketURL!)
         const data: Set<newBroadcast> = new Set()
         let styleTimer = setTimeout(() => {}, 0)
 
+        // Function for rate limiting the UI updates.
         function flush() {
             if (data.size === 0) {
                 return
             }
             for (const update of data) {
                 // If this message originated from the same client, skip it.
-                // This should eliminate flickering when interacting with the UI with higher latency.
+                // We use a unique ID per client so that a client won't respond to messages originating
+                // from itself (eg, updating the UI).
+                // This should eliminate flickering, particularly when interacting with the UI with
+                // higher latency to the server.
                 if (update.clientID === multiplayer.id) {
                     continue
                 }
                 if (update.device === light.id) {
-                    // Begin a blue glow on the card when a change is received.
+                    // Begin a blue glow on the card when a change is received. This helps give a hint that
+                    // another user is interacting with the light.
                     if (cardFetchStyle !== cardStyles.fetchNewSync) {
                         clearTimeout(styleTimer)
                         setCardFetchStyle(cardStyles.fetchNewSync)
@@ -287,6 +291,7 @@ export const LightCard = (props: LightsRowProps) => {
         const timer = setInterval(flush, 16.7)
 
         ws.onmessage = (event) => {
+            // Keepalive pings don't need to be processed as commands, so don't add them to our data set.
             if (event.data === "ping") {
                 return
             }
