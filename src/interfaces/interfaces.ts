@@ -98,7 +98,8 @@ export interface goveeDeviceNameOnly {
 export interface newBroadcast {
     device: string,
     type: string,
-    value: string
+    value: string,
+    clientID: string
 }
 
 export interface LightsRowProps {

@@ -1,6 +1,10 @@
 import { websocketURL } from "../config"
+import {v4 as uuid} from "uuid"
 
 export const multiplayer = {
+    // generate unique ID per client so that a client doesn't listen for messages originating from itself.
+    // This should eliminate flickering when interacting with the UI with higher latency.
+    id: uuid(),
     client: new WebSocket(websocketURL!),
     reconnect() {
         this.client = new WebSocket(websocketURL!)
@@ -10,6 +14,7 @@ export const multiplayer = {
             device: id,
             type: "brightness",
             value: sliderValue,
+            clientID: this.id
         })
         this.client.send(message)
     },
@@ -19,6 +24,7 @@ export const multiplayer = {
             device: id,
             type: "color",
             value: colorValue,
+            clientID: this.id
         })
         this.client.send(message)
     },

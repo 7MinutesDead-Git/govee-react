@@ -260,6 +260,11 @@ export const LightCard = (props: LightsRowProps) => {
                 return
             }
             for (const update of data) {
+                // If this message originated from the same client, skip it.
+                // This should eliminate flickering when interacting with the UI with higher latency.
+                if (update.clientID === multiplayer.id) {
+                    continue
+                }
                 if (update.device === light.id) {
                     // Begin a blue glow on the card when a change is received.
                     if (cardFetchStyle !== cardStyles.fetchNewSync) {
