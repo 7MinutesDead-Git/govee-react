@@ -19,7 +19,7 @@ REACT_APP_PORT="8080"
 REACT_APP_SERVER_URL="http://localhost"
 REACT_APP_SERVER_SOCKET="ws://localhost"
 ```
-2) You'll want to modify these environment variables on whatever service you decide to host the app on, to match where you end up hosting the backend server (e.g., replace `http://localhost` with `whatever-you-name-your-backend.fly.io` if your server was hosted on fly.io). Most services have their own ways of setting environment variables, so check with their documentation (netlify for example has an "Environment" setting under "Build and Deploy" where you can declare these for production).  
+2) You'll want to modify these environment variables on whatever service you decide to host the app on, to match where you end up hosting the backend server *(for example, replace `http://localhost` with `whatever-you-name-your-backend.fly.io` if your server was hosted on fly.io)*. Most services have their own ways of setting environment variables, so check with their documentation (netlify for example has an "Environment" setting under "Build and Deploy" where you can declare these for production).  
   
 3) Setup the [govee-server backend here](https://github.com/7MinutesDead-Git/govee-server), and choose a hosting service or method for deployment of a backend.  
   
