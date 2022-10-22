@@ -1,5 +1,5 @@
 # Govee React
-A React+Node app originally to let my partner control my wifi LED lights from across the globe.  
+A React+Node app originally to let my partner control my wifi LED lights from across the globe. Now I also like to use it for interviews :P  
   
 Adjust the sliders and color pickers to change the brightness and color of the lightbulbs via REST API.  
   
