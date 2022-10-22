@@ -4,6 +4,7 @@ A React+Node app originally to let my partner control my wifi LED lights from ac
 Adjust the sliders and color pickers to change the brightness and color of the lightbulbs via REST API.  
   
 Requests are sent to the [node server](https://github.com/7MinutesDead-Git/govee-server), before forwarded onto [Govee's external API](https://govee-public.s3.amazonaws.com/developer-docs/GoveeDeveloperAPIReference.pdf) (since these particular bulbs do not have local API support).  
+  
 React-query is used to manage cache and refetch stale data automatically. However, Govee's official external API is aggressively rate-limited which severely limits how often we can automatically refetch data to keep the UI in sync (say, if we make changes via Govee's official app rather than this one).  
   
 But wouldn't it be cool if not only we could get the current state more often, but even see external changes live? Of course it would! So, this app also makes use of websockets.  
