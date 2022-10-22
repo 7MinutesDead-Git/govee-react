@@ -1,6 +1,25 @@
 # Govee React
-A React+Node app to let my partner control my wifi LED lights from across the globe.
+A React+Node app to let my partner control my wifi LED lights from across the globe.  
+  
+Adjust the sliders and color pickers to change the brightness and color of the lightbulbs via REST API.  
+  
+Requests are sent to the [node server](https://github.com/7MinutesDead-Git/govee-server), before forwarded onto Govee's external API (since these particular bulbs do not have local API support).  
+React-query is used to manage cache and refetch stale data automatically. However, Govee's official external API is aggressively rate-limited which severely limits how often we can automatically refetch data to keep the UI in sync (say, if we make changes via Govee's official app rather than this one).  
+  
+But wouldn't it be cool if not only we could get the current state more often, but even see external changes live? Of course it would! So, this app also makes use of websockets.  
+Any interaction with the UI by you or others will update live for all clients. The server simply broadcasts all changes received to all clients. This is a separate route from the commands send to the external Govee API for actually changing the lights, and is handled by the node server.
 ![image](https://user-images.githubusercontent.com/50963144/196177093-20877aed-0816-44a9-a6da-9fb4f25999c4.png)
+
+## SETUP  
+1) On your local dev build, you'll need to place a `.env` file in the root directory, configured as such:  
+```
+REACT_APP_PORT="8080"
+REACT_APP_SERVER_URL="http://localhost"
+REACT_APP_SERVER_SOCKET="ws://localhost"
+```
+2) You'll want to modify these environment variables on whatever service you decide to host the app on, to match where you end up hosting the backend server (e.g., replace `http://localhost` with `my-govee-backend.fly.io` if your server was hosted on fly.io). Most services have their own ways of setting environment variables, so check with their documentation (netlify, for example, has an "Environment" setting under "Build and Deploy").  
+  
+3) Setup the [govee-server backend here](https://github.com/7MinutesDead-Git/govee-server).
 
 ## Available Scripts
 
