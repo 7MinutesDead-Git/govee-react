@@ -1,6 +1,8 @@
 # Govee React
 A React+Node app originally to let my partner control my wifi LED lights from across the globe. Now I also like to use it for interviews :P  
   
+This should work with every Govee light that supports their external API (that you have completed the setup process for), though I haven't tested it on bulbs beyond H6003. 
+  
 ![image](https://user-images.githubusercontent.com/50963144/196177093-20877aed-0816-44a9-a6da-9fb4f25999c4.png)  
   
 Adjust the sliders and color pickers to change the brightness and color of the lightbulbs via REST API.  
