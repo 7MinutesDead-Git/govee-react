@@ -95,6 +95,7 @@ export const LightCard = (props: LightsRowProps) => {
     }
 
     async function changeBrightness(inputBrightness: number) {
+        multiplayer.broadcastBrightnessChange(light.id, inputBrightness)
         // Ensure we don't send a request to set an identical brightness.
         if (inputBrightness === lastBrightnessSliderValue.current) {
             return
@@ -164,6 +165,7 @@ export const LightCard = (props: LightsRowProps) => {
         }, 500)
 
         async function sendColorChange() {
+            multiplayer.broadcastColorChange(device, inputColor)
             if (!await onlineCheck()) {
                 throw new Error("Device offline")
             }
@@ -246,20 +248,21 @@ export const LightCard = (props: LightsRowProps) => {
         }
     },[light.status.color, light.status.colorTem])
 
+
     // Effect for managing UI sync with websocket updates from other users.
     // Throttles the updates to 60fps (16.7ms).
     // https://stackoverflow.com/a/66616016/13627106
     useEffect(() => {
         const ws = new WebSocket(websocketURL!)
-        const data: Set<newBroadcast> = new Set()
+        const commandBuffer: Set<newBroadcast> = new Set()
         let styleTimer = setTimeout(() => {}, 0)
 
         // Function for rate limiting the UI updates.
         function flush() {
-            if (data.size === 0) {
+            if (commandBuffer.size === 0) {
                 return
             }
-            for (const update of data) {
+            for (const update of commandBuffer) {
                 // If this message originated from the same client, skip it.
                 // We use a unique ID per client so that a client won't respond to messages originating
                 // from itself (eg, updating the UI).
@@ -286,7 +289,7 @@ export const LightCard = (props: LightsRowProps) => {
                     }
                 }
             }
-            data.clear()
+            commandBuffer.clear()
         }
         const timer = setInterval(flush, 16.7)
 
@@ -296,7 +299,7 @@ export const LightCard = (props: LightsRowProps) => {
                 return
             }
             const command: newBroadcast = JSON.parse(event.data)
-            data.add(command)
+            commandBuffer.add(command)
         }
         ws.onclose = () => {
             ws.close()
