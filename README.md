@@ -1,5 +1,9 @@
 # Govee React
-A React+Node app originally to let my partner control my wifi LED lights from across the globe. Now I also like to use it for interviews :P  
+A React+Node app originally to let my partner control my wifi LED lights from across the globe. Now I also let interviewers play with it :P  
+  
+This should work with every Govee light that supports their external API, though I haven't tested it on bulbs beyond H6003. 
+  
+![image](https://user-images.githubusercontent.com/50963144/196177093-20877aed-0816-44a9-a6da-9fb4f25999c4.png)  
   
 Adjust the sliders and color pickers to change the brightness and color of the lightbulbs via REST API.  
   
@@ -8,9 +12,8 @@ Requests are sent to the [node server](https://github.com/7MinutesDead-Git/govee
 React-query is used to manage cache and refetch stale data automatically. However, Govee's official external API is aggressively rate-limited which severely limits how often we can automatically refetch data to keep the UI in sync (say, if we make changes via Govee's official app rather than this one).  
   
 But wouldn't it be cool if not only we could get the current state more often, but even see external changes live? Of course it would! So, this app also makes use of websockets.  
-Any interaction with the UI by you or others will update live for all clients. The server simply broadcasts all changes received to all clients. This is a separate route from the commands send to the external Govee API for actually changing the lights, and is handled by the node server.
-![image](https://user-images.githubusercontent.com/50963144/196177093-20877aed-0816-44a9-a6da-9fb4f25999c4.png)
-
+Any interaction with the UI by you or others will update live for all clients. The server simply broadcasts all changes received to all clients. This is a separate route from the commands sent to the external Govee API for actually changing the lights, and is handled by the node server.  
+  
 ## SETUP  
 1) Once you have cloned down or forked this repo, be sure to run `npm install` in the root directory to install the dependencies *(such as the very nice [react-hot-toast](https://react-hot-toast.com/) for fancy toast notifications when commands are being sent to the server).* 
 2) On your local dev build, you'll need to place a `.env` file in the root directory, configured as such:  
