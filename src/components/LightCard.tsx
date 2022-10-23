@@ -80,13 +80,13 @@ export const LightCard = (props: LightsRowProps) => {
         return true
     }
 
-    function flashRowOnSuccess() {
+    function flashCardOnSuccess() {
         setCardFetchStyle(cardStyles.fetchSuccess)
         setTimeout(() => {
             setCardFetchStyle(cardStyles.fetchReset)
         }, 1000)
     }
-    function flashRowOnFailure() {
+    function flashCardOnFailure() {
         setCardFetchStyle(cardStyles.fetchFailure)
     }
 
@@ -117,19 +117,17 @@ export const LightCard = (props: LightsRowProps) => {
             }
             const response = await fetch(devicesURL, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json'},
                 body: JSON.stringify(commandBody)
             })
             if (response.status === 200) {
                 updateIllumination(inputBrightness)
-                flashRowOnSuccess()
+                flashCardOnSuccess()
                 setRateLimited(false)
             }
             else if (response.status === 429) {
                 updateIllumination(inputBrightness)
-                flashRowOnFailure()
+                flashCardOnFailure()
                 setRateLimited(true)
                 throw new Error("Rate limited")
             }
@@ -138,40 +136,34 @@ export const LightCard = (props: LightsRowProps) => {
                 throw new Error("Something went wrong")
             }
         }
-        await toast.promise(
-            brightnessFetch(),
-            {
-                loading: `Sending ${inputBrightness}% brightness to ${light.details.deviceName}`,
-                success: `${light.details.deviceName} brightness now at ${inputBrightness}%!`,
-                error: "Brightness change failed!"
-            }
-        )
+        await toast.promise(brightnessFetch(), {
+            loading: `Sending ${inputBrightness}% brightness to ${light.details.deviceName}`,
+            success: `${light.details.deviceName} brightness now at ${inputBrightness}%!`,
+            error: "Brightness change failed!"
+        })
     }
 
     // Sends a debounced request to the server to change the color of the light.
     // This is necessary since the color picker doesn't have an onChangeEnd() event like the slider does.
-    async function changeColor(device: string, model: string, inputColor: string) {
-        multiplayer.broadcastColorChange(device, inputColor)
+    async function changeColor(inputColor: string) {
+        multiplayer.broadcastColorChange(light.id, inputColor)
         clearTimeout(colorChangeDebounceTimer.current)
         colorChangeDebounceTimer.current = setTimeout(async () => {
-            await toast.promise(
-                sendColorChange(),
-                {
-                    loading: `Sending color to ${light.details.deviceName}`,
-                    success: `${light.details.deviceName} color set to ${inputColor}!`,
-                    error: "Color change failed!"
-                }
-            )
+            await toast.promise(sendColorChange(), {
+                loading: `Sending color to ${light.details.deviceName}`,
+                success: `${light.details.deviceName} color set to ${inputColor}!`,
+                error: "Color change failed!"
+            })
         }, 500)
 
         async function sendColorChange() {
-            multiplayer.broadcastColorChange(device, inputColor)
+            multiplayer.broadcastColorChange(light.id, inputColor)
             if (!await onlineCheck()) {
                 throw new Error("Device offline")
             }
             const commandBody = {
-                "device": device,
-                "model": model,
+                "device": light.id,
+                "model": light.details.model,
                 "cmd": {
                     "name": "color",
                     "value": {
@@ -191,13 +183,15 @@ export const LightCard = (props: LightsRowProps) => {
             if (response.status === 200) {
                 setColor(inputColor)
                 // Sending black as a color request to their API turns the light off lol.
-                inputColor === "#000000" ? updateIllumination(0) : updateIllumination(light.status.brightness)
-                flashRowOnSuccess()
+                inputColor === "#000000" ?
+                    updateIllumination(0) :
+                    updateIllumination(light.status.brightness)
+                flashCardOnSuccess()
                 setRateLimited(false)
             }
             else if (response.status === 429) {
                 setColor(color)
-                flashRowOnFailure()
+                flashCardOnFailure()
                 setRateLimited(true)
                 throw new Error("Rate limit exceeded.")
             }
@@ -256,7 +250,6 @@ export const LightCard = (props: LightsRowProps) => {
         const ws = new WebSocket(websocketURL!)
         const commandBuffer: Set<newBroadcast> = new Set()
         let styleTimer = setTimeout(() => {}, 0)
-
         // Function for rate limiting the UI updates.
         function flush() {
             if (commandBuffer.size === 0) {
@@ -344,7 +337,7 @@ export const LightCard = (props: LightsRowProps) => {
                 size="sm"
                 // According to Mantine docs, onChangeEnd is supposed to exist on ColorPicker element but doesn't,
                 // so we'll need to debounce in changeColor method.
-                onChange={(inputColor) => changeColor(light.id, light.details.model, inputColor)}
+                onChange={(inputColor) => changeColor(inputColor)}
                 style={cardStyles.controlSurface}/>
 
             <Slider
