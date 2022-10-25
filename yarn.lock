@@ -6444,7 +6444,7 @@
   "resolved" "https://registry.npmjs.org/minimalistic-assert/-/minimalistic-assert-1.0.1.tgz"
   "version" "1.0.1"
 
-"minimatch@^3.0.4", "minimatch@^3.1.1", "minimatch@^3.1.2":
+"minimatch@^3.0.4", "minimatch@^3.0.5", "minimatch@^3.1.1", "minimatch@^3.1.2":
   "integrity" "sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw=="
   "resolved" "https://registry.npmjs.org/minimatch/-/minimatch-3.1.2.tgz"
   "version" "3.1.2"
@@ -6457,13 +6457,6 @@
   "version" "5.1.0"
   dependencies:
     "brace-expansion" "^2.0.1"
-
-"minimatch@3.0.4":
-  "integrity" "sha512-yJHVQEhyqPLUTgt9B83PXu6W3rx4MvvHvSUvToogpwoGDOUQ+yDrR0HRot+yOCdCO7u4hX3pWft6kWBBcqh0UA=="
-  "resolved" "https://registry.npmjs.org/minimatch/-/minimatch-3.0.4.tgz"
-  "version" "3.0.4"
-  dependencies:
-    "brace-expansion" "^1.1.7"
 
 "minimist@^1.2.0", "minimist@^1.2.6":
   "integrity" "sha512-Jsjnk4bw3YJqYzbdyBiNsPWHPfO++UGG749Cxs6peCu5Xg4nrena6OVxOYxrQTqww0Jmwt+Ref8rggumkTLz9Q=="
@@ -7788,11 +7781,11 @@
     "picomatch" "^2.2.1"
 
 "recursive-readdir@^2.2.2":
-  "integrity" "sha512-nRCcW9Sj7NuZwa2XvH9co8NPeXUBhZP7CRKJtU+cS6PW9FpCIFoI5ib0NT1ZrbNuPoRy0ylyCaUL8Gih4LSyFg=="
-  "resolved" "https://registry.npmjs.org/recursive-readdir/-/recursive-readdir-2.2.2.tgz"
-  "version" "2.2.2"
+  "integrity" "sha512-8HrF5ZsXk5FAH9dgsx3BlUer73nIhuj+9OrQwEbLTPOBzGkL1lsFCR01am+v+0m2Cmbs1nP12hLDl5FA7EszKA=="
+  "resolved" "https://registry.npmjs.org/recursive-readdir/-/recursive-readdir-2.2.3.tgz"
+  "version" "2.2.3"
   dependencies:
-    "minimatch" "3.0.4"
+    "minimatch" "^3.0.5"
 
 "redent@^3.0.0":
   "integrity" "sha512-6tDA8g98We0zd0GvVeMT9arEOnTw9qM03L9cJXaCjrip1OO764RDBLBfrB4cwzNGDj5OA5ioymC9GkizgWJDUg=="
