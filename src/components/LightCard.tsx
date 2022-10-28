@@ -40,12 +40,7 @@ const cardStyles = {
 export const LightCard = (props: LightsRowProps) => {
     const queryClient = useQueryClient()
     const { light } = props
-    const isIlluminating = light.status.powerState === "on" &&
-        light.status.brightness > 0 &&
-        light.status.color !== {r: 0, g: 0, b: 0}
-
     const [ rateLimited, setRateLimited ] = useState(false)
-    const [ illuminating, setIlluminating ] = useState(isIlluminating)
 
     // Color hooks
     // TODO: Change color state hooks to useMutation.
@@ -53,8 +48,17 @@ export const LightCard = (props: LightsRowProps) => {
     const colorChangeDebounceTimer = useRef(setTimeout(() => {}, 0))
 
     // Brightness hooks
+    // When the brightness is set to 0, the external API will instead reflect that as powerState "off".
+    // The brightness reported by the API then defaults to 100 when powerState is off, for whatever reason.
+    // That causes our slider to show max brightness when in fact the light is off at 0, so we'll do this:
+    const isIlluminating = light.status.powerState === "on" &&
+        light.status.brightness > 0 &&
+        light.status.color !== {r: 0, g: 0, b: 0}
+    const initialBrightness = isIlluminating ? light.status.brightness : 0
+    const [ illuminating, setIlluminating ] = useState(isIlluminating)
+
     const brightnessSliderChanging = useRef(false)
-    const [ brightnessSliderValue, setBrightnessSliderValue] = useState(light.status.brightness)
+    const [ brightnessSliderValue, setBrightnessSliderValue] = useState(initialBrightness)
     const lastBrightnessSliderValue = useRef(light.status.brightness)
     const lastBrightnessFetched = useRef(light.status.brightness)
     const brightnessMutation = useMutation(
