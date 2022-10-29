@@ -14,6 +14,11 @@ React-query is used to manage cache and refetch stale data automatically. Howeve
 But wouldn't it be cool if not only we could get the current state more often, but even see external changes live? Of course it would! So, this app also makes use of websockets.  
 Any interaction with the UI by you or others will update live for all clients. The server simply broadcasts all changes received to all clients. This is a separate route from the commands sent to the external Govee API for actually changing the lights, and is handled by the node server.  
   
+The client also [interpolates](https://en.wikipedia.org/wiki/Linear_interpolation) between websocket messages received from the server, so things look smoother. Meaning, if your client receives color updates (someone else is moving the color picker around) every 100ms, the UI will still update every say 16.7ms (60 FPS) and choose a value at a point between the received update and the currently *lerped* (linearly interpolated) value, thus inching closer each render in a smooth fashion.  
+This allows us to reasonably cutdown on the amount of network activity and server load while keeping the live aspect of the UI responsive and smooth.  
+  
+This is like how video games smooth out player movement with network or server latency. If you're into game development, you've likely seen `lerp` a lot, haha.
+  
 ## SETUP  
 1) Once you have cloned down or forked this repo, be sure to run `npm install` in the root directory to install the dependencies *(such as the very nice [react-hot-toast](https://react-hot-toast.com/) for fancy toast notifications when commands are being sent to the server).* 
 2) On your local dev build, you'll need to place a `.env` file in the root directory, configured as such:  
