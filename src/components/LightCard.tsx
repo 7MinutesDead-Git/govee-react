@@ -3,11 +3,11 @@ import { websocketURL } from "../config"
 import { Card, Text, Group, Slider, ColorPicker } from '@mantine/core'
 import { useEffect, useRef, useState } from 'react'
 import { BadgeNetworkStatus, BadgeIlluminationStatus } from "./Badges"
-import { devicesURL } from "../config"
-import {LightsRowProps, newBroadcast} from "../interfaces/interfaces"
+import { NetworkConfig, devicesURL } from "../config"
+import { LightsRowProps, newBroadcast } from "../interfaces/interfaces"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import toast from 'react-hot-toast'
-import { rgbToHex } from "../utils/helpers"
+import { hexToRGB, lerpColorHex, rgbToHex } from "../utils/helpers"
 
 const cardStyles = {
     controlSurface: {
@@ -36,6 +36,7 @@ const cardStyles = {
     },
 }
 
+let lerpColorInterval = setInterval(() => {}, 16.7)
 
 export const LightCard = (props: LightsRowProps) => {
     const queryClient = useQueryClient()
@@ -44,7 +45,12 @@ export const LightCard = (props: LightsRowProps) => {
 
     // Color hooks
     // TODO: Change color state hooks to useMutation.
-    const [ color, setColor ] = useState("")
+    const [ color, setColor ] = useState(rgbToHex(light.status.color))
+    // The color we are aiming for, when lerping to smooth out network latency.
+    const targetColor = useRef(color)
+    // The currently lerped color between targetColor and previously lerped color.
+    const lerpedColor = useRef(color)
+    // Ensures we don't send a fetch request until we have stopped moving the color picker for some time.
     const colorChangeDebounceTimer = useRef(setTimeout(() => {}, 0))
 
     // Brightness hooks
@@ -152,6 +158,7 @@ export const LightCard = (props: LightsRowProps) => {
     async function changeColor(inputColor: string) {
         multiplayer.broadcastColorChange(light.id, inputColor)
         clearTimeout(colorChangeDebounceTimer.current)
+
         colorChangeDebounceTimer.current = setTimeout(async () => {
             await toast.promise(sendColorChange(), {
                 loading: `Sending color to ${light.details.deviceName}`,
@@ -170,11 +177,7 @@ export const LightCard = (props: LightsRowProps) => {
                 "model": light.details.model,
                 "cmd": {
                     "name": "color",
-                    "value": {
-                        "r": parseInt(inputColor.slice(1, 3), 16),
-                        "g": parseInt(inputColor.slice(3, 5), 16),
-                        "b": parseInt(inputColor.slice(5, 7), 16)
-                    }
+                    "value": hexToRGB(inputColor)
                 }
             }
             const response = await fetch(devicesURL, {
@@ -223,12 +226,28 @@ export const LightCard = (props: LightsRowProps) => {
             return brightnessSliderValue
         }
     }
+
     // Set our display brightness value to the slider value returned from the onChange() function,
     // and sets a reference boolean flag to indicate the value is currently changing.
     function handleBrightnessSliderChange(sliderValue: number) {
         multiplayer.broadcastBrightnessChange(light.id, sliderValue)
         brightnessSliderChanging.current = true
         setBrightnessSliderValue(sliderValue)
+    }
+
+    // Lerp between current color displayed in the UI, and target color received from broadcast.
+    // This helps smooth out the color change when multiple users are changing the color,
+    // and with higher latency to the server, and also allows for using a lower socket update rate
+    // while maintaining smooth UI movement.
+    function lerpNetworkColorChange() {
+        if (targetColor.current !== lerpedColor.current) {
+            lerpedColor.current = lerpColorHex(
+                lerpedColor.current,
+                targetColor.current,
+                NetworkConfig.lerpScale
+            )
+            setColor(lerpedColor.current)
+        }
     }
 
     // TODO: This may not need to be an effect since the only dependencies are props,
@@ -239,38 +258,29 @@ export const LightCard = (props: LightsRowProps) => {
             setColor("#ffffff")
         }
         else if (light.status.color) {
-            const red = light.status.color.r
-            const green = light.status.color.g
-            const blue = light.status.color.b
-            setColor(rgbToHex(red, green, blue))
+            setColor(rgbToHex(light.status.color))
         }
     },[light.status.color, light.status.colorTem])
 
 
     // Effect for managing UI sync with websocket updates from other users.
-    // Throttles the updates to 60fps (16.7ms).
+    // Throttles the updates according to the NetworkConfig.socketUpdateRate.
     // https://stackoverflow.com/a/66616016/13627106
     useEffect(() => {
         const ws = new WebSocket(websocketURL!)
         const commandBuffer: Set<newBroadcast> = new Set()
         let styleTimer = setTimeout(() => {}, 0)
-        // Function for rate limiting the UI updates.
+        // Function for rate limiting the UI updates by building up commands in a buffer before processing.
         function flush() {
             if (commandBuffer.size === 0) {
                 return
             }
             for (const update of commandBuffer) {
-                // If this message originated from the same client, skip it.
-                // We use a unique ID per client so that a client won't respond to messages originating
-                // from itself (eg, updating the UI).
-                // This should eliminate flickering, particularly when interacting with the UI with
-                // higher latency to the server.
                 if (update.clientID === multiplayer.id) {
                     continue
                 }
                 if (update.device === light.id) {
-                    // Begin a blue glow on the card when a change is received. This helps give a hint that
-                    // another user is interacting with the light.
+                    // Helps give a hint that another user is interacting with the light.
                     if (cardFetchStyle !== cardStyles.fetchNewSync) {
                         clearTimeout(styleTimer)
                         setCardFetchStyle(cardStyles.fetchNewSync)
@@ -281,14 +291,19 @@ export const LightCard = (props: LightsRowProps) => {
                         setBrightnessSliderValue(num)
                         updateIllumination(num)
                     }
+                    // Receiving color input changes will be lerped to smooth out transitions despite latency.
                     else if (update.type === "color") {
-                        setColor(update.value)
+                        targetColor.current = update.value
+                        if (targetColor.current !== lerpedColor.current) {
+                            clearInterval(lerpColorInterval)
+                            lerpColorInterval = setInterval(lerpNetworkColorChange, NetworkConfig.lerpUpdateRate)
+                        }
                     }
                 }
             }
             commandBuffer.clear()
         }
-        const timer = setInterval(flush, 16.7)
+        const timer = setInterval(flush, NetworkConfig.socketUpdateRate)
 
         ws.onmessage = (event) => {
             // Keepalive pings don't need to be processed as commands, so don't add them to our data set.
