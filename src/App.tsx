@@ -1,10 +1,10 @@
-import {Center, Loader, MantineProvider, Stack, Text} from "@mantine/core"
-import {theme} from "./theme"
-import {useQuery} from "@tanstack/react-query"
-import {BadgeConnectionStatus} from "./components/Badges"
-import {LightsHeader} from "./components/LightsHeader"
-import {Toasty} from "./components/Toasty"
-import {intervals} from "./config"
+import { Center, Loader, MantineProvider, Stack, Text } from "@mantine/core"
+import { theme } from "./theme"
+import { useQuery } from "@tanstack/react-query"
+import { BadgeConnectionStatus } from "./components/Badges"
+import { LightsHeader } from "./components/LightsHeader"
+import { Toasty } from "./components/Toasty"
+import { QueryConfig } from "./config"
 import {
     getAvailableLights,
     getRateLimitTimeRemaining,
@@ -42,7 +42,7 @@ export default function App() {
         ["connected"],
         () => getAvailableLights(),
         {
-            staleTime: intervals.staleTime,
+            staleTime: QueryConfig.staleTime,
         })
 
     // https://tanstack.com/query/v4/docs/guides/disabling-queries#isinitialloading
@@ -54,9 +54,9 @@ export default function App() {
         {
             enabled: !!connectedLights,
             refetchOnWindowFocus: true,
-            refetchInterval: intervals.refetchInterval,
+            refetchInterval: QueryConfig.refetchInterval,
             refetchIntervalInBackground: true,
-            staleTime: intervals.staleTime,
+            staleTime: QueryConfig.staleTime,
         })
 
     const { data: rateLimitTimeRemaining } = useQuery(
