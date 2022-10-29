@@ -84,6 +84,12 @@ export interface goveeDeviceWithState {
     }
 }
 
+export interface rgbColor {
+    r: number,
+    g: number,
+    b: number
+}
+
 export interface goveeDevicesMap {
     [id: string]: goveeDeviceWithState
 }
