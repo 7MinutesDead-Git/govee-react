@@ -1,3 +1,5 @@
+// TODO: Split out color and brightness state and methods into separate components
+// TODO: Add swatches for color picker, and ability to save colors to local storage.
 import { multiplayer } from "../api/websocket-utilities"
 import { websocketURL } from "../config"
 import { Card, Text, Group, Slider, ColorPicker } from '@mantine/core'
@@ -9,9 +11,40 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import toast from 'react-hot-toast'
 import { hexToRGB, lerpColorHex, rgbToHex } from "../utils/helpers"
 
+
+const swatchPresets = [
+    '#25262b',
+    '#868e96',
+    '#fa5252',
+    '#e64980',
+    '#be4bdb',
+    '#7950f2',
+    '#4c6ef5',
+    '#228be6',
+    '#15aabf',
+    '#12b886',
+    '#40c057',
+    '#82c91e',
+    '#fab005',
+    '#fd7e14'
+]
 const cardStyles = {
     controlSurface: {
         padding: "1.5rem 0"
+    },
+    // https://mantine.dev/core/color-picker/?t=styles-api
+    colorPicker: {
+        swatch: {
+            transition: "all 0.5s ease-in-out",
+            "&:hover": {
+                transition: "all 0.05s ease-in-out",
+                transform: "scale(1.1)",
+                filter: "brightness(1.5)"
+            }
+        },
+        swatches: {
+            padding: "1rem 0 0 0",
+        }
     },
     fetchSuccess: {
         animation: "success 0.5s ease-in-out",
@@ -46,10 +79,12 @@ export const LightCard = (props: LightsRowProps) => {
     // Color hooks
     // TODO: Change color state hooks to useMutation.
     const [ color, setColor ] = useState(rgbToHex(light.status.color))
+    const [ grabberColor, setGrabberColor ] = useState(rgbToHex(light.status.color))
     // The color we are aiming for, when lerping to smooth out network latency.
     const targetColor = useRef(color)
     // The currently lerped color between targetColor and previously lerped color.
     const lerpedColor = useRef(color)
+    const [ swatches, setSwatches ] = useState<string[]>(swatchPresets)
     // Ensures we don't send a fetch request until we have stopped moving the color picker for some time.
     const colorChangeDebounceTimer = useRef(setTimeout(() => {}, 0))
 
@@ -169,6 +204,7 @@ export const LightCard = (props: LightsRowProps) => {
 
         async function sendColorChange() {
             multiplayer.broadcastColorChange(light.id, inputColor)
+            updateGrabberColorText(inputColor)
             if (!await onlineCheck()) {
                 throw new Error("Device offline")
             }
@@ -206,6 +242,13 @@ export const LightCard = (props: LightsRowProps) => {
                 throw new Error("Something went wrong when setting color.")
             }
         }
+    }
+
+    function updateGrabberColorText(inputColor: string) {
+        clearTimeout(colorChangeDebounceTimer.current)
+        colorChangeDebounceTimer.current = setTimeout(() => {
+            setGrabberColor(inputColor)
+        }, 100)
     }
 
     // Setting the value of the slider to the light.status.brightness props would lock the slider animation in place
@@ -293,6 +336,7 @@ export const LightCard = (props: LightsRowProps) => {
                     }
                     // Receiving color input changes will be lerped to smooth out transitions despite latency.
                     else if (update.type === "color") {
+                        updateGrabberColorText(update.value)
                         targetColor.current = update.value
                         if (targetColor.current !== lerpedColor.current) {
                             clearInterval(lerpColorInterval)
@@ -348,6 +392,7 @@ export const LightCard = (props: LightsRowProps) => {
 
             <Group position="apart" mt="xs" mb="xs" spacing="xs" align="center">
                 <BadgeNetworkStatus online={light.status.online} updating={brightnessMutation.isLoading}/>
+                <Text color={grabberColor}>{grabberColor}</Text>
             </Group>
 
             <ColorPicker
@@ -357,7 +402,10 @@ export const LightCard = (props: LightsRowProps) => {
                 // According to Mantine docs, onChangeEnd is supposed to exist on ColorPicker element but doesn't,
                 // so we'll need to debounce in changeColor method.
                 onChange={(inputColor) => changeColor(inputColor)}
-                style={cardStyles.controlSurface}/>
+                style={cardStyles.controlSurface}
+                styles={cardStyles.colorPicker}
+                swatches={swatches}
+            />
 
             <Slider
                 size="xl"
