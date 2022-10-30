@@ -84,7 +84,7 @@ export const LightCard = (props: LightsRowProps) => {
     const targetColor = useRef(color)
     // The currently lerped color between targetColor and previously lerped color.
     const lerpedColor = useRef(color)
-    const [ swatches, setSwatches ] = useState<string[]>(swatchPresets)
+    // const [ swatches, setSwatches ] = useState<string[]>(swatchPresets)
     // Ensures we don't send a fetch request until we have stopped moving the color picker for some time.
     const colorChangeDebounceTimer = useRef(setTimeout(() => {}, 0))
 
@@ -404,7 +404,7 @@ export const LightCard = (props: LightsRowProps) => {
                 onChange={(inputColor) => changeColor(inputColor)}
                 style={cardStyles.controlSurface}
                 styles={cardStyles.colorPicker}
-                swatches={swatches}
+                swatches={swatchPresets}
             />
 
             <Slider
