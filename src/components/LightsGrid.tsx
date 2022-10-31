@@ -5,6 +5,7 @@ import { LightCard } from "./LightCard"
 
 const gridStyles = {
     grid: {
+        width: '100%',
         margin: "0 auto",
         overflow: "hidden",
     }
@@ -33,7 +34,7 @@ export const LightsGrid = (props: LightTableProps) => {
         <Grid justify="center" align="center" columns={16} gutter="lg" style={gridStyles.grid}>
             {sortedLights.map((light: goveeDeviceWithState) => {
                 return (
-                    <Grid.Col key={light.id} sm={9} md={8} lg={8} xl={7}>
+                    <Grid.Col key={light.id} sm={9} md={8} lg={6} xl={4} >
                         <LightCard light={light}/>
                     </Grid.Col>
                 )
