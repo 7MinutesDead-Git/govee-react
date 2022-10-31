@@ -3,6 +3,7 @@ import {ColorSwatch, Text, MantineNumberSize, Styles, ColorSwatchStylesParams} f
 interface EmptyColorSwatchProps {
     size: number
     color?: string
+    title?: string
     radius: MantineNumberSize | undefined
     styles: Styles<"children" | "root" | "overlay" | "shadowOverlay" | "alphaOverlay", ColorSwatchStylesParams> | undefined
     onClick: () => void
@@ -11,6 +12,7 @@ interface EmptyColorSwatchProps {
 export const EmptyColorSwatch = (props: EmptyColorSwatchProps) => {
     return (
         <ColorSwatch
+            title={props.title}
             color="transparent"
             radius={props.radius}
             size={props.size}
