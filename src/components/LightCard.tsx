@@ -2,30 +2,24 @@
 // TODO: Add swatches for color picker, and ability to save colors to local storage.
 import { multiplayer } from "../api/websocket-utilities"
 import { websocketURL } from "../config"
-import { Card, Text, Group, Slider, ColorPicker } from '@mantine/core'
+import { Card, Text, Group, Slider, ColorPicker, ColorSwatch, Grid, CloseButton } from '@mantine/core'
 import { useEffect, useRef, useState } from 'react'
 import { BadgeNetworkStatus, BadgeIlluminationStatus } from "./Badges"
+import { EmptyColorSwatch } from "./EmptyColorSwatch"
 import { NetworkConfig, devicesURL } from "../config"
 import { LightsRowProps, newBroadcast } from "../interfaces/interfaces"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import toast from 'react-hot-toast'
 import { hexToRGB, lerpColorHex, rgbToHex } from "../utils/helpers"
+import { useLocalStorageState } from "../utils/hooks";
 
 
 const swatchPresets = [
-    '#25262b',
-    '#868e96',
     '#fa5252',
-    '#e64980',
-    '#be4bdb',
     '#7950f2',
     '#4c6ef5',
-    '#228be6',
     '#15aabf',
-    '#12b886',
-    '#40c057',
     '#82c91e',
-    '#fab005',
     '#fd7e14'
 ]
 const cardStyles = {
@@ -34,16 +28,30 @@ const cardStyles = {
     },
     // https://mantine.dev/core/color-picker/?t=styles-api
     colorPicker: {
-        swatch: {
-            transition: "all 0.5s ease-in-out",
-            "&:hover": {
-                transition: "all 0.05s ease-in-out",
-                transform: "scale(1.1)",
-                filter: "brightness(1.5)"
+        swatchRoot: {
+            root: {
+                transition: "all 0.5s ease-in-out",
+                "&:hover": {
+                    zIndex: 1,
+                    cursor: "pointer",
+                    transition: "all 0.05s ease-in-out",
+                    transform: "scale(1.1)",
+                    filter: "brightness(1.5)"
+                },
             }
         },
         swatches: {
             padding: "1rem 0 0 0",
+        },
+        closeButton: {
+            position: "relative" as "relative",
+            top: "-4rem",
+            zIndex: 1,
+            transition: "all 0.3s ease-in-out",
+            "&:hover": {
+                transition: "all 0.05s ease-in-out",
+                transform: "scale(1.1)",
+            }
         }
     },
     fetchSuccess: {
@@ -84,7 +92,7 @@ export const LightCard = (props: LightsRowProps) => {
     const targetColor = useRef(color)
     // The currently lerped color between targetColor and previously lerped color.
     const lerpedColor = useRef(color)
-    // const [ swatches, setSwatches ] = useState<string[]>(swatchPresets)
+    const [ swatches, setSwatches ] = useLocalStorageState(`${light.id}-swatches`, swatchPresets)
     // Ensures we don't send a fetch request until we have stopped moving the color picker for some time.
     const colorChangeDebounceTimer = useRef(setTimeout(() => {}, 0))
 
@@ -239,6 +247,7 @@ export const LightCard = (props: LightsRowProps) => {
                 throw new Error("Rate limit exceeded.")
             }
             else {
+                setColor(color)
                 throw new Error("Something went wrong when setting color.")
             }
         }
@@ -291,6 +300,24 @@ export const LightCard = (props: LightsRowProps) => {
             )
             setColor(lerpedColor.current)
         }
+    }
+
+    function addSwatch(color: string) {
+        const newSwatches = [...swatches]
+        newSwatches.push(color)
+        setSwatches(newSwatches)
+    }
+
+    function deleteSwatch(color: string) {
+        const newSwatches = [...swatches]
+        const index = newSwatches.indexOf(color)
+        newSwatches.splice(index, 1)
+
+        if (newSwatches.length === 0) {
+            setSwatches(swatchPresets)
+            return
+        }
+        setSwatches(newSwatches)
     }
 
     // TODO: This may not need to be an effect since the only dependencies are props,
@@ -403,10 +430,36 @@ export const LightCard = (props: LightsRowProps) => {
                 // so we'll need to debounce in changeColor method.
                 onChange={(inputColor) => changeColor(inputColor)}
                 style={cardStyles.controlSurface}
-                styles={cardStyles.colorPicker}
-                swatches={swatchPresets}
-            />
+                styles={cardStyles.colorPicker}/>
 
+            {/* Color swatches */}
+            <Grid gutter={10}>
+                {swatches.map((hexValue: string, index: number) => {
+                    return (
+                        <div key={`${light.id}-${index}-${hexValue}`}>
+                            <ColorSwatch
+                                color={hexValue}
+                                radius="xs"
+                                size={80}
+                                onClick={() => changeColor(hexValue)}
+                                styles={cardStyles.colorPicker.swatchRoot}/>
+                            <CloseButton
+                                title="Delete color"
+                                size="sm" iconSize={15}
+                                style={cardStyles.colorPicker.closeButton}
+                                className="swatch-delete"
+                                onClick={() => deleteSwatch(hexValue)}/>
+                        </div>
+                    )
+                })}
+                <EmptyColorSwatch
+                    radius="xs"
+                    size={80}
+                    styles={cardStyles.colorPicker.swatchRoot}
+                    onClick={() => addSwatch(color)}/>
+            </Grid>
+
+            {/* Brightness Slider */}
             <Slider
                 size="xl"
                 thumbSize={25}
