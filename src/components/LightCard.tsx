@@ -2,7 +2,11 @@
 // TODO: Add swatches for color picker, and ability to save colors to local storage.
 import { multiplayer } from "../api/websocket-utilities"
 import { websocketURL } from "../config"
-import { Card, Text, Group, Slider, ColorPicker, ColorSwatch, Grid, CloseButton } from '@mantine/core'
+import {
+    Card, Text, Group,
+    Slider, ColorPicker, ColorSwatch,
+    Grid, CloseButton, Accordion
+} from '@mantine/core'
 import { useEffect, useRef, useState } from 'react'
 import { BadgeNetworkStatus, BadgeIlluminationStatus } from "./Badges"
 import { EmptyColorSwatch } from "./EmptyColorSwatch"
@@ -22,6 +26,11 @@ const swatchPresets = [
     '#82c91e',
     '#fd7e14'
 ]
+
+// in pixels
+const swatchSize = 60
+const swatchCloseOffset = 0
+
 const cardStyles = {
     controlSurface: {
         padding: "1.5rem 0"
@@ -45,7 +54,7 @@ const cardStyles = {
         },
         closeButton: {
             position: "relative" as "relative",
-            top: "-4rem",
+            top: `-${swatchSize + swatchCloseOffset}px`,
             zIndex: 1,
             transition: "all 0.3s ease-in-out",
             "&:hover": {
@@ -433,31 +442,42 @@ export const LightCard = (props: LightsRowProps) => {
                 styles={cardStyles.colorPicker}/>
 
             {/* Color swatches */}
-            <Grid gutter={10}>
-                {swatches.map((hexValue: string, index: number) => {
-                    return (
-                        <div key={`${light.id}-${index}-${hexValue}`}>
-                            <ColorSwatch
-                                color={hexValue}
+            <Accordion variant="contained" radius="xs" defaultValue="color presets" chevronPosition="left">
+                <Accordion.Item value="presets">
+                    <Accordion.Control>Presets</Accordion.Control>
+                    <Accordion.Panel>
+                        <Grid gutter={20}>
+                            {swatches.map((hexValue: string, index: number) => {
+                                return (
+                                    <div key={`${light.id}-${index}-${hexValue}`}>
+                                        <ColorSwatch
+                                            title={hexValue}
+                                            color={hexValue}
+                                            radius="xs"
+                                            size={swatchSize}
+                                            onClick={() => changeColor(hexValue)}
+                                            styles={cardStyles.colorPicker.swatchRoot}/>
+                                        <CloseButton
+                                            title="Delete color"
+                                            size="sm"
+                                            iconSize={15}
+                                            style={cardStyles.colorPicker.closeButton}
+                                            className="swatch-delete"
+                                            onClick={() => deleteSwatch(hexValue)}/>
+                                    </div>
+                                )
+                            })}
+                            <EmptyColorSwatch
+                                title="Add color"
                                 radius="xs"
-                                size={80}
-                                onClick={() => changeColor(hexValue)}
-                                styles={cardStyles.colorPicker.swatchRoot}/>
-                            <CloseButton
-                                title="Delete color"
-                                size="sm" iconSize={15}
-                                style={cardStyles.colorPicker.closeButton}
-                                className="swatch-delete"
-                                onClick={() => deleteSwatch(hexValue)}/>
-                        </div>
-                    )
-                })}
-                <EmptyColorSwatch
-                    radius="xs"
-                    size={80}
-                    styles={cardStyles.colorPicker.swatchRoot}
-                    onClick={() => addSwatch(color)}/>
-            </Grid>
+                                size={swatchSize}
+                                styles={cardStyles.colorPicker.swatchRoot}
+                                onClick={() => addSwatch(color)}/>
+                        </Grid>
+                    </Accordion.Panel>
+                </Accordion.Item>
+            </Accordion>
+
 
             {/* Brightness Slider */}
             <Slider
