@@ -108,6 +108,7 @@ export const LightCard = (props: LightCardProps) => {
     const targetColor = useRef(color)
     // The currently lerped color between targetColor and previously lerped color.
     const lerpedColor = useRef(color)
+    const clickedSwatch = useRef(false)
     const [ swatches, setSwatches ] = useLocalStorageState(`${light.id}-swatches`, swatchPresets)
     // Ensures we don't send a fetch request until we have stopped moving the color picker for some time.
     const colorChangeDebounceTimer = useRef(setTimeout(() => {}, 0))
@@ -218,15 +219,18 @@ export const LightCard = (props: LightCardProps) => {
         multiplayer.broadcastColorChange(light.id, inputColor)
         clearTimeout(colorChangeDebounceTimer.current)
 
+        const debounceWait = clickedSwatch.current ? 0 : 500
+
         colorChangeDebounceTimer.current = setTimeout(async () => {
             await toast.promise(sendColorChange(), {
                 loading: `Sending color to ${light.details.deviceName}`,
                 success: `${light.details.deviceName} color set to ${inputColor}!`,
                 error: "Color change failed!"
             })
-        }, 500)
+        }, debounceWait)
 
         async function sendColorChange() {
+            clickedSwatch.current = false
             multiplayer.broadcastColorChange(light.id, inputColor)
             updateGrabberColorText(inputColor)
             if (!await onlineCheck()) {
@@ -337,6 +341,7 @@ export const LightCard = (props: LightCardProps) => {
     }
 
     async function handleSwatchClick(color: string) {
+        clickedSwatch.current = true
         await changeColor(color)
     }
 
