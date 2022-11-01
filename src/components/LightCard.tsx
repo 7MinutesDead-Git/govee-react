@@ -11,11 +11,12 @@ import { useEffect, useRef, useState } from 'react'
 import { BadgeNetworkStatus, BadgeIlluminationStatus } from "./Badges"
 import { EmptyColorSwatch } from "./EmptyColorSwatch"
 import { NetworkConfig, devicesURL } from "../config"
-import { LightsRowProps, newBroadcast } from "../interfaces/interfaces"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { LightCardProps, newBroadcast } from "../interfaces/interfaces"
+import {useMutation, useQueryClient} from "@tanstack/react-query"
 import toast from 'react-hot-toast'
 import { hexToRGB, lerpColorHex, rgbToHex } from "../utils/helpers"
 import { useLocalStorageState } from "../utils/hooks";
+// import {getRateLimitTimeRemaining} from "../api/fetch-utilities";
 
 
 const swatchPresets = [
@@ -88,10 +89,16 @@ const cardStyles = {
 
 let lerpColorInterval = setInterval(() => {}, 16.7)
 
-export const LightCard = (props: LightsRowProps) => {
+export const LightCard = (props: LightCardProps) => {
     const queryClient = useQueryClient()
     const { light } = props
     const [ rateLimited, setRateLimited ] = useState(false)
+
+    // const { data: rateLimitTime = 0, refetch: refetchRateLimit } = useQuery(
+    //     ["rateLimitTime"],
+    //     getRateLimitTimeRemaining,
+    //     { enabled: rateLimited })
+
 
     // Color hooks
     // TODO: Change color state hooks to useMutation.
@@ -329,6 +336,10 @@ export const LightCard = (props: LightsRowProps) => {
         setSwatches(newSwatches)
     }
 
+    async function handleSwatchClick(color: string) {
+        await changeColor(color)
+    }
+
     // TODO: This may not need to be an effect since the only dependencies are props,
     //  and this is not syncing state with an external system.
     useEffect(() => {
@@ -416,8 +427,15 @@ export const LightCard = (props: LightsRowProps) => {
             component="section"
             style={{...cardFetchStyle, ...cardStyles.card}}>
 
+            {/*<LoadingOverlay*/}
+            {/*    visible={!!rateLimitTime && rateLimitTime > 0}*/}
+            {/*    loaderProps={{ size: 'xl', color: 'white', variant: 'bars' }}*/}
+            {/*    overlayBlur={0}*/}
+            {/*    overlayColor="#111111">*/}
+            {/*</LoadingOverlay>*/}
+
             <Group position="apart" mt="xs" mb="xs" spacing="xs" align="center">
-                <Text weight={800} color="white" size="lg">
+                <Text weight={800} color="white" size="xl">
                     {light.details.deviceName}
                 </Text>
                 <BadgeIlluminationStatus
@@ -455,8 +473,9 @@ export const LightCard = (props: LightsRowProps) => {
                                             color={hexValue}
                                             radius="xs"
                                             size={swatchSize}
-                                            onClick={() => changeColor(hexValue)}
-                                            styles={cardStyles.colorPicker.swatchRoot}/>
+                                            onClick={() => handleSwatchClick(hexValue)}
+                                            styles={cardStyles.colorPicker.swatchRoot}>
+                                        </ColorSwatch>
                                         <CloseButton
                                             title="Delete color"
                                             size="sm"
