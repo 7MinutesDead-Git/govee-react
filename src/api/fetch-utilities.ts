@@ -7,16 +7,14 @@ export async function getRateLimitExpireDate() {
     return data.date
 }
 
-export async function getRateLimitTimeRemaining() {
+export async function getRateLimitTimeRemaining(): Promise<number> {
     try {
         const response = await fetch(rateLimitExpireURL)
         const data = await response.json()
-        if (data.date === "Invalid Date") {
-            return "a bit"
-        }
-        return (data.date - Date.now()).toLocaleString()
+        return data.seconds
     }
     catch (e) {
+        console.log("Error fetching rate limit remaining time: ", e)
         throw new Error("Error getting rate limit time remaining")
     }
 }
