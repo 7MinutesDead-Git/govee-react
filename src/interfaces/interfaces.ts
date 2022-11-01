@@ -108,10 +108,10 @@ export interface newBroadcast {
     clientID: string
 }
 
-export interface LightsRowProps {
+export interface LightCardProps {
     light: goveeDeviceWithState,
 }
-export interface LightTableProps {
+export interface LightsGridProps {
     lights: goveeDeviceWithState[] | undefined,
     isLoading: boolean,
 }

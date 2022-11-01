@@ -1,6 +1,6 @@
 import {Loader, Center, Grid} from '@mantine/core'
 import {goveeDeviceNameOnly, goveeDeviceWithState} from '../interfaces/interfaces'
-import { LightTableProps } from "../interfaces/interfaces"
+import { LightsGridProps } from "../interfaces/interfaces"
 import { LightCard } from "./LightCard"
 
 const gridStyles = {
@@ -11,18 +11,18 @@ const gridStyles = {
     }
 }
 
-export const LightsGrid = (props: LightTableProps) => {
+export const LightsGrid = (props: LightsGridProps) => {
     if (props.isLoading) {
         return (
             <Center style={{minHeight: "80vh"}}>
-                <Loader color="violet" size="xl"/>
+                <Loader color="violet" size="xl" variant="bars"/>
             </Center>
         )
     }
     else if (!props.lights) {
         return (
             <Center style={{minHeight: "80vh"}}>
-                Need some lights?
+                No lights found. Are your lights registered and setup on Govee?
             </Center>
         )
     }
