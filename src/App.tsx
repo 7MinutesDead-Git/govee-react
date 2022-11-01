@@ -5,12 +5,8 @@ import { BadgeConnectionStatus } from "./components/Badges"
 import { LightsHeader } from "./components/LightsHeader"
 import { Toasty } from "./components/Toasty"
 import { QueryConfig } from "./config"
-import {
-    getAvailableLights,
-    getRateLimitTimeRemaining,
-    getStateOfLights
-} from "./api/fetch-utilities"
-import {LightsGrid} from "./components/LightsGrid"
+import { getAvailableLights, getStateOfLights } from "./api/fetch-utilities"
+import { LightsGrid } from "./components/LightsGrid"
 import { multiplayer } from "./api/websocket-utilities"
 
 
@@ -59,11 +55,6 @@ export default function App() {
             staleTime: QueryConfig.staleTime,
         })
 
-    const { data: rateLimitTimeRemaining } = useQuery(
-        ["rateLimitTimeRemaining"],
-        () => getRateLimitTimeRemaining(),
-        { enabled: isError })
-
 
     // Render
     if (isError) {
@@ -71,10 +62,7 @@ export default function App() {
             <MantineProvider theme={theme} withGlobalStyles withNormalizeCSS>
                 <Toasty />
                 <LightsHeader>
-                    <BadgeConnectionStatus
-                        online={!isInitialLoading}
-                        error={true}
-                        errorMessage={rateLimitTimeRemaining}/>
+                    <BadgeConnectionStatus online={!isInitialLoading} error={true}/>
                 </LightsHeader>
                 <Center>
                     <Text>{(
@@ -96,8 +84,8 @@ export default function App() {
                 <LightsHeader>
                     <BadgeConnectionStatus online={!isLoading} error={false}/>
                 </LightsHeader>
-                <Center>
-                    <Loader size="lg" />
+                <Center style={{minHeight: "80vh"}}>
+                    <Loader color="white" size="xl" variant="bars"/>
                 </Center>
             </MantineProvider>
         )
