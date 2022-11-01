@@ -59,6 +59,10 @@ body {
     transition: transform 0.1s ease-in-out;
     transform: scale(2.5);
 }
+
+.mantine-ColorSwatch-shadowOverlay {
+    box-shadow: none;
+}
 .effect-button {
     user-select: none;
     cursor: default;
