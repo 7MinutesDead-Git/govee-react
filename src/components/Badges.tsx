@@ -7,6 +7,8 @@ const badgeStyles = {
     badge: {
         transition: "all 0.3s ease-in-out",
         margin: "0 0.5rem",
+        // Mantine's LoadingOverlay component is apparently z-indexed at 399.
+        zIndex: 400,
     },
     networkOnline: {},
     networkOffline: {
@@ -18,7 +20,7 @@ const badgeStyles = {
     illuminationDark: {
         animation: "none",
         color: "#5a5c61",
-        backgroundColor: "#242528"
+        backgroundColor: "#242528",
     },
     // https://stackoverflow.com/a/69161332/13627106
     connectionStatus: {
