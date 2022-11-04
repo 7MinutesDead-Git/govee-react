@@ -1,7 +1,8 @@
-import {Loader, Center, Grid} from '@mantine/core'
-import {goveeDeviceNameOnly, goveeDeviceWithState} from '../interfaces/interfaces'
+import { Loader, Center, Grid } from '@mantine/core'
+import { goveeDeviceNameOnly, goveeDeviceWithState } from '../interfaces/interfaces'
 import { LightsGridProps } from "../interfaces/interfaces"
 import { LightCard } from "./LightCard"
+import { useMemo } from "react";
 
 const gridStyles = {
     grid: {
@@ -12,6 +13,14 @@ const gridStyles = {
 }
 
 export const LightsGrid = (props: LightsGridProps) => {
+    const sortedLights = useMemo(() => {
+        if (props.lights) {
+            return props.lights.sort((a: goveeDeviceNameOnly, b: goveeDeviceNameOnly) => {
+                return a.details.deviceName.toLowerCase().localeCompare(b.details.deviceName.toLowerCase())
+            })
+        }
+    }, [props.lights])
+
     if (props.isLoading) {
         return (
             <Center style={{minHeight: "80vh"}}>
@@ -19,16 +28,13 @@ export const LightsGrid = (props: LightsGridProps) => {
             </Center>
         )
     }
-    else if (!props.lights) {
+    else if (!sortedLights) {
         return (
             <Center style={{minHeight: "80vh"}}>
                 No lights found. Are your lights registered and setup on Govee?
             </Center>
         )
     }
-    const sortedLights = props.lights.sort((a: goveeDeviceNameOnly, b: goveeDeviceNameOnly) => {
-        return a.details.deviceName.toLowerCase().localeCompare(b.details.deviceName.toLowerCase())
-    })
 
     return (
         <Grid justify="center" align="center" columns={16} gutter="lg" style={gridStyles.grid}>
