@@ -350,6 +350,7 @@ export const LightCard = (props: LightCardProps) => {
 
     async function handleSwatchClick(preset: Preset) {
         clickedSwatch.current = true
+        setBrightnessSliderValue(preset.brightness)
         await changeColor(preset.color)
         await changeBrightness(preset.brightness)
     }
