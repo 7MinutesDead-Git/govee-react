@@ -11,7 +11,7 @@ import { useEffect, useRef, useState } from 'react'
 import { BadgeNetworkStatus, BadgeIlluminationStatus } from "./Badges"
 import { EmptyColorSwatch } from "./EmptyColorSwatch"
 import { NetworkConfig, devicesURL } from "../config"
-import { LightCardProps, newBroadcast } from "../interfaces/interfaces"
+import {LightCardProps, newBroadcast, Preset} from "../interfaces/interfaces"
 import {useMutation, useQueryClient} from "@tanstack/react-query"
 import toast from 'react-hot-toast'
 import { hexToRGB, lerpColorHex, rgbToHex } from "../utils/helpers"
@@ -19,13 +19,13 @@ import { useLocalStorageState } from "../utils/hooks";
 // import {getRateLimitTimeRemaining} from "../api/fetch-utilities";
 
 
-const swatchPresets = [
-    '#fa5252',
-    '#7950f2',
-    '#4c6ef5',
-    '#15aabf',
-    '#82c91e',
-    '#fd7e14'
+const swatchDefaults: Preset[] = [
+    { color: '#fa5252', brightness: 100 },
+    { color: '#7950f2', brightness: 100 },
+    { color: '#4c6ef5', brightness: 100 },
+    { color: '#15aabf', brightness: 100 },
+    { color: '#82c91e', brightness: 100 },
+    { color: '#000317', brightness: 10 },
 ]
 
 // in pixels
@@ -57,11 +57,18 @@ const cardStyles = {
             position: "relative" as "relative",
             top: `-${swatchSize + swatchCloseOffset}px`,
             zIndex: 1,
+            textShadow: "0 0 1px #000",
             transition: "all 0.3s ease-in-out",
             "&:hover": {
                 transition: "all 0.05s ease-in-out",
                 transform: "scale(1.1)",
             }
+        },
+        swatchBrightness: {
+            color: "#fff",
+            textShadow: "0 0 1px #000",
+            fontSize: "0.8rem",
+            fontWeight: "bold" as "bold",
         }
     },
     fetchSuccess: {
@@ -109,7 +116,7 @@ export const LightCard = (props: LightCardProps) => {
     // The currently lerped color between targetColor and previously lerped color.
     const lerpedColor = useRef(color)
     const clickedSwatch = useRef(false)
-    const [ swatches, setSwatches ] = useLocalStorageState(`${light.id}-swatches`, swatchPresets)
+    const [ swatches, setSwatches ] = useLocalStorageState(`${light.id}-swatches`, swatchDefaults)
     // Ensures we don't send a fetch request until we have stopped moving the color picker for some time.
     const colorChangeDebounceTimer = useRef(setTimeout(() => {}, 0))
 
@@ -324,25 +331,27 @@ export const LightCard = (props: LightCardProps) => {
 
     function addSwatch(color: string) {
         const newSwatches = [...swatches]
-        newSwatches.push(color)
+        const newPreset = { color: color, brightness: brightnessSliderValue }
+        newSwatches.push(newPreset)
         setSwatches(newSwatches)
     }
 
-    function deleteSwatch(color: string) {
+    function deleteSwatch(preset: Preset) {
         const newSwatches = [...swatches]
-        const index = newSwatches.indexOf(color)
+        const index = newSwatches.findIndex((item) => item.color === preset.color)
         newSwatches.splice(index, 1)
 
         if (newSwatches.length === 0) {
-            setSwatches(swatchPresets)
+            setSwatches(swatchDefaults)
             return
         }
         setSwatches(newSwatches)
     }
 
-    async function handleSwatchClick(color: string) {
+    async function handleSwatchClick(preset: Preset) {
         clickedSwatch.current = true
-        await changeColor(color)
+        await changeColor(preset.color)
+        await changeBrightness(preset.brightness)
     }
 
     // TODO: This may not need to be an effect since the only dependencies are props,
@@ -432,13 +441,6 @@ export const LightCard = (props: LightCardProps) => {
             component="section"
             style={{...cardFetchStyle, ...cardStyles.card}}>
 
-            {/*<LoadingOverlay*/}
-            {/*    visible={!!rateLimitTime && rateLimitTime > 0}*/}
-            {/*    loaderProps={{ size: 'xl', color: 'white', variant: 'bars' }}*/}
-            {/*    overlayBlur={0}*/}
-            {/*    overlayColor="#111111">*/}
-            {/*</LoadingOverlay>*/}
-
             <Group position="apart" mt="xs" mb="xs" spacing="xs" align="center">
                 <Text weight={800} color="white" size="xl">
                     {light.details.deviceName}
@@ -470,24 +472,26 @@ export const LightCard = (props: LightCardProps) => {
                     <Accordion.Control>Presets</Accordion.Control>
                     <Accordion.Panel>
                         <Grid gutter={20}>
-                            {swatches.map((hexValue: string, index: number) => {
+                            {swatches.map((colorPreset: Preset, index: number) => {
                                 return (
-                                    <div key={`${light.id}-${index}-${hexValue}`}>
+                                    <div key={`${light.id}-${index}-${colorPreset.color}`}>
                                         <ColorSwatch
-                                            title={hexValue}
-                                            color={hexValue}
+                                            title={colorPreset.color}
+                                            color={colorPreset.color}
                                             radius="xs"
                                             size={swatchSize}
-                                            onClick={() => handleSwatchClick(hexValue)}
+                                            onClick={() => handleSwatchClick(colorPreset)}
                                             styles={cardStyles.colorPicker.swatchRoot}>
+                                            <Text style={cardStyles.colorPicker.swatchBrightness}>
+                                                {colorPreset.brightness}
+                                            </Text>
                                         </ColorSwatch>
                                         <CloseButton
                                             title="Delete color"
                                             size="sm"
                                             iconSize={15}
                                             style={cardStyles.colorPicker.closeButton}
-                                            className="swatch-delete"
-                                            onClick={() => deleteSwatch(hexValue)}/>
+                                            onClick={() => deleteSwatch(colorPreset)}/>
                                     </div>
                                 )
                             })}
