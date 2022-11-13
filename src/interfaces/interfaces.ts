@@ -111,7 +111,13 @@ export interface newBroadcast {
 export interface LightCardProps {
     light: goveeDeviceWithState,
 }
+
 export interface LightsGridProps {
     lights: goveeDeviceWithState[] | undefined,
     isLoading: boolean,
+}
+
+export interface Preset {
+    color: string,
+    brightness: number,
 }
