@@ -2,22 +2,18 @@
 // TODO: Add swatches for color picker, and ability to save colors to local storage.
 import { multiplayer } from "../api/websocket-utilities"
 import { websocketURL } from "../config"
-import {
-    Card, Text, Group,
-    Slider, ColorPicker, ColorSwatch,
-    Grid, CloseButton, Accordion
-} from '@mantine/core'
+import { Card, Text, Group, Slider, ColorPicker,
+    ColorSwatch, Grid, CloseButton, Accordion } from '@mantine/core'
 import { useEffect, useRef, useState } from 'react'
 import { BadgeNetworkStatus, BadgeIlluminationStatus } from "./Badges"
 import { EmptyColorSwatch } from "./EmptyColorSwatch"
 import { NetworkConfig, devicesURL } from "../config"
-import {LightCardProps, newBroadcast, Preset} from "../interfaces/interfaces"
-import {useMutation, useQueryClient} from "@tanstack/react-query"
+import { LightCardProps, newBroadcast, Preset } from "../interfaces/interfaces"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import toast from 'react-hot-toast'
 import { hexToRGB, lerpColorHex, rgbToHex } from "../utils/helpers"
 import { useLocalStorageState } from "../utils/hooks";
-// import {getRateLimitTimeRemaining} from "../api/fetch-utilities";
-
+import { cardStyles, swatchSize } from "./LightCardStyles"
 
 const swatchDefaults: Preset[] = [
     { color: '#fa5252', brightness: 100 },
@@ -28,84 +24,12 @@ const swatchDefaults: Preset[] = [
     { color: '#000317', brightness: 10 },
 ]
 
-// in pixels
-const swatchSize = 60
-const swatchCloseOffset = 0
-
-const cardStyles = {
-    controlSurface: {
-        padding: "1.5rem 0"
-    },
-    // https://mantine.dev/core/color-picker/?t=styles-api
-    colorPicker: {
-        swatchRoot: {
-            root: {
-                transition: "all 0.5s ease-in-out",
-                "&:hover": {
-                    zIndex: 1,
-                    cursor: "pointer",
-                    transition: "all 0.05s ease-in-out",
-                    transform: "scale(1.1)",
-                    filter: "brightness(1.5)"
-                },
-            }
-        },
-        swatches: {
-            padding: "1rem 0 0 0",
-        },
-        closeButton: {
-            position: "relative" as "relative",
-            top: `-${swatchSize + swatchCloseOffset}px`,
-            zIndex: 1,
-            textShadow: "0 0 1px #000",
-            transition: "all 0.3s ease-in-out",
-            "&:hover": {
-                transition: "all 0.05s ease-in-out",
-                transform: "scale(1.1)",
-            }
-        },
-        swatchBrightness: {
-            color: "#fff",
-            textShadow: "0 0 1px #000",
-            fontSize: "0.8rem",
-            fontWeight: "bold" as "bold",
-        }
-    },
-    fetchSuccess: {
-        animation: "success 0.5s ease-in-out",
-    },
-    fetchFailure: {
-        animation: "failure 2s ease-in-out infinite",
-    },
-    fetchNewSync: {
-        animation: "newSync 4s ease-in-out infinite",
-    },
-    fetchReset: {
-        animation: "",
-    },
-    card: {
-        transition: "all 1s ease-in-out",
-        backgroundColor: "#25262b",
-        "&:hover": {
-            transition: "all 0.1s ease-in-out",
-            backgroundColor: "#6a0dff",
-            color: "white",
-        }
-    },
-}
-
 let lerpColorInterval = setInterval(() => {}, 16.7)
 
 export const LightCard = (props: LightCardProps) => {
     const queryClient = useQueryClient()
     const { light } = props
     const [ rateLimited, setRateLimited ] = useState(false)
-
-    // const { data: rateLimitTime = 0, refetch: refetchRateLimit } = useQuery(
-    //     ["rateLimitTime"],
-    //     getRateLimitTimeRemaining,
-    //     { enabled: rateLimited })
-
 
     // Color hooks
     // TODO: Change color state hooks to useMutation.
@@ -467,12 +391,12 @@ export const LightCard = (props: LightCardProps) => {
                 style={cardStyles.controlSurface}
                 styles={cardStyles.colorPicker}/>
 
-            {/* Color swatches */}
+            {/* Swatch Presets */}
             <Accordion variant="contained" radius="xs" defaultValue="color presets" chevronPosition="left">
                 <Accordion.Item value="presets">
                     <Accordion.Control>Presets</Accordion.Control>
                     <Accordion.Panel>
-                        <Grid gutter={20}>
+                        <Grid gutter={20} style={cardStyles.colorPicker.swatchesGrid}>
                             {swatches.map((colorPreset: Preset, index: number) => {
                                 return (
                                     <div key={`${light.id}-${index}-${colorPreset.color}`}>
@@ -500,7 +424,7 @@ export const LightCard = (props: LightCardProps) => {
                                 title="Add color"
                                 radius="xs"
                                 size={swatchSize}
-                                styles={cardStyles.colorPicker.swatchRoot}
+                                styles={{...cardStyles.colorPicker.swatchRoot}}
                                 onClick={() => addSwatch(color)}/>
                         </Grid>
                     </Accordion.Panel>
