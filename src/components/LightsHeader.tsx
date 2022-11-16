@@ -2,7 +2,6 @@ import {Header, Center} from "@mantine/core"
 import React, {useEffect, useRef} from "react"
 import { HeaderLinkButton } from "./HeaderLinkButton"
 import { SocialIcon } from "react-social-icons"
-import {EffectButton} from "./EffectButton";
 
 
 interface LightsHeaderProps {
@@ -44,27 +43,6 @@ export const LightsHeader = (props: LightsHeaderProps) => {
     const [ headerButtonAnimation, setHeaderButtonAnimation ] = React.useState("none")
     const headerAnimationCompleteDelay = useRef(0)
 
-    // Creates an array of EffectButtons to fill the header with staggered animations.
-    function handleMouseOver(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-        if (e.target instanceof HTMLAnchorElement) {
-            // TODO: Remove this inline style when mousing out somehow.
-            e.target.style.animation = styles.headerButtonNoAnimation
-        }
-        const buttons = Array(effectArrayWidth).fill(null)
-        const staggeredDelayButtons = buttons.map((button, index) => {
-            const delay = 0.05 * (buttons.length - index)
-            return <EffectButton animationDelay={0.05 * (buttons.length - index)} key={`effect-button-${index}-${delay}`}/>
-        })
-        headerAnimationCompleteDelay.current = buttons.length * 0.05
-        setHeaderButtonAnimation(() => styles.headerButtonAnimationNoHover(headerAnimationCompleteDelay.current))
-        setAnimationButtons(staggeredDelayButtons)
-    }
-    // Removes the EffectButtons from the header.
-    function handleMouseOut() {
-        setAnimationButtons(emptyEffectButtonArray)
-        setHeaderButtonAnimation("none")
-    }
-
     // Updates the number of EffectButtons in the header when the window is resized.
     useEffect(() => {
         function handleResize() {
@@ -77,8 +55,6 @@ export const LightsHeader = (props: LightsHeaderProps) => {
 
     return (
         <Header
-            onMouseOver={handleMouseOver}
-            onMouseOut={handleMouseOut}
             height={height}
             withBorder={true}
             fixed={true}

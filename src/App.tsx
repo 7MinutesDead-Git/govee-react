@@ -8,6 +8,9 @@ import { QueryConfig } from "./config"
 import { getAvailableLights, getStateOfLights } from "./api/fetch-utilities"
 import { LightsGrid } from "./components/LightsGrid"
 import { multiplayer } from "./api/websocket-utilities"
+import { LoggedIn } from "./providers/session"
+import React, {useState} from "react";
+import {LoginForm} from "./components/LoginForm";
 
 
 multiplayer.client.onopen = () => {
@@ -33,6 +36,7 @@ multiplayer.client.onerror = (error) => {
 
 
 export default function App() {
+    const [loggedIn, setLoggedIn] = useState(false)
     // Hooks
     const { error, data: connectedLights, isError, isLoading } = useQuery(
         ["connected"],
@@ -93,13 +97,18 @@ export default function App() {
 
     return (
         <MantineProvider theme={theme} withGlobalStyles withNormalizeCSS>
-            <Toasty />
-            <LightsHeader>
-                <BadgeConnectionStatus online={!isInitialLoading}/>
-            </LightsHeader>
-            <Stack align="center" justify="center" spacing="xl">
-                <LightsGrid lights={lights} isLoading={isInitialLoading}/>
-            </Stack>
+            <LoggedIn.Provider value={loggedIn}>
+                <Toasty />
+                <LightsHeader>
+                    <Center>
+                        {!isInitialLoading && <LoginForm loggedIn={loggedIn}/>}
+                        <BadgeConnectionStatus online={!isInitialLoading} error={false}/>
+                    </Center>
+                </LightsHeader>
+                <Stack align="center" justify="center" spacing="xl">
+                    <LightsGrid lights={lights} isLoading={isInitialLoading}/>
+                </Stack>
+            </LoggedIn.Provider>
         </MantineProvider>
     );
 }
