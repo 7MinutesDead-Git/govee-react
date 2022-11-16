@@ -4,7 +4,8 @@ import { multiplayer } from "../api/websocket-utilities"
 import { websocketURL } from "../config"
 import { Card, Text, Group, Slider, ColorPicker,
     ColorSwatch, Grid, CloseButton, Accordion } from '@mantine/core'
-import { useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
+import { LoggedIn } from "../providers/session"
 import { BadgeNetworkStatus, BadgeIlluminationStatus } from "./Badges"
 import { EmptyColorSwatch } from "./EmptyColorSwatch"
 import { NetworkConfig, devicesURL } from "../config"
@@ -27,6 +28,7 @@ const swatchDefaults: Preset[] = [
 let lerpColorInterval = setInterval(() => {}, 16.7)
 
 export const LightCard = (props: LightCardProps) => {
+    const loggedIn = useContext(LoggedIn)
     const queryClient = useQueryClient()
     const { light } = props
     const [ rateLimited, setRateLimited ] = useState(false)
@@ -96,6 +98,11 @@ export const LightCard = (props: LightCardProps) => {
     }
 
     async function changeBrightness(inputBrightness: number) {
+        if (!loggedIn) {
+            toast.error("You must be logged in to change brightness.")
+            setBrightnessSliderValue(props.light.status.brightness)
+            return
+        }
         multiplayer.broadcastBrightnessChange(light.id, inputBrightness)
         // Ensure we don't send a request to set an identical brightness.
         if (inputBrightness === lastBrightnessSliderValue.current) {
@@ -147,12 +154,19 @@ export const LightCard = (props: LightCardProps) => {
     // Sends a debounced request to the server to change the color of the light.
     // This is necessary since the color picker doesn't have an onChangeEnd() event like the slider does.
     async function changeColor(inputColor: string) {
-        multiplayer.broadcastColorChange(light.id, inputColor)
+        if (loggedIn) {
+            multiplayer.broadcastColorChange(light.id, inputColor)
+        }
         clearTimeout(colorChangeDebounceTimer.current)
-
         const debounceWait = clickedSwatch.current ? 0 : 500
 
         colorChangeDebounceTimer.current = setTimeout(async () => {
+            if (!loggedIn) {
+                toast.error("You must be logged in to change color.")
+                setColor(rgbToHex(light.status.color))
+                clickedSwatch.current = false
+                return
+            }
             await toast.promise(sendColorChange(), {
                 loading: `Sending color to ${light.details.deviceName}`,
                 success: `${light.details.deviceName} color set to ${inputColor}!`,
@@ -449,6 +463,7 @@ export const LightCard = (props: LightCardProps) => {
                     { value: 50, label: "Moody" },
                     { value: 90, label: "Bright" },
                 ]}/>
+            {props.children}
         </Card>
     );
 }
