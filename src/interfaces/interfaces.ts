@@ -1,3 +1,5 @@
+import { ReactNode } from "react"
+
 export enum h6003SupportedCommands {
     turn = "turn",
     brightness = "brightness",
@@ -110,6 +112,7 @@ export interface newBroadcast {
 
 export interface LightCardProps {
     light: goveeDeviceWithState,
+    children?: ReactNode
 }
 
 export interface LightsGridProps {
