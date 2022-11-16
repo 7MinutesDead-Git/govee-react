@@ -7,14 +7,15 @@ interface HeaderLinkButtonProps {
     href?: string
     onMouseOver?: () => void
     onMouseOut?: () => void
-    animation: string
+    onClick?: () => void
+    animation?: string
 }
 
 const styles = {
     button: (animation: string) => ({
         root: {
-            margin: "0 0.3rem",
-            padding: "0 0.5rem 0 0",
+            margin: "0 0.2rem",
+            padding: "0 0.6rem 0 0",
             transition: "all 1s ease-in-out",
             "&:hover": {
                 transition: "all 0.1s ease-in-out",
@@ -31,11 +32,12 @@ export const HeaderLinkButton = (props: HeaderLinkButtonProps) => {
         <Button
             onMouseOut={props.onMouseOut}
             onMouseOver={props.onMouseOver}
+            onClick={props.onClick}
             component="a"
             href={props.href}
             target="_blank"
             rel="noopener noreferrer"
-            styles={() => styles.button(props.animation)}
+            styles={() => styles.button(props.animation ? props.animation : "none")}
             color="indigo"
             variant="subtle"
             radius="xs"
