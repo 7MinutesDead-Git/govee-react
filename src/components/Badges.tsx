@@ -8,7 +8,7 @@ const badgeStyles = {
         transition: "all 0.3s ease-in-out",
         margin: "0 0.5rem",
         // Mantine's LoadingOverlay component is apparently z-indexed at 399.
-        zIndex: 400,
+        zIndex: 1,
     },
     networkOnline: {},
     networkOffline: {
@@ -25,7 +25,7 @@ const badgeStyles = {
     // https://stackoverflow.com/a/69161332/13627106
     connectionStatus: {
         animation: "blink 4s linear infinite",
-        margin: "0 0.5rem",
+        margin: "0.5rem",
     } as React.CSSProperties,
 }
 
