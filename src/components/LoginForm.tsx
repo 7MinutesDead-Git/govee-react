@@ -4,7 +4,7 @@ import { useForm } from '@mantine/form'
 import { HeaderLinkButton } from "./HeaderLinkButton"
 import { LoginFormProps, LoginFormValues } from "../interfaces/interfaces"
 import { LoginIcon } from "./Icons"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import toast from "react-hot-toast"
 import { authenticate } from "../api/fetch-utilities";
 
@@ -31,6 +31,7 @@ const formStyles = {
 }
 
 export const LoginForm = (props: LoginFormProps) => {
+    const queryClient = useQueryClient()
     const [showLoginForm, setShowLoginForm] = useState(false)
     const form = useForm({
         initialValues: {
@@ -43,9 +44,11 @@ export const LoginForm = (props: LoginFormProps) => {
         },
     })
     const authMutate = useMutation((input: LoginFormValues) => authenticate(input), {
-        onSuccess: () => {
+        onSuccess: async () => {
             setShowLoginForm(false)
             toast.success("Logged in successfully!")
+            // Force a refetch of all queries to update the UI for the new user.
+            await queryClient.invalidateQueries(["lights"])
         },
         onError: (error) => {
             // https://stackoverflow.com/a/67828747/13627106
