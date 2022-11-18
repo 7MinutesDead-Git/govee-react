@@ -9,6 +9,8 @@ export const websocketURL = baseWebSocketURL
 export const devicesURL = `${baseURL}devices`
 export const stateURL = `${devicesURL}/state`
 export const rateLimitExpireURL = `${devicesURL}/rate-limit`
+export const loginURL = `${baseURL}auth`
+
 export enum intervals {
     twoSeconds = 2000,
     fiveSeconds = 5000,

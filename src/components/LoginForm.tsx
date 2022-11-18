@@ -1,18 +1,12 @@
-import { Modal, PasswordInput, TextInput, Button } from "@mantine/core"
-import { useDisclosure } from "@mantine/hooks"
+import {Modal, PasswordInput, TextInput, Button, Loader} from "@mantine/core"
 import React, { useState } from "react"
 import { useForm } from '@mantine/form'
 import { HeaderLinkButton } from "./HeaderLinkButton"
+import { LoginFormProps, LoginFormValues } from "../interfaces/interfaces"
 import { LoginIcon } from "./Icons"
-
-interface LoginFormProps {
-    loggedIn: boolean,
-}
-
-interface LoginFormValues {
-    username: string,
-    password: string,
-}
+import { useMutation } from "@tanstack/react-query"
+import toast from "react-hot-toast"
+import { authenticate } from "../api/fetch-utilities";
 
 const formStyles = {
     form: {
@@ -37,7 +31,6 @@ const formStyles = {
 }
 
 export const LoginForm = (props: LoginFormProps) => {
-    const [ passwordVisible, { toggle: togglePasswordVisible } ] = useDisclosure(false)
     const [showLoginForm, setShowLoginForm] = useState(false)
     const form = useForm({
         initialValues: {
@@ -48,11 +41,23 @@ export const LoginForm = (props: LoginFormProps) => {
             username: (value) => (value.length < 3 ? 'Username must have at least 3 letters' : null),
             password: (value) => (value.length < 3 ? 'Password must have at least 3 letters' : null),
         },
-    });
+    })
+    const authMutate = useMutation((input: LoginFormValues) => authenticate(input), {
+        onSuccess: () => {
+            setShowLoginForm(false)
+            toast.success("Logged in successfully!")
+        },
+        onError: (error) => {
+            // https://stackoverflow.com/a/67828747/13627106
+            if (error instanceof Error) {
+                toast.error(error.message)
+            }
+        }
+    })
 
-    function handleSubmit(values: LoginFormValues) {
+    function handleSubmit() {
         form.validate()
-        console.log(values)
+        authMutate.mutate(form.values)
     }
 
     return (
@@ -62,25 +67,31 @@ export const LoginForm = (props: LoginFormProps) => {
                 centered={true}
                 onClose={() => setShowLoginForm(false)}
                 title="Hey there!">
-                <form onSubmit={form.onSubmit((values) => handleSubmit(values))} style={formStyles.form}>
+                <form onSubmit={form.onSubmit(() => handleSubmit())} style={formStyles.form}>
                     <TextInput
-                        withAsterisk
                         label="username"
                         placeholder="DayMan"
+                        autoComplete="username"
                         styles={formStyles.input}
                         {...form.getInputProps('username')}/>
                     <PasswordInput
-                        withAsterisk
                         label="password"
                         placeholder="master0ftheN1ghtm4n"
-                        visible={passwordVisible}
+                        autoComplete="current-password"
                         styles={formStyles.input}
-                        onVisibilityChange={togglePasswordVisible}
                         {...form.getInputProps('password')}/>
-                    <Button type="submit" variant="outline" color="teal" radius="xs">
-                        <LoginIcon style={{margin: "0 0.3rem 0 0"}} color="#2bfabe"/>
-                        Connect
-                    </Button>
+
+                    {authMutate.isLoading ? (
+                        <Button type="submit" variant="outline" color="teal" radius="xs" disabled>
+                            <Loader style={{margin: "0 0.3rem 0 0"}} color="#2bfabe"/>
+                            Connecting
+                        </Button>
+                    ) : (
+                        <Button type="submit" variant="outline" color="teal" radius="xs">
+                            <LoginIcon style={{margin: "0 0.3rem 0 0"}} color="#2bfabe"/>
+                            Connect
+                        </Button>
+                    )}
                 </form>
             </Modal>
             <HeaderLinkButton onClick={() => setShowLoginForm(!showLoginForm)}>

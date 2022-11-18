@@ -1,5 +1,24 @@
-import {devicesURL, rateLimitExpireURL, stateURL} from "../config"
-import {goveeDevice, goveeDevicesMap, goveeDeviceWithState, goveeStateResponse} from "../interfaces/interfaces"
+import { devicesURL, rateLimitExpireURL, stateURL, loginURL } from "../config"
+import { goveeDevice, goveeDevicesMap, goveeDeviceWithState, goveeStateResponse } from "../interfaces/interfaces"
+import { LoginFormValues } from "../interfaces/interfaces"
+
+
+export async function authenticate(values: LoginFormValues) {
+    const response = await fetch(loginURL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+    })
+
+    if (response.status === 200) {
+        return response.json()
+    }
+    else {
+        throw new Error("Please check your username and password")
+    }
+}
 
 export async function getRateLimitExpireDate() {
     const response = await fetch(rateLimitExpireURL)

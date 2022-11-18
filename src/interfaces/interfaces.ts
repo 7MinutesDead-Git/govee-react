@@ -124,3 +124,12 @@ export interface Preset {
     color: string,
     brightness: number,
 }
+
+export interface LoginFormProps {
+    loggedIn: boolean,
+}
+
+export interface LoginFormValues {
+    username: string,
+    password: string,
+}
