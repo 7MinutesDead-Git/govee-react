@@ -9,6 +9,7 @@ export async function authenticate(values: LoginFormValues) {
         headers: {
             "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify(values),
     })
 
