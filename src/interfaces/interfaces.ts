@@ -127,6 +127,7 @@ export interface Preset {
 
 export interface LoginFormProps {
     loggedIn: boolean,
+    setLoggedIn: (loggedIn: boolean) => void
 }
 
 export interface LoginFormValues {
