@@ -44,8 +44,10 @@ export const LoginForm = (props: LoginFormProps) => {
         },
     })
     const authMutate = useMutation((input: LoginFormValues) => authenticate(input), {
-        onSuccess: async () => {
+        onSuccess: async (data) => {
+            console.log(data)
             setShowLoginForm(false)
+            props.setLoggedIn(true)
             toast.success("Logged in successfully!")
             // Force a refetch of all queries to update the UI for the new user.
             await queryClient.invalidateQueries(["lights"])
