@@ -7,37 +7,13 @@ import { Toasty } from "./components/Toasty"
 import { QueryConfig } from "./config"
 import { getAvailableLights, getStateOfLights } from "./api/fetch-utilities"
 import { LightsGrid } from "./components/LightsGrid"
-import { multiplayer } from "./api/websocket-utilities"
 import { LoggedIn } from "./providers/session"
-import React, {useState} from "react";
-import {LoginForm} from "./components/LoginForm";
-
-
-multiplayer.client.onopen = () => {
-    console.log("Websocket connected")
-    setInterval(() => {
-        multiplayer.client.send("ping")
-    }, 5000)
-}
-multiplayer.client.onclose = () => {
-    console.log("Websocket closed. Reconnecting...")
-    setTimeout(() => {
-        multiplayer.reconnect()
-    }, 1000)
-}
-multiplayer.client.onerror = (error) => {
-    console.error("There was a websocket error for the multiplayer connection: ", error)
-    multiplayer.client.close()
-    console.log("Attempting to reconnect..")
-    setTimeout(() => {
-        multiplayer.reconnect()
-    }, 1000)
-}
+import { useState } from "react";
+import { LoginForm } from "./components/LoginForm"
 
 
 export default function App() {
     const [loggedIn, setLoggedIn] = useState(false)
-    // Hooks
     const { error, data: connectedLights, isError, isLoading } = useQuery(
         ["connected"],
         () => getAvailableLights(),
@@ -58,7 +34,6 @@ export default function App() {
             refetchIntervalInBackground: true,
             staleTime: QueryConfig.staleTime,
         })
-
 
     // Render
     if (isError) {
@@ -101,7 +76,7 @@ export default function App() {
                 <Toasty />
                 <LightsHeader>
                     <Center>
-                        {!isInitialLoading && <LoginForm loggedIn={loggedIn}/>}
+                        {!isInitialLoading && <LoginForm loggedIn={loggedIn} setLoggedIn={setLoggedIn}/>}
                         <BadgeConnectionStatus online={!isInitialLoading} error={false}/>
                     </Center>
                 </LightsHeader>
