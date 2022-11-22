@@ -44,7 +44,7 @@ export const LightCard = (props: LightCardProps) => {
     const clickedSwatch = useRef(false)
     const [ swatches, setSwatches ] = useLocalStorageState(`${light.id}-swatches`, swatchDefaults)
     // Ensures we don't send a fetch request until we have stopped moving the color picker for some time.
-    const colorChangeDebounceTimer = useRef(setTimeout(() => {}, 0))
+    const debounceTimer = useRef(setTimeout(() => {}, 0))
 
     // Brightness hooks
     // When the brightness is set to 0, the external API will instead reflect that as powerState "off".
@@ -125,7 +125,7 @@ export const LightCard = (props: LightCardProps) => {
             }
             const response = await fetch(devicesURL, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json'},
+                headers: { 'Content-Type': 'application/json', credentials: 'include' },
                 body: JSON.stringify(commandBody)
             })
             if (response.status === 200) {
@@ -157,10 +157,10 @@ export const LightCard = (props: LightCardProps) => {
         if (loggedIn) {
             multiplayer.broadcastColorChange(light.id, inputColor)
         }
-        clearTimeout(colorChangeDebounceTimer.current)
+        clearTimeout(debounceTimer.current)
         const debounceWait = clickedSwatch.current ? 0 : 500
 
-        colorChangeDebounceTimer.current = setTimeout(async () => {
+        debounceTimer.current = setTimeout(async () => {
             if (!loggedIn) {
                 toast.error("You must be logged in to change color.")
                 setColor(rgbToHex(light.status.color))
@@ -191,9 +191,7 @@ export const LightCard = (props: LightCardProps) => {
             }
             const response = await fetch(devicesURL, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json', credentials: 'include' },
                 body: JSON.stringify(commandBody)
             })
             if (response.status === 200) {
@@ -219,8 +217,8 @@ export const LightCard = (props: LightCardProps) => {
     }
 
     function updateGrabberColorText(inputColor: string) {
-        clearTimeout(colorChangeDebounceTimer.current)
-        colorChangeDebounceTimer.current = setTimeout(() => {
+        clearTimeout(debounceTimer.current)
+        debounceTimer.current = setTimeout(() => {
             setGrabberColor(inputColor)
         }, 100)
     }
@@ -247,7 +245,12 @@ export const LightCard = (props: LightCardProps) => {
     // Set our display brightness value to the slider value returned from the onChange() function,
     // and sets a reference boolean flag to indicate the value is currently changing.
     function handleBrightnessSliderChange(sliderValue: number) {
-        multiplayer.broadcastBrightnessChange(light.id, sliderValue)
+        // TODO: For some reason, since changing the brightness slider causes a re-render,
+        //  our loggedIn context is returning false, even though it's true.
+        //  Everyone else's loggedIn context is returning true, so I'm not sure what's going on.
+        // if (loggedIn) {
+            multiplayer.broadcastBrightnessChange(light.id, sliderValue)
+        // }
         brightnessSliderChanging.current = true
         setBrightnessSliderValue(sliderValue)
     }
