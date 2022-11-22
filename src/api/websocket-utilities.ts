@@ -8,9 +8,11 @@ export const multiplayer = {
     id: uuid(),
     client: new WebSocket(websocketURL!),
     commandBuffer: new Set<newBroadcast>(),
+
     reconnect() {
         this.client = new WebSocket(websocketURL!)
     },
+
     broadcastBrightnessChange(id: string, sliderValue: number): void {
         const message = JSON.stringify({
             device: id,
@@ -30,4 +32,36 @@ export const multiplayer = {
         })
         this.client.send(message)
     },
+}
+
+multiplayer.client.onopen = () => {
+    console.log("Socket established.")
+    try {
+        setInterval(() => {
+            if (multiplayer.client.readyState !== multiplayer.client.OPEN) {
+                multiplayer.client.close()
+                multiplayer.reconnect()
+            }
+            multiplayer.client.send("ping")
+        }, 5000)
+    }
+    catch (error) {
+        console.error("There was an error sending a ping to the server: ", error)
+        multiplayer.client.close()
+        multiplayer.reconnect()
+    }
+}
+multiplayer.client.onclose = () => {
+    console.log("Websocket closed. Reconnecting...")
+    setTimeout(() => {
+        multiplayer.reconnect()
+    }, 1000)
+}
+multiplayer.client.onerror = (error) => {
+    console.error("There was a websocket error for the multiplayer connection: ", error)
+    multiplayer.client.close()
+    setTimeout(() => {
+        console.log("Attempting to reconnect..")
+        multiplayer.reconnect()
+    }, 1000)
 }

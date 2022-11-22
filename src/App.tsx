@@ -7,33 +7,13 @@ import { Toasty } from "./components/Toasty"
 import { QueryConfig } from "./config"
 import { getAvailableLights, getStateOfLights } from "./api/fetch-utilities"
 import { LightsGrid } from "./components/LightsGrid"
-import { multiplayer } from "./api/websocket-utilities"
-
-
-multiplayer.client.onopen = () => {
-    console.log("Websocket connected")
-    setInterval(() => {
-        multiplayer.client.send("ping")
-    }, 5000)
-}
-multiplayer.client.onclose = () => {
-    console.log("Websocket closed. Reconnecting...")
-    setTimeout(() => {
-        multiplayer.reconnect()
-    }, 1000)
-}
-multiplayer.client.onerror = (error) => {
-    console.error("There was a websocket error for the multiplayer connection: ", error)
-    multiplayer.client.close()
-    console.log("Attempting to reconnect..")
-    setTimeout(() => {
-        multiplayer.reconnect()
-    }, 1000)
-}
+import { LoggedIn } from "./providers/session"
+import { useState } from "react";
+import { LoginForm } from "./components/LoginForm"
 
 
 export default function App() {
-    // Hooks
+    const [loggedIn, setLoggedIn] = useState(false)
     const { error, data: connectedLights, isError, isLoading } = useQuery(
         ["connected"],
         () => getAvailableLights(),
@@ -54,7 +34,6 @@ export default function App() {
             refetchIntervalInBackground: true,
             staleTime: QueryConfig.staleTime,
         })
-
 
     // Render
     if (isError) {
@@ -93,13 +72,18 @@ export default function App() {
 
     return (
         <MantineProvider theme={theme} withGlobalStyles withNormalizeCSS>
-            <Toasty />
-            <LightsHeader>
-                <BadgeConnectionStatus online={!isInitialLoading}/>
-            </LightsHeader>
-            <Stack align="center" justify="center" spacing="xl">
-                <LightsGrid lights={lights} isLoading={isInitialLoading}/>
-            </Stack>
+            <LoggedIn.Provider value={loggedIn}>
+                <Toasty />
+                <LightsHeader>
+                    <Center>
+                        {!isInitialLoading && <LoginForm loggedIn={loggedIn} setLoggedIn={setLoggedIn}/>}
+                        <BadgeConnectionStatus online={!isInitialLoading} error={false}/>
+                    </Center>
+                </LightsHeader>
+                <Stack align="center" justify="center" spacing="xl">
+                    <LightsGrid lights={lights} isLoading={isInitialLoading}/>
+                </Stack>
+            </LoggedIn.Provider>
         </MantineProvider>
     );
 }
