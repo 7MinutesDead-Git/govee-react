@@ -1,6 +1,7 @@
 import { devicesURL, rateLimitExpireURL, stateURL, loginURL } from "../config"
 import { goveeDevice, goveeDevicesMap, goveeDeviceWithState, goveeStateResponse } from "../interfaces/interfaces"
 import { LoginFormValues } from "../interfaces/interfaces"
+import { multiplayer } from "./websocket-utilities"
 
 
 export async function authenticate(values: LoginFormValues) {
@@ -14,10 +15,28 @@ export async function authenticate(values: LoginFormValues) {
     })
 
     if (response.status === 200) {
+        multiplayer.client.close()
+        multiplayer.reconnect()
         return response.json()
     }
     else {
         throw new Error("Please check your username and password")
+    }
+}
+
+export async function logout() {
+    const response = await fetch(loginURL, {
+        method: "DELETE",
+        credentials: "include",
+    })
+
+    if (response.status === 200) {
+        multiplayer.client.close()
+        multiplayer.reconnect()
+        return response.json()
+    }
+    else {
+        throw new Error("Error logging out")
     }
 }
 
