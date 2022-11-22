@@ -6,7 +6,7 @@ import { LoginFormProps, LoginFormValues } from "../interfaces/interfaces"
 import { LoginIcon } from "./Icons"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import toast from "react-hot-toast"
-import { authenticate } from "../api/fetch-utilities";
+import { authenticate, logout } from "../api/fetch-utilities";
 
 const formStyles = {
     form: {
@@ -65,6 +65,12 @@ export const LoginForm = (props: LoginFormProps) => {
         authMutate.mutate(form.values)
     }
 
+    async function handleLogout() {
+        await logout()
+        props.setLoggedIn(false)
+        toast.success("Logged out! See ya later.")
+    }
+
     return (
         <>
             <Modal
@@ -99,8 +105,11 @@ export const LoginForm = (props: LoginFormProps) => {
                     )}
                 </form>
             </Modal>
-            <HeaderLinkButton onClick={() => setShowLoginForm(!showLoginForm)}>
-                <LoginIcon/>
+            <HeaderLinkButton onClick={props.loggedIn ?
+                () => handleLogout() :
+                () => setShowLoginForm(!showLoginForm)
+            }>
+                <LoginIcon color={props.loggedIn ? "red": "white"}/>
                 {props.loggedIn ? "Logout" : "Login"}
             </HeaderLinkButton>
         </>

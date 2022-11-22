@@ -8,9 +8,11 @@ export const multiplayer = {
     id: uuid(),
     client: new WebSocket(websocketURL!),
     commandBuffer: new Set<newBroadcast>(),
+
     reconnect() {
         this.client = new WebSocket(websocketURL!)
     },
+
     broadcastBrightnessChange(id: string, sliderValue: number): void {
         const message = JSON.stringify({
             device: id,
