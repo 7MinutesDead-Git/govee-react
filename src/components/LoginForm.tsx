@@ -105,9 +105,12 @@ export const LoginForm = (props: LoginFormProps) => {
                     )}
                 </form>
             </Modal>
-            <HeaderLinkButton onClick={props.loggedIn ?
-                () => handleLogout() :
-                () => setShowLoginForm(!showLoginForm)
+            <HeaderLinkButton
+                color={props.loggedIn ? "red" : "teal"}
+                variant={props.loggedIn ? "subtle" : "filled"}
+                onClick={props.loggedIn ?
+                    () => handleLogout() :
+                    () => setShowLoginForm(!showLoginForm)
             }>
                 <LoginIcon color={props.loggedIn ? "red": "white"}/>
                 {props.loggedIn ? "Logout" : "Login"}

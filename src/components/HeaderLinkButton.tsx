@@ -4,7 +4,9 @@ import React from "react"
 interface HeaderLinkButtonProps {
     children?: React.ReactNode
     color?: string
+    variant?: "filled" | "light" | "outline" | "default" | "subtle"
     href?: string
+    className?: string
     onMouseOver?: () => void
     onMouseOut?: () => void
     onClick?: () => void
@@ -30,6 +32,7 @@ const styles = {
 export const HeaderLinkButton = (props: HeaderLinkButtonProps) => {
     return (
         <Button
+            className={props.className ?? ""}
             onMouseOut={props.onMouseOut}
             onMouseOver={props.onMouseOver}
             onClick={props.onClick}
@@ -38,8 +41,8 @@ export const HeaderLinkButton = (props: HeaderLinkButtonProps) => {
             target="_blank"
             rel="noopener noreferrer"
             styles={() => styles.button(props.animation ? props.animation : "none")}
-            color="indigo"
-            variant="subtle"
+            color={props.color ?? "indigo"}
+            variant={props.variant ?? "subtle"}
             radius="xs"
             size="sm">
             {props.children}
