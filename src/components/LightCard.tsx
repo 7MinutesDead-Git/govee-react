@@ -2,8 +2,10 @@
 // TODO: Add swatches for color picker, and ability to save colors to local storage.
 import { multiplayer } from "../api/websocket-utilities"
 import { websocketURL } from "../config"
-import { Card, Text, Group, Slider, ColorPicker,
-    ColorSwatch, Grid, CloseButton, Accordion } from '@mantine/core'
+import {
+    Card, Text, Group, Slider, ColorPicker,
+    ColorSwatch, Grid, CloseButton, Accordion
+} from '@mantine/core'
 import { useContext, useEffect, useRef, useState } from 'react'
 import { LoggedIn } from "../providers/session"
 import { BadgeNetworkStatus, BadgeIlluminationStatus } from "./Badges"
@@ -15,6 +17,7 @@ import toast from 'react-hot-toast'
 import { hexToRGB, lerpColorHex, rgbToHex } from "../utils/helpers"
 import { useLocalStorageState } from "../utils/hooks";
 import { cardStyles, swatchSize } from "./LightCardStyles"
+import {LoginOverlay} from "./LoginOverlay";
 
 const swatchDefaults: Preset[] = [
     { color: '#fa5252', brightness: 100 },
@@ -467,6 +470,7 @@ export const LightCard = (props: LightCardProps) => {
                     { value: 90, label: "Bright" },
                 ]}/>
             {props.children}
+            <LoginOverlay/>
         </Card>
     );
 }
