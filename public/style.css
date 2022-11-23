@@ -4,6 +4,8 @@ body {
 #root {
     margin: 6rem auto;
 }
+
+
 .btn-lights-status {
     transition: all 0.2s ease-in-out;
 }
@@ -75,6 +77,7 @@ body {
     opacity: 0;
 }
 
+
 @keyframes blink {
     0% {
         opacity: 1;
@@ -86,7 +89,6 @@ body {
         opacity: 1;
     }
 }
-
 @keyframes headerEffect {
     0% {
         opacity: 1;
@@ -97,7 +99,6 @@ body {
         opacity: 0;
     }
 }
-
 @keyframes headerButtonComplete {
     0% {
         background-color: white;
@@ -108,7 +109,6 @@ body {
         color: white;
     }
 }
-
 @keyframes headerButtonCompleteNoHover {
     0% {
         background-color: #6a0dff;
@@ -118,7 +118,6 @@ body {
         background-color: #121111;
     }
 }
-
 @keyframes success {
     0% {
         background-color: rgba(79,255,175,0.15);
@@ -127,7 +126,6 @@ body {
         background-color: #25262b;
     }
 }
-
 @keyframes failure {
     0% {
         background-color: #25262b;
@@ -139,7 +137,6 @@ body {
         background-color: #25262b;
     }
 }
-
 @keyframes newSync {
     0% {
         background-color: rgba(76,161,255,0.25);
@@ -149,5 +146,22 @@ body {
     }
     100% {
         background-color: rgba(76,161,255,0.25);
+    }
+}
+
+
+@media screen and (max-width: 640px) {
+    .link-github {
+        display: none;
+    }
+}
+@media screen and (max-width: 530px) {
+    .link-linkedin {
+        display: none;
+    }
+}
+@media screen and (max-width: 410px) {
+    .link-portfolio {
+        display: none;
     }
 }

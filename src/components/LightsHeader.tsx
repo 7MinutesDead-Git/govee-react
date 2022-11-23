@@ -38,12 +38,13 @@ export const LightsHeader = (props: LightsHeaderProps) => {
 
     return (
         <Header
+            className="header-social-links"
             height={height}
             withBorder={true}
             fixed={true}
             style={styles.lightsHeader}>
             <Center>
-                <HeaderLinkButton href="https://7minutes.dev/?referrer=govee">
+                <HeaderLinkButton href="https://7minutes.dev/?referrer=govee" className="link-portfolio">
                     <SocialIcon
                         network=""
                         target="_blank"
@@ -53,7 +54,7 @@ export const LightsHeader = (props: LightsHeaderProps) => {
                         bgColor="transparent"/>
                     7minutes.dev
                 </HeaderLinkButton>
-                <HeaderLinkButton href="https://www.linkedin.com/in/alex-gulikers-28256a219/">
+                <HeaderLinkButton href="https://www.linkedin.com/in/alex-gulikers-28256a219/" className="link-linkedin">
                     <SocialIcon
                         network="linkedin"
                         target="_blank"
@@ -63,7 +64,7 @@ export const LightsHeader = (props: LightsHeaderProps) => {
                         bgColor="transparent"/>
                     contact
                 </HeaderLinkButton>
-                <HeaderLinkButton href="https://github.com/7MinutesDead-Git/govee-react">
+                <HeaderLinkButton href="https://github.com/7MinutesDead-Git/govee-react" className="link-github">
                     <SocialIcon
                         network="github"
                         target="_blank"
