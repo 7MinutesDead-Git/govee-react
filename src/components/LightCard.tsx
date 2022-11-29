@@ -101,6 +101,7 @@ export const LightCard = (props: LightCardProps) => {
     }
 
     async function changeBrightness(inputBrightness: number) {
+        toast.dismiss()
         if (!loggedIn) {
             toast.error("You must be logged in to change brightness.")
             setBrightnessSliderValue(props.light.status.brightness)
@@ -164,6 +165,7 @@ export const LightCard = (props: LightCardProps) => {
         const debounceWait = clickedSwatch.current ? 0 : 500
 
         debounceTimer.current = setTimeout(async () => {
+            toast.dismiss()
             if (!loggedIn) {
                 toast.error("You must be logged in to change color.")
                 setColor(rgbToHex(light.status.color))

@@ -10,5 +10,5 @@ export const theme: MantineThemeOverride = {
     md: 1000,
     lg: 1300,
     xl: 1800,
-  }
+  },
 };

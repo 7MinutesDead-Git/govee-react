@@ -14,6 +14,7 @@ export const LoginOverlay = (props: LoginOverlayProps) => {
     const [color, setColor] = useState(43)
 
     function handleClick() {
+        toast.dismiss()
         setColor(100)
         toast.error("You need to login first.")
         setTimeout(() => {

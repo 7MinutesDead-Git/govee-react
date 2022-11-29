@@ -1,4 +1,4 @@
-import { Toaster } from "react-hot-toast"
+import { Toaster, ToastBar, toast } from "react-hot-toast"
 import { intervals } from "../config"
 
 const toastStyles = {
@@ -7,6 +7,7 @@ const toastStyles = {
             borderRadius: '10px',
             background: '#333',
             color: '#fff',
+            userSelect: 'none' as 'none',
         },
         duration: intervals.twoSeconds,
     },
@@ -17,8 +18,24 @@ const toastStyles = {
         }
     }
 }
+const containerStyle = {
+    top: 75,
+}
 export const Toasty = () => {
     return (
-        <Toaster position="top-center" toastOptions={toastStyles.default}/>
+        <Toaster toastOptions={toastStyles.default} containerStyle={containerStyle}>
+            {(t) => (
+                <div onClick={() => toast.dismiss(t.id)}>
+                    <ToastBar toast={t}>
+                        {({ icon, message }) => (
+                            <>
+                                {icon}
+                                {message}
+                            </>
+                        )}
+                    </ToastBar>
+                </div>
+            )}
+        </Toaster>
     )
 }

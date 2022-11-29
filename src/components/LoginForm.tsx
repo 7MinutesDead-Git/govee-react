@@ -71,6 +71,11 @@ export const LoginForm = (props: LoginFormProps) => {
         toast.success("Logged out! See ya later.")
     }
 
+    function handleLogin() {
+        setShowLoginForm(!showLoginForm)
+        toast.dismiss()
+    }
+
     return (
         <>
             <Modal
@@ -110,7 +115,7 @@ export const LoginForm = (props: LoginFormProps) => {
                 variant={props.loggedIn ? "subtle" : "filled"}
                 onClick={props.loggedIn ?
                     () => handleLogout() :
-                    () => setShowLoginForm(!showLoginForm)
+                    () => handleLogin()
             }>
                 <LoginIcon color={props.loggedIn ? "red": "white"}/>
                 {props.loggedIn ? "Logout" : "Login"}
