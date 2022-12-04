@@ -359,7 +359,11 @@ export const LightCard = (props: LightCardProps) => {
 
         ws.onmessage = (event) => {
             // Keepalive pings don't need to be processed as commands, so don't add them to our data set.
+            if (event.data === "pong") {
+                return
+            }
             if (event.data === "ping") {
+                ws.send("pong")
                 return
             }
             const command: newBroadcast = JSON.parse(event.data)

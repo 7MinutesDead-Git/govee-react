@@ -1,4 +1,4 @@
-import {Loader, Center, Grid } from '@mantine/core'
+import { Loader, Center, Grid } from '@mantine/core'
 import { goveeDeviceNameOnly, goveeDeviceWithState } from '../interfaces/interfaces'
 import { LightsGridProps } from "../interfaces/interfaces"
 import { LightCard } from "./LightCard"
