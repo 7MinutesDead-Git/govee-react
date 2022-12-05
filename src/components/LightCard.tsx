@@ -4,8 +4,11 @@ import { multiplayer } from "../api/websocket-utilities"
 import { websocketURL } from "../config"
 import {
     Card, Text, Group, Slider, ColorPicker,
-    ColorSwatch, Grid, CloseButton, Accordion
+    ColorSwatch, Grid, CloseButton, Accordion,
+    CopyButton, Button
 } from '@mantine/core'
+import { motion } from "framer-motion"
+import { IconCopy } from '@tabler/icons'
 import { useContext, useEffect, useRef, useState } from 'react'
 import { LoggedIn } from "../providers/session"
 import { BadgeNetworkStatus, BadgeIlluminationStatus } from "./Badges"
@@ -404,7 +407,24 @@ export const LightCard = (props: LightCardProps) => {
 
             <Group position="apart" mt="xs" mb="xs" spacing="xs" align="center">
                 <BadgeNetworkStatus online={light.status.online} updating={brightnessMutation.isLoading}/>
-                <Text color={grabberColor}>{grabberColor}</Text>
+                {/* Hex color copy button */}
+                <CopyButton value={grabberColor} timeout={1000}>
+                    {({ copied, copy }) => (
+                        <motion.div
+                            whileHover={{
+                                scale: 1.1,
+                                transition: { duration: 0.1 },
+                            }}
+                            whileTap={{ scale: 0.9 }}>
+                            <Button onClick={copy} color="dark" radius="xs" size="xs" uppercase styles={cardStyles.hexColorButton}>
+                                <Text color={copied ? "white" : grabberColor} weight={500} style={cardStyles.hexColorText}>
+                                    {copied ? "copied" : grabberColor}
+                                </Text>
+                                <IconCopy color={copied ? "white" : grabberColor} size={16}/>
+                            </Button>
+                        </motion.div>
+                    )}
+                </CopyButton>
             </Group>
 
             <ColorPicker
@@ -425,7 +445,9 @@ export const LightCard = (props: LightCardProps) => {
                         <Grid gutter={20} style={cardStyles.colorPicker.swatchesGrid}>
                             {swatches.map((colorPreset: Preset, index: number) => {
                                 return (
-                                    <div key={`${light.id}-${index}-${colorPreset.color}`}>
+                                    <motion.div key={`${light.id}-${index}-${colorPreset.color}`}
+                                                whileHover={{ filter: "brightness(1.3)" }}
+                                                whileTap={{ scale: 0.9 }}>
                                         <ColorSwatch
                                             title={colorPreset.color}
                                             color={colorPreset.color}
@@ -443,7 +465,7 @@ export const LightCard = (props: LightCardProps) => {
                                             iconSize={15}
                                             style={cardStyles.colorPicker.closeButton}
                                             onClick={() => deleteSwatch(colorPreset)}/>
-                                    </div>
+                                    </motion.div>
                                 )
                             })}
                             <EmptyColorSwatch

@@ -67,4 +67,12 @@ export const cardStyles = {
             color: "white",
         }
     },
+    hexColorText: {
+        padding: "0 0.25rem 0 0",
+    },
+    hexColorButton: {
+        root: {
+            filter: "brightness(1.45)",
+        }
+    }
 }

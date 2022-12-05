@@ -23,13 +23,12 @@ export const LoginOverlay = (props: LoginOverlayProps) => {
     }
 
     return (
-        <>
-            {!loggedIn && <Overlay
-                opacity={0.7}
-                gradient={`linear-gradient(128deg, rgba(${color},43,43,1) 0%, rgba(0,0,0,1) 100%);`}
-                color="black"
-                zIndex={3}
-                onClick={handleClick}/>}
-        </>
+        <>{!loggedIn && <Overlay
+            opacity={0.7}
+            gradient={`linear-gradient(128deg, rgba(${color},43,43,1) 0%, rgba(0,0,0,1) 100%);`}
+            color="black"
+            zIndex={3}
+            onClick={handleClick}/>
+        }</>
     )
 }
