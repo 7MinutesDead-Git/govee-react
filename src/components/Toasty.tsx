@@ -19,7 +19,7 @@ const toastStyles = {
     }
 }
 const containerStyle = {
-    top: 75,
+    top: 72,
 }
 export const Toasty = () => {
     return (
