@@ -1,5 +1,5 @@
-// TODO: Split out color and brightness state and methods into separate components
-// TODO: Add swatches for color picker, and ability to save colors to local storage.
+// TODO: Begin splitting out this behemoth of a component into smaller components
+//  and extract the state away from the rendering.
 import { multiplayer } from "../api/websocket-utilities"
 import { websocketURL } from "../config"
 import {
