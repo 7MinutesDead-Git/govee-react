@@ -184,7 +184,6 @@ export const LightCard = (props: LightCardProps) => {
 
         async function sendColorChange() {
             clickedSwatch.current = false
-            multiplayer.broadcastColorChange(light.id, inputColor)
             updateGrabberColorText(inputColor)
             if (!await onlineCheck()) {
                 throw new Error("Device offline")
