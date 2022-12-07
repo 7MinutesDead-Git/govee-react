@@ -1,21 +1,20 @@
 // TODO: Begin splitting out this behemoth of a component into smaller components
 //  and extract the state away from the rendering.
-import { multiplayer } from "../api/websocket-utilities"
-import { websocketURL } from "../config"
-import { Card, Text, Group, Slider, ColorPicker, CopyButton, Button } from '@mantine/core'
-import { motion } from "framer-motion"
-import { IconCopy } from '@tabler/icons'
+import { multiplayer } from "../../api/websocket-utilities"
+import { websocketURL } from "../../config"
+import { Card, Text, Group, Slider, ColorPicker } from '@mantine/core'
 import { useContext, useEffect, useRef, useState } from 'react'
-import { LoggedIn } from "../providers/session"
-import { BadgeNetworkStatus, BadgeIlluminationStatus } from "./Badges"
-import { NetworkConfig, devicesURL } from "../config"
-import { LightCardProps, newBroadcast } from "../interfaces/interfaces"
+import { LoggedIn } from "../../providers/session"
+import { BadgeIlluminationStatus } from "../Badges"
+import { NetworkConfig, devicesURL } from "../../config"
+import { LightCardProps, newBroadcast } from "../../interfaces/interfaces"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import toast from 'react-hot-toast'
-import { hexToRGB, lerpColorHex, rgbToHex } from "../utils/helpers"
+import { hexToRGB, lerpColorHex, rgbToHex } from "../../utils/helpers"
 import { cardStyles } from "./LightCardStyles"
-import { LoginOverlay } from "./LoginOverlay"
+import { LoginOverlay } from "../LoginOverlay"
 import { SwatchesDisplay } from "./controls/Swatches"
+import {LightCardStatusBar} from "./LightCardStatusBar";
 
 
 let lerpColorInterval = setInterval(() => {}, 16.7)
@@ -364,27 +363,10 @@ export const LightCard = (props: LightCardProps) => {
                     rateLimited={rateLimited}/>
             </Group>
 
-            <Group position="apart" mt="xs" mb="xs" spacing="xs" align="center">
-                <BadgeNetworkStatus online={light.status.online} updating={brightnessMutation.isLoading}/>
-                {/* Hex color copy button */}
-                <CopyButton value={grabberColor} timeout={1000}>
-                    {({ copied, copy }) => (
-                        <motion.div
-                            whileHover={{
-                                scale: 1.1,
-                                transition: { duration: 0.1 },
-                            }}
-                            whileTap={{ scale: 0.9 }}>
-                            <Button onClick={copy} color="dark" radius="xs" size="xs" uppercase styles={cardStyles.hexColorButton}>
-                                <Text color={copied ? "white" : grabberColor} weight={500} style={cardStyles.hexColorText}>
-                                    {copied ? "copied" : grabberColor}
-                                </Text>
-                                <IconCopy color={copied ? "white" : grabberColor} size={16}/>
-                            </Button>
-                        </motion.div>
-                    )}
-                </CopyButton>
-            </Group>
+            <LightCardStatusBar
+                grabberColor={grabberColor}
+                isLoading={brightnessMutation.isLoading}
+                light={light}/>
 
             <ColorPicker
                 fullWidth={true}
