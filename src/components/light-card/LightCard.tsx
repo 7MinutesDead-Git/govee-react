@@ -289,7 +289,7 @@ export const LightCard = (props: LightCardProps) => {
             ws.close()
             flush()
         }
-    }, [cardFetchStyle, light.id])
+    }, [cardFetchStyle, light.id, handleSocketUpdate])
 
 
     return (
