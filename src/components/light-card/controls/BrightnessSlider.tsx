@@ -1,6 +1,6 @@
 import { Slider } from "@mantine/core"
 import { cardStyles } from "../LightCardStyles"
-import { multiplayer } from "../../../api/websocket-utilities"
+import { multiplayer } from "../../../utils/api/websocket-utilities"
 import { goveeDeviceWithState } from "../../../interfaces/interfaces"
 import { MutableRefObject, useRef } from "react"
 import { UseMutationResult } from "@tanstack/react-query"

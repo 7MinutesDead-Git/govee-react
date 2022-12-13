@@ -1,6 +1,6 @@
-import { devicesURL, rateLimitExpireURL, stateURL, loginURL } from "../config"
-import { goveeDevice, goveeDevicesMap, goveeDeviceWithState, goveeStateResponse } from "../interfaces/interfaces"
-import { LoginFormValues } from "../interfaces/interfaces"
+import { devicesURL, rateLimitExpireURL, stateURL, loginURL } from "../../config"
+import { goveeDevice, goveeDevicesMap, goveeDeviceWithState, goveeStateResponse } from "../../interfaces/interfaces"
+import { LoginFormValues } from "../../interfaces/interfaces"
 import { multiplayer } from "./websocket-utilities"
 
 
