@@ -124,6 +124,43 @@ export const LightCard = (props: LightCardProps) => {
         })
     }
 
+    async function changeTemperature(inputTemperature: number) {
+        toast.dismiss()
+        if (!loggedIn) {
+            toast.error("You must be logged in to change the temperature.")
+            setColorTemperature(props.light.status.colorTem ?? 5450)
+            return
+        }
+        multiplayer.broadcastTemperatureChange(light.id, inputTemperature)
+        await toast.promise(temperatureFetch(), {
+            loading: `Changing temperature to ${inputTemperature}K for ${light.details.deviceName}`,
+            success: `${light.details.deviceName} temperature now at ${inputTemperature}K`,
+            error: "Temperature change failed!"
+        })
+
+        async function temperatureFetch() {
+            if (!await onlineCheck()) {
+                throw new Error("Device offline")
+            }
+            const response = await sendLightCommand(light, inputTemperature)
+            if (response.status === statusCodes.success) {
+                setColor("#fff")
+                flashCardOnSuccess()
+                setRateLimited(false)
+            }
+            else if (response.status === statusCodes.rateLimited) {
+                flashCardOnFailure()
+                setRateLimited(true)
+                throw new Error("Rate limited")
+            }
+            else {
+                console.log("Hmm, something went wrong.", response)
+                throw new Error("Something went wrong")
+            }
+        }
+
+    }
+
     // Sends a debounced request to the server to change the color of the light.
     // This is necessary since the color picker doesn't have an onChangeEnd() event like the slider does.
     async function changeColor(inputColor: string) {
