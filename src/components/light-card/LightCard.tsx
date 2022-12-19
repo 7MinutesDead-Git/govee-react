@@ -331,6 +331,14 @@ export const LightCard = (props: LightCardProps) => {
                 illuminating={illuminating}
                 rateLimited={rateLimited}
             />
+            <SwatchesDisplay
+                light={light}
+                brightnessSliderValue={brightnessSliderValue}
+                changeBrightness={async (presetBrightness) => brightnessMutation.mutate(presetBrightness)}
+                changeColor={async (presetColor) => colorMutation.mutate(presetColor)}
+                color={color}
+                setBrightnessSliderValue={(presetBrightness: number) => setBrightnessSliderValue(presetBrightness)}
+            />
             <ColorPicker
                 fullWidth={true}
                 value={color}
@@ -338,14 +346,6 @@ export const LightCard = (props: LightCardProps) => {
                 onChange={(inputColor) => changeColor(inputColor)}
                 style={cardStyles.controlSurface}
                 styles={cardStyles.colorPicker}
-            />
-            <SwatchesDisplay
-                light={light}
-                brightnessSliderValue={brightnessSliderValue}
-                changeBrightness={(presetBrightness) => changeBrightness(presetBrightness)}
-                changeColor={(presetColor) => changeColor(presetColor)}
-                color={color}
-                setBrightnessSliderValue={(presetBrightness: number) => setBrightnessSliderValue(presetBrightness)}
             />
             <BrightnessSlider
                 light={light}
