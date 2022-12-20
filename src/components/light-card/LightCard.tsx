@@ -39,6 +39,12 @@ export const LightCard = (props: LightCardProps) => {
     const clickedSwatch = useRef(false)
     // Ensures we don't send a fetch request until we have stopped moving the color picker for some time.
     const debounceTimer = useRef(setTimeout(() => {}, 0))
+    // TODO: Currently only used for swatches, as it makes color picker movements laggy for some reason.. debugging.
+    const colorMutation = useMutation((color: string) => changeColor(color), {
+        onSuccess: () => {
+            queryClient.invalidateQueries(["lights", light.id])
+        }
+    })
 
     // Brightness hooks
     const isIlluminating = getIlluminationStatus(light)
@@ -326,7 +332,7 @@ export const LightCard = (props: LightCardProps) => {
 
             <LightCardStatusHeader
                 grabberColor={grabberColor}
-                isLoading={brightnessMutation.isLoading}
+                isLoading={brightnessMutation.isLoading || colorMutation.isLoading || temperatureMutation.isLoading}
                 light={light}
                 illuminating={illuminating}
                 rateLimited={rateLimited}
