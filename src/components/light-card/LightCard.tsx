@@ -209,11 +209,12 @@ export const LightCard = (props: LightCardProps) => {
             }
             const response = await sendLightCommand(light, inputColor)
             if (response.status === statusCodes.success) {
-                setColor(inputColor)
                 // Sending black as a color request to their API turns the light off lol.
                 inputColor === "#000000" ? updateIllumination(0) : updateIllumination(light.status.brightness)
                 flashCardOnSuccess()
                 setRateLimited(false)
+                setColorTemperature(temperatures.middle)
+                setColor(inputColor)
             }
             else if (response.status === statusCodes.rateLimited) {
                 setColor(color)
