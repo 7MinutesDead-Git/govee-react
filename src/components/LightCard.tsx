@@ -2,34 +2,21 @@
 //  and extract the state away from the rendering.
 import { multiplayer } from "../api/websocket-utilities"
 import { websocketURL } from "../config"
-import {
-    Card, Text, Group, Slider, ColorPicker,
-    ColorSwatch, Grid, CloseButton, Accordion,
-    CopyButton, Button
-} from '@mantine/core'
+import { Card, Text, Group, Slider, ColorPicker, CopyButton, Button } from '@mantine/core'
 import { motion } from "framer-motion"
 import { IconCopy } from '@tabler/icons'
 import { useContext, useEffect, useRef, useState } from 'react'
 import { LoggedIn } from "../providers/session"
 import { BadgeNetworkStatus, BadgeIlluminationStatus } from "./Badges"
-import { EmptyColorSwatch } from "./EmptyColorSwatch"
 import { NetworkConfig, devicesURL } from "../config"
-import { LightCardProps, newBroadcast, Preset } from "../interfaces/interfaces"
+import { LightCardProps, newBroadcast } from "../interfaces/interfaces"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import toast from 'react-hot-toast'
 import { hexToRGB, lerpColorHex, rgbToHex } from "../utils/helpers"
-import { useLocalStorageState } from "../utils/hooks";
-import { cardStyles, swatchSize } from "./LightCardStyles"
-import {LoginOverlay} from "./LoginOverlay";
+import { cardStyles } from "./LightCardStyles"
+import { LoginOverlay } from "./LoginOverlay"
+import { SwatchesDisplay } from "./controls/Swatches"
 
-const swatchDefaults: Preset[] = [
-    { color: '#fa5252', brightness: 100 },
-    { color: '#7950f2', brightness: 100 },
-    { color: '#4c6ef5', brightness: 100 },
-    { color: '#15aabf', brightness: 100 },
-    { color: '#82c91e', brightness: 100 },
-    { color: '#000317', brightness: 10 },
-]
 
 let lerpColorInterval = setInterval(() => {}, 16.7)
 
@@ -48,7 +35,6 @@ export const LightCard = (props: LightCardProps) => {
     // The currently lerped color between targetColor and previously lerped color.
     const lerpedColor = useRef(color)
     const clickedSwatch = useRef(false)
-    const [ swatches, setSwatches ] = useLocalStorageState(`${light.id}-swatches`, swatchDefaults)
     // Ensures we don't send a fetch request until we have stopped moving the color picker for some time.
     const debounceTimer = useRef(setTimeout(() => {}, 0))
 
@@ -277,32 +263,6 @@ export const LightCard = (props: LightCardProps) => {
         }
     }
 
-    function addSwatch(color: string) {
-        const newSwatches = [...swatches]
-        const newPreset = { color: color, brightness: brightnessSliderValue }
-        newSwatches.push(newPreset)
-        setSwatches(newSwatches)
-    }
-
-    function deleteSwatch(preset: Preset) {
-        const newSwatches = [...swatches]
-        const index = newSwatches.findIndex((item) => item.color === preset.color)
-        newSwatches.splice(index, 1)
-
-        if (newSwatches.length === 0) {
-            setSwatches(swatchDefaults)
-            return
-        }
-        setSwatches(newSwatches)
-    }
-
-    async function handleSwatchClick(preset: Preset) {
-        clickedSwatch.current = true
-        setBrightnessSliderValue(preset.brightness)
-        await changeColor(preset.color)
-        await changeBrightness(preset.brightness)
-    }
-
     // TODO: This may not need to be an effect since the only dependencies are props,
     //  and this is not syncing state with an external system.
     useEffect(() => {
@@ -436,47 +396,14 @@ export const LightCard = (props: LightCardProps) => {
                 style={cardStyles.controlSurface}
                 styles={cardStyles.colorPicker}/>
 
-            {/* Swatch Presets */}
-            <Accordion variant="contained" radius="xs" defaultValue="color presets" chevronPosition="left">
-                <Accordion.Item value="presets">
-                    <Accordion.Control>Presets</Accordion.Control>
-                    <Accordion.Panel>
-                        <Grid gutter={20} style={cardStyles.colorPicker.swatchesGrid}>
-                            {swatches.map((colorPreset: Preset, index: number) => {
-                                return (
-                                    <motion.div key={`${light.id}-${index}-${colorPreset.color}`}
-                                                whileHover={{ filter: "brightness(1.3)" }}
-                                                whileTap={{ scale: 0.9 }}>
-                                        <ColorSwatch
-                                            title={colorPreset.color}
-                                            color={colorPreset.color}
-                                            radius="xs"
-                                            size={swatchSize}
-                                            onClick={() => handleSwatchClick(colorPreset)}
-                                            styles={cardStyles.colorPicker.swatchRoot}>
-                                            <Text style={cardStyles.colorPicker.swatchBrightness}>
-                                                {colorPreset.brightness}
-                                            </Text>
-                                        </ColorSwatch>
-                                        <CloseButton
-                                            title="Delete color"
-                                            size="sm"
-                                            iconSize={15}
-                                            style={cardStyles.colorPicker.closeButton}
-                                            onClick={() => deleteSwatch(colorPreset)}/>
-                                    </motion.div>
-                                )
-                            })}
-                            <EmptyColorSwatch
-                                title="Add color"
-                                radius="xs"
-                                size={swatchSize}
-                                styles={{...cardStyles.colorPicker.swatchRoot}}
-                                onClick={() => addSwatch(color)}/>
-                        </Grid>
-                    </Accordion.Panel>
-                </Accordion.Item>
-            </Accordion>
+            <SwatchesDisplay
+                light={light}
+                brightnessSliderValue={brightnessSliderValue}
+                changeBrightness={(presetBrightness) => changeBrightness(presetBrightness)}
+                changeColor={(presetColor) => changeColor(presetColor)}
+                color={color}
+                setBrightnessSliderValue={(presetBrightness: number) => setBrightnessSliderValue(presetBrightness)}
+            />
 
 
             {/* Brightness Slider */}
