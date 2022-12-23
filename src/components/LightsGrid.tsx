@@ -1,7 +1,7 @@
 import { Loader, Center, Grid } from '@mantine/core'
 import { goveeDeviceNameOnly, goveeDeviceWithState } from '../interfaces/interfaces'
 import { LightsGridProps } from "../interfaces/interfaces"
-import { LightCard } from "./LightCard"
+import { LightCard } from "./light-card/LightCard"
 import { useMemo } from "react"
 
 const gridStyles = {

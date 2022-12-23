@@ -1,5 +1,5 @@
-import { goveeDeviceWithState, Preset } from "../../interfaces/interfaces"
-import { useLocalStorageState } from "../../utils/hooks"
+import { goveeDeviceWithState, Preset } from "../../../interfaces/interfaces"
+import { useLocalStorageState } from "../../../utils/hooks"
 import { useRef } from "react"
 import { Accordion, CloseButton, ColorSwatch, Grid, Text } from "@mantine/core"
 import { cardStyles, swatchSize } from "../LightCardStyles"
