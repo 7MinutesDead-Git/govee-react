@@ -219,35 +219,35 @@ export const LightCard = (props: LightCardProps) => {
         }
     }
 
-    // TODO: It would be really nice to extract functions like this out of the component.
-    function handleSocketUpdate(styleTimer: NodeJS.Timeout, update: MultiplayerMessage) {
-        // Helps give a hint that another user is interacting with the light.
-        if (cardFetchStyle !== cardStyles.fetchNewSync) {
-            clearTimeout(styleTimer)
-            setCardFetchStyle(cardStyles.fetchNewSync)
-            setTimeout(() => setCardFetchStyle(cardStyles.fetchReset), 2000)
-        }
-        if (update.type === "brightness") {
-            const num = Number(update.value)
-            setBrightnessSliderValue(num)
-            updateIllumination(num)
-        }
-        // Receiving color input changes will be lerped to smooth out transitions despite latency.
-        else if (update.type === "color") {
-            updateGrabberColorText(update.value)
-            targetColor.current = update.value
-            if (targetColor.current !== lerpedColor.current) {
-                clearInterval(lerpColorInterval)
-                lerpColorInterval = setInterval(lerpNetworkColorChange, NetworkConfig.lerpUpdateRate)
-            }
-        }
-    }
-
 
     // Effect for managing UI sync with websocket updates from other users.
     // Throttles the updates according to the NetworkConfig.socketUpdateRate.
     // https://stackoverflow.com/a/66616016/13627106
     useEffect(() => {
+        // TODO: It would be really nice to extract functions like this out of the component.
+        function handleSocketUpdate(styleTimer: NodeJS.Timeout, update: MultiplayerMessage) {
+            // Helps give a hint that another user is interacting with the light.
+            if (cardFetchStyle !== cardStyles.fetchNewSync) {
+                clearTimeout(styleTimer)
+                setCardFetchStyle(cardStyles.fetchNewSync)
+                setTimeout(() => setCardFetchStyle(cardStyles.fetchReset), 2000)
+            }
+            if (update.type === "brightness") {
+                const num = Number(update.value)
+                setBrightnessSliderValue(num)
+                updateIllumination(num)
+            }
+            // Receiving color input changes will be lerped to smooth out transitions despite latency.
+            else if (update.type === "color") {
+                updateGrabberColorText(update.value)
+                targetColor.current = update.value
+                if (targetColor.current !== lerpedColor.current) {
+                    clearInterval(lerpColorInterval)
+                    lerpColorInterval = setInterval(lerpNetworkColorChange, NetworkConfig.lerpUpdateRate)
+                }
+            }
+        }
+
         const ws = new WebSocket(websocketURL!)
         const commandBuffer: Set<newBroadcast> = new Set()
         let styleTimer = setTimeout(() => {}, 0)
@@ -289,7 +289,7 @@ export const LightCard = (props: LightCardProps) => {
             ws.close()
             flush()
         }
-    }, [cardFetchStyle, light.id, handleSocketUpdate])
+    }, [cardFetchStyle, light.id])
 
 
     return (
