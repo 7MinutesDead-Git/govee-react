@@ -134,3 +134,8 @@ export interface LoginFormValues {
     username: string,
     password: string,
 }
+
+export interface MultiplayerMessage {
+    type: string,
+    value: string
+}

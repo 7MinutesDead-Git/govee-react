@@ -48,15 +48,19 @@ export const cardStyles = {
     },
     fetchSuccess: {
         animation: "success 0.5s ease-in-out",
+        border: "1px solid #53ffb4",
     },
     fetchFailure: {
         animation: "failure 2s ease-in-out infinite",
+        border: "1px solid #ff0000",
     },
     fetchNewSync: {
-        animation: "newSync 4s ease-in-out infinite",
+        animation: "",
+        border: "1px solid #0091ff",
     },
     fetchReset: {
         animation: "",
+        border: "1px solid #373a40",
     },
     card: {
         transition: "all 1s ease-in-out",

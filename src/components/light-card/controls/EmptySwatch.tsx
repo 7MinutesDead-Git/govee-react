@@ -9,7 +9,7 @@ interface EmptyColorSwatchProps {
     onClick: () => void
 }
 
-export const EmptyColorSwatch = (props: EmptyColorSwatchProps) => {
+export const EmptySwatch = (props: EmptyColorSwatchProps) => {
     return (
         <ColorSwatch
             title={props.title}
