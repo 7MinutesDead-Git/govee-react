@@ -2,10 +2,9 @@
 //  and extract the state away from the rendering.
 import { multiplayer } from "../../api/websocket-utilities"
 import { websocketURL } from "../../config"
-import { Card, Text, Group, Slider, ColorPicker } from '@mantine/core'
+import { Card, ColorPicker } from '@mantine/core'
 import { useContext, useEffect, useRef, useState } from 'react'
 import { LoggedIn } from "../../providers/session"
-import { BadgeIlluminationStatus } from "../Badges"
 import { NetworkConfig, devicesURL } from "../../config"
 import { LightCardProps, newBroadcast } from "../../interfaces/interfaces"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
@@ -14,7 +13,8 @@ import { hexToRGB, lerpColorHex, rgbToHex } from "../../utils/helpers"
 import { cardStyles } from "./LightCardStyles"
 import { LoginOverlay } from "../LoginOverlay"
 import { SwatchesDisplay } from "./controls/Swatches"
-import {LightCardStatusBar} from "./LightCardStatusBar";
+import { LightCardStatusHeader } from "./LightCardStatusHeader"
+import { BrightnessSlider } from "./controls/BrightnessSlider"
 
 
 let lerpColorInterval = setInterval(() => {}, 16.7)
@@ -50,7 +50,6 @@ export const LightCard = (props: LightCardProps) => {
     const brightnessSliderChanging = useRef(false)
     const [ brightnessSliderValue, setBrightnessSliderValue] = useState(initialBrightness)
     const lastBrightnessSliderValue = useRef(light.status.brightness)
-    const lastBrightnessFetched = useRef(light.status.brightness)
     const brightnessMutation = useMutation(
         (value: number) => changeBrightness(value),
         {
@@ -215,38 +214,6 @@ export const LightCard = (props: LightCardProps) => {
         }, 100)
     }
 
-    // Setting the value of the slider to the light.status.brightness props would lock the slider animation in place
-    // since the props wouldn't change until the next sync. That meant the value would reset as you dragged the slider,
-    // since dragging the slider triggers a re-render.
-    // So, this function allows the slider value to update freely based on the value being returned from onChange()
-    // within the slider component, and will also update the brightness value when the parent refetching finds updated data
-    // and causes a re-render.
-    function handleBrightnessSliderValue() {
-        if (brightnessSliderChanging.current) {
-            return brightnessSliderValue
-        }
-        else if (lastBrightnessFetched.current !== light.status.brightness) {
-            lastBrightnessFetched.current = light.status.brightness
-            return light.status.brightness
-        }
-        else {
-            return brightnessSliderValue
-        }
-    }
-
-    // Set our display brightness value to the slider value returned from the onChange() function,
-    // and sets a reference boolean flag to indicate the value is currently changing.
-    function handleBrightnessSliderChange(sliderValue: number) {
-        // TODO: For some reason, since changing the brightness slider causes a re-render,
-        //  our loggedIn context is returning false, even though it's true.
-        //  Everyone else's loggedIn context is returning true, so I'm not sure what's going on.
-        // if (loggedIn) {
-            multiplayer.broadcastBrightnessChange(light.id, sliderValue)
-        // }
-        brightnessSliderChanging.current = true
-        setBrightnessSliderValue(sliderValue)
-    }
-
     // Lerp between current color displayed in the UI, and target color received from broadcast.
     // This helps smooth out the color change when multiple users are changing the color,
     // and with higher latency to the server, and also allows for using a lower socket update rate
@@ -353,20 +320,13 @@ export const LightCard = (props: LightCardProps) => {
             component="section"
             style={{...cardFetchStyle, ...cardStyles.card}}>
 
-            <Group position="apart" mt="xs" mb="xs" spacing="xs" align="center">
-                <Text weight={800} color="white" size="xl">
-                    {light.details.deviceName}
-                </Text>
-                <BadgeIlluminationStatus
-                    online={light.status.online}
-                    illuminating={illuminating}
-                    rateLimited={rateLimited}/>
-            </Group>
-
-            <LightCardStatusBar
+            <LightCardStatusHeader
                 grabberColor={grabberColor}
                 isLoading={brightnessMutation.isLoading}
-                light={light}/>
+                light={light}
+                illuminating={illuminating}
+                rateLimited={rateLimited}
+            />
 
             <ColorPicker
                 fullWidth={true}
@@ -376,7 +336,8 @@ export const LightCard = (props: LightCardProps) => {
                 // so we'll need to debounce in changeColor method.
                 onChange={(inputColor) => changeColor(inputColor)}
                 style={cardStyles.controlSurface}
-                styles={cardStyles.colorPicker}/>
+                styles={cardStyles.colorPicker}
+            />
 
             <SwatchesDisplay
                 light={light}
@@ -387,24 +348,14 @@ export const LightCard = (props: LightCardProps) => {
                 setBrightnessSliderValue={(presetBrightness: number) => setBrightnessSliderValue(presetBrightness)}
             />
 
+            <BrightnessSlider
+                light={light}
+                brightnessSliderChanging={brightnessSliderChanging}
+                brightnessSliderValue={brightnessSliderValue}
+                setBrightnessSliderValue={(newValue: number) => setBrightnessSliderValue(newValue)}
+                brightnessMutation={brightnessMutation}
+            />
 
-            {/* Brightness Slider */}
-            <Slider
-                size="xl"
-                thumbSize={25}
-                step={10}
-                color="dark"
-                precision={0}
-                value={handleBrightnessSliderValue()}
-                defaultValue={light.status.powerState === "on" ? light.status.brightness : 0}
-                style={cardStyles.controlSurface}
-                onChange={(currentValue) => handleBrightnessSliderChange(currentValue)}
-                onChangeEnd={(chosenValue) => brightnessMutation.mutate(chosenValue)}
-                marks={[
-                    { value: 10, label: "Dim" },
-                    { value: 50, label: "Moody" },
-                    { value: 90, label: "Bright" },
-                ]}/>
             {props.children}
             <LoginOverlay/>
         </Card>
