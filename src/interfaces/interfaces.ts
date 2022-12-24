@@ -103,7 +103,7 @@ export interface goveeDeviceNameOnly {
     }
 }
 
-export interface newBroadcast {
+export interface multiplayerBroadcast {
     device: string,
     type: string,
     value: string,
