@@ -1,21 +1,22 @@
 // TODO: Begin splitting out this behemoth of a component into smaller components
 //  and extract the state away from the rendering.
-import { multiplayer } from "../../api/websocket-utilities"
+import { multiplayer } from "../../utils/api/websocket-utilities"
 import { websocketURL } from "../../config"
 import { Card, ColorPicker } from '@mantine/core'
 import { useContext, useEffect, useRef, useState } from 'react'
 import { LoggedIn } from "../../providers/session"
-import { NetworkConfig, devicesURL } from "../../config"
-import { LightCardProps, MultiplayerMessage, newBroadcast } from "../../interfaces/interfaces"
+import { NetworkConfig } from "../../config"
+import { LightCardProps, multiplayerBroadcast } from "../../interfaces/interfaces"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import toast from 'react-hot-toast'
-import { hexToRGB, lerpColorHex, rgbToHex } from "../../utils/colorFunctions"
+import { lerpColorHex, rgbToHex } from "../../utils/colorFunctions"
 import { cardStyles } from "./LightCardStyles"
 import { LoginOverlay } from "../LoginOverlay"
 import { SwatchesDisplay } from "./controls/Swatches"
 import { LightCardStatusHeader } from "./LightCardStatusHeader"
 import { BrightnessSlider } from "./controls/BrightnessSlider"
 import { getIlluminationStatus } from "./utils/getIlluminationStatus";
+import {sendLightCommand} from "./utils/commands";
 
 
 let lerpColorInterval = setInterval(() => {}, 16.7)
@@ -96,23 +97,11 @@ export const LightCard = (props: LightCardProps) => {
         lastBrightnessSliderValue.current = inputBrightness
         brightnessSliderChanging.current = false
 
-        const commandBody = {
-            "device": light.id,
-            "model": light.details.model,
-            "cmd": {
-                "name": "brightness",
-                "value": inputBrightness
-            }
-        }
         async function brightnessFetch() {
             if (!await onlineCheck()) {
                 throw new Error("Device offline")
             }
-            const response = await fetch(devicesURL, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json', credentials: 'include' },
-                body: JSON.stringify(commandBody)
-            })
+            const response = await sendLightCommand(light, inputBrightness)
             if (response.status === 200) {
                 updateIllumination(inputBrightness)
                 flashCardOnSuccess()
@@ -129,6 +118,7 @@ export const LightCard = (props: LightCardProps) => {
                 throw new Error("Something went wrong")
             }
         }
+
         await toast.promise(brightnessFetch(), {
             loading: `Sending ${inputBrightness}% brightness to ${light.details.deviceName}`,
             success: `${light.details.deviceName} brightness now at ${inputBrightness}%!`,
@@ -166,25 +156,11 @@ export const LightCard = (props: LightCardProps) => {
             if (!await onlineCheck()) {
                 throw new Error("Device offline")
             }
-            const commandBody = {
-                "device": light.id,
-                "model": light.details.model,
-                "cmd": {
-                    "name": "color",
-                    "value": hexToRGB(inputColor)
-                }
-            }
-            const response = await fetch(devicesURL, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json', credentials: 'include' },
-                body: JSON.stringify(commandBody)
-            })
+            const response = await sendLightCommand(light, inputColor)
             if (response.status === 200) {
                 setColor(inputColor)
                 // Sending black as a color request to their API turns the light off lol.
-                inputColor === "#000000" ?
-                    updateIllumination(0) :
-                    updateIllumination(light.status.brightness)
+                inputColor === "#000000" ? updateIllumination(0) : updateIllumination(light.status.brightness)
                 flashCardOnSuccess()
                 setRateLimited(false)
             }
@@ -225,7 +201,7 @@ export const LightCard = (props: LightCardProps) => {
     // https://stackoverflow.com/a/66616016/13627106
     useEffect(() => {
         // TODO: It would be really nice to extract functions like this out of the component.
-        function handleSocketUpdate(styleTimer: NodeJS.Timeout, update: MultiplayerMessage) {
+        function handleSocketUpdate(update: multiplayerBroadcast) {
             // Helps give a hint that another user is interacting with the light.
             if (cardFetchStyle !== cardStyles.fetchNewSync) {
                 clearTimeout(styleTimer)
@@ -249,7 +225,7 @@ export const LightCard = (props: LightCardProps) => {
         }
 
         const ws = new WebSocket(websocketURL!)
-        const commandBuffer: Set<newBroadcast> = new Set()
+        const commandBuffer: Set<multiplayerBroadcast> = new Set()
         let styleTimer = setTimeout(() => {}, 0)
         // Function for rate limiting the UI updates by building up commands in a buffer before processing.
         function flush() {
@@ -259,7 +235,7 @@ export const LightCard = (props: LightCardProps) => {
                 if (update.clientID === multiplayer.id) continue
                 // Only worry about messages for the current light.
                 if (update.device === light.id) {
-                    handleSocketUpdate(styleTimer, update)
+                    handleSocketUpdate(update)
                 }
             }
             commandBuffer.clear()
@@ -275,7 +251,7 @@ export const LightCard = (props: LightCardProps) => {
                 ws.send("pong")
                 return
             }
-            const command: newBroadcast = JSON.parse(event.data)
+            const command: multiplayerBroadcast = JSON.parse(event.data)
             commandBuffer.add(command)
         }
         ws.onclose = () => {

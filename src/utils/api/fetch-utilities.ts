@@ -1,6 +1,6 @@
-import { devicesURL, rateLimitExpireURL, stateURL, loginURL } from "../config"
-import { goveeDevice, goveeDevicesMap, goveeDeviceWithState, goveeStateResponse } from "../interfaces/interfaces"
-import { LoginFormValues } from "../interfaces/interfaces"
+import { devicesURL, rateLimitExpireURL, stateURL, loginURL } from "../../config"
+import { goveeDevice, goveeDevicesMap, goveeStateResponse } from "../../interfaces/interfaces"
+import { LoginFormValues } from "../../interfaces/interfaces"
 import { multiplayer } from "./websocket-utilities"
 
 
@@ -133,10 +133,4 @@ export async function getStateOfLights(onlineDevices: goveeDevice[] | undefined)
         results.push(completeDevices[device])
     }
     return results
-}
-
-export async function getStateOfLight(light: goveeDevice, connectedLights: goveeDevice[]) {
-    const response = await fetch(`${stateURL}?device=${light.device}&model=${light.model}`)
-    const data: goveeDeviceWithState = await response.json()
-    return data
 }

@@ -6,7 +6,7 @@ import { LoginFormProps, LoginFormValues } from "../interfaces/interfaces"
 import { LoginIcon } from "./Icons"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import toast from "react-hot-toast"
-import { authenticate, logout } from "../api/fetch-utilities";
+import { authenticate, logout } from "../utils/api/fetch-utilities";
 
 const formStyles = {
     form: {

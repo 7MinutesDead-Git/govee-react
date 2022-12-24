@@ -5,7 +5,7 @@ import { BadgeConnectionStatus } from "./components/Badges"
 import { LightsHeader } from "./components/LightsHeader"
 import { Toasty } from "./components/Toasty"
 import { QueryConfig } from "./config"
-import { getAvailableLights, getStateOfLights } from "./api/fetch-utilities"
+import { getAvailableLights, getStateOfLights } from "./utils/api/fetch-utilities"
 import { LightsGrid } from "./components/LightsGrid"
 import { LoggedIn } from "./providers/session"
 import { useState } from "react";
