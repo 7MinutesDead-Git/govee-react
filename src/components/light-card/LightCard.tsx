@@ -17,7 +17,7 @@ import { LightCardStatusHeader } from "./LightCardStatusHeader"
 import { BrightnessSlider } from "./controls/BrightnessSlider"
 import { getIlluminationStatus } from "./utils/getIlluminationStatus"
 import { sendLightCommand } from "./utils/commands"
-import { durations, statusCodes, clocks } from "../../utils/constants"
+import { durations, statusCodes, clocks, intervals } from "../../utils/constants"
 import { temperatures, TemperatureSlider } from "./controls/TemperatureSlider"
 
 
@@ -62,7 +62,7 @@ export const LightCard = (props: LightCardProps) => {
     })
 
     // Temperature hooks
-    const [ colorTemperature, setColorTemperature ] = useState(light.status.colorTem ?? 5450)
+    const [ colorTemperature, setColorTemperature ] = useState(light.status.colorTem ?? temperatures.middle)
     const temperatureSliderChanging = useRef(false)
     const temperatureMutation = useMutation((value: number) => changeTemperature(value), {
         onSuccess: () => {
@@ -144,7 +144,7 @@ export const LightCard = (props: LightCardProps) => {
         toast.dismiss()
         if (!loggedIn) {
             toast.error("You must be logged in to change the temperature.")
-            setColorTemperature(props.light.status.colorTem ?? 5450)
+            setColorTemperature(props.light.status.colorTem ?? temperatures.middle)
             return
         }
         multiplayer.broadcastTemperatureChange(light.id, inputTemperature)
@@ -264,7 +264,7 @@ export const LightCard = (props: LightCardProps) => {
             // Helps give a hint that another user is interacting with the light.
             if (cardFetchStyle !== cardStyles.fetchNewSync) {
                 setCardFetchStyle(cardStyles.fetchNewSync)
-                setTimeout(() => setCardFetchStyle(cardStyles.fetchReset), 2000)
+                setTimeout(() => setCardFetchStyle(cardStyles.fetchReset), intervals.twoSeconds)
             }
             if (update.type === "brightness") {
                 const num = Number(update.value)
