@@ -15,11 +15,10 @@ import { LoginOverlay } from "../LoginOverlay"
 import { SwatchesDisplay } from "./controls/Swatches"
 import { LightCardStatusHeader } from "./LightCardStatusHeader"
 import { BrightnessSlider } from "./controls/BrightnessSlider"
-import { getIlluminationStatus } from "./utils/getIlluminationStatus";
-import {sendLightCommand} from "./utils/commands";
+import { getIlluminationStatus } from "./utils/getIlluminationStatus"
+import { sendLightCommand } from "./utils/commands"
+import { durations, statusCodes, clocks } from "../../utils/constants"
 
-
-let lerpColorInterval = setInterval(() => {}, 16.7)
 
 export const LightCard = (props: LightCardProps) => {
     const loggedIn = useContext(LoggedIn)
@@ -28,7 +27,6 @@ export const LightCard = (props: LightCardProps) => {
     const [ rateLimited, setRateLimited ] = useState(false)
 
     // Color hooks
-    // TODO: Change color state hooks to useMutation.
     // Receiving a color temperature means the light bulb isn't following the typical RGB color model.
     const initialColor = light.status.colorTem ? "#ffffff" : rgbToHex(light.status.color)
     const [ color, setColor ] = useState(initialColor)
@@ -72,7 +70,7 @@ export const LightCard = (props: LightCardProps) => {
         setCardFetchStyle(cardStyles.fetchSuccess)
         setTimeout(() => {
             setCardFetchStyle(cardStyles.fetchReset)
-        }, 1000)
+        }, durations.flashResetDelay)
     }
     function flashCardOnFailure() {
         setCardFetchStyle(cardStyles.fetchFailure)
@@ -102,12 +100,12 @@ export const LightCard = (props: LightCardProps) => {
                 throw new Error("Device offline")
             }
             const response = await sendLightCommand(light, inputBrightness)
-            if (response.status === 200) {
+            if (response.status === statusCodes.success) {
                 updateIllumination(inputBrightness)
                 flashCardOnSuccess()
                 setRateLimited(false)
             }
-            else if (response.status === 429) {
+            else if (response.status === statusCodes.rateLimited) {
                 updateIllumination(inputBrightness)
                 flashCardOnFailure()
                 setRateLimited(true)
@@ -133,7 +131,7 @@ export const LightCard = (props: LightCardProps) => {
             multiplayer.broadcastColorChange(light.id, inputColor)
         }
         clearTimeout(debounceTimer.current)
-        const debounceWait = clickedSwatch.current ? 0 : 500
+        const debounceWait = clickedSwatch.current ? 0 : durations.colorChangeDebounceDelay
 
         debounceTimer.current = setTimeout(async () => {
             toast.dismiss()
@@ -157,14 +155,14 @@ export const LightCard = (props: LightCardProps) => {
                 throw new Error("Device offline")
             }
             const response = await sendLightCommand(light, inputColor)
-            if (response.status === 200) {
+            if (response.status === statusCodes.success) {
                 setColor(inputColor)
                 // Sending black as a color request to their API turns the light off lol.
                 inputColor === "#000000" ? updateIllumination(0) : updateIllumination(light.status.brightness)
                 flashCardOnSuccess()
                 setRateLimited(false)
             }
-            else if (response.status === 429) {
+            else if (response.status === statusCodes.rateLimited) {
                 setColor(color)
                 flashCardOnFailure()
                 setRateLimited(true)
@@ -204,7 +202,6 @@ export const LightCard = (props: LightCardProps) => {
         function handleSocketUpdate(update: multiplayerBroadcast) {
             // Helps give a hint that another user is interacting with the light.
             if (cardFetchStyle !== cardStyles.fetchNewSync) {
-                clearTimeout(styleTimer)
                 setCardFetchStyle(cardStyles.fetchNewSync)
                 setTimeout(() => setCardFetchStyle(cardStyles.fetchReset), 2000)
             }
@@ -218,15 +215,14 @@ export const LightCard = (props: LightCardProps) => {
                 updateGrabberColorText(update.value)
                 targetColor.current = update.value
                 if (targetColor.current !== lerpedColor.current) {
-                    clearInterval(lerpColorInterval)
-                    lerpColorInterval = setInterval(lerpNetworkColorChange, NetworkConfig.lerpUpdateRate)
+                    clearInterval(clocks.lerpColorInterval)
+                    clocks.lerpColorInterval = setInterval(lerpNetworkColorChange, NetworkConfig.lerpUpdateRate)
                 }
             }
         }
 
         const ws = new WebSocket(websocketURL!)
         const commandBuffer: Set<multiplayerBroadcast> = new Set()
-        let styleTimer = setTimeout(() => {}, 0)
         // Function for rate limiting the UI updates by building up commands in a buffer before processing.
         function flush() {
             if (commandBuffer.size === 0) return
@@ -284,18 +280,14 @@ export const LightCard = (props: LightCardProps) => {
                 illuminating={illuminating}
                 rateLimited={rateLimited}
             />
-
             <ColorPicker
                 fullWidth={true}
                 value={color}
                 size="sm"
-                // According to Mantine docs, onChangeEnd is supposed to exist on ColorPicker element but doesn't,
-                // so we'll need to debounce in changeColor method.
                 onChange={(inputColor) => changeColor(inputColor)}
                 style={cardStyles.controlSurface}
                 styles={cardStyles.colorPicker}
             />
-
             <SwatchesDisplay
                 light={light}
                 brightnessSliderValue={brightnessSliderValue}
@@ -304,7 +296,6 @@ export const LightCard = (props: LightCardProps) => {
                 color={color}
                 setBrightnessSliderValue={(presetBrightness: number) => setBrightnessSliderValue(presetBrightness)}
             />
-
             <BrightnessSlider
                 light={light}
                 brightnessSliderChanging={brightnessSliderChanging}
@@ -312,7 +303,6 @@ export const LightCard = (props: LightCardProps) => {
                 setBrightnessSliderValue={(newValue: number) => setBrightnessSliderValue(newValue)}
                 brightnessMutation={brightnessMutation}
             />
-
             {props.children}
             <LoginOverlay/>
         </Card>
