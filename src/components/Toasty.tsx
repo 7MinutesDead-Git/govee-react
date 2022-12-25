@@ -1,5 +1,6 @@
 import { Toaster, ToastBar, toast } from "react-hot-toast"
-import { intervals } from "../config"
+import { intervals } from "../utils/constants"
+
 
 const toastStyles = {
     default: {
