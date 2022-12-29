@@ -260,11 +260,15 @@ export const LightCard = (props: LightCardProps) => {
             // Receiving color input changes will be lerped to smooth out transitions despite latency.
             else if (update.type === "color") {
                 updateGrabberColorText(update.value)
+                setColorTemperature(temperatures.middle)
                 targetColor.current = update.value
                 if (targetColor.current !== lerpedColor.current) {
                     clearInterval(clocks.lerpColorInterval)
                     clocks.lerpColorInterval = setInterval(lerpNetworkColorChange, NetworkConfig.lerpUpdateRate)
                 }
+            }
+            else if (update.type === "temperature") {
+                setColorTemperature(Number(update.value))
             }
         }
 
