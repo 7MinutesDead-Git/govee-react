@@ -354,6 +354,13 @@ export const LightCard = (props: LightCardProps) => {
                 setBrightnessSliderValue={(newValue: number) => setBrightnessSliderValue(newValue)}
                 brightnessMutation={brightnessMutation}
             />
+            <TemperatureSlider
+                light={light}
+                setSliderValue={(newValue:number) => setColorTemperature(newValue)}
+                sliderValue={colorTemperature}
+                sliderChanging={temperatureSliderChanging}
+                mutation={temperatureMutation}
+            />
             {props.children}
             <LoginOverlay/>
         </Card>
