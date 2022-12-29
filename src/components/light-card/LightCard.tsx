@@ -18,6 +18,7 @@ import { BrightnessSlider } from "./controls/BrightnessSlider"
 import { getIlluminationStatus } from "./utils/getIlluminationStatus"
 import { sendLightCommand } from "./utils/commands"
 import { durations, statusCodes, clocks } from "../../utils/constants"
+import { temperatures, TemperatureSlider } from "./controls/TemperatureSlider"
 
 
 export const LightCard = (props: LightCardProps) => {
@@ -50,6 +51,15 @@ export const LightCard = (props: LightCardProps) => {
         onSuccess: () => {
             // TODO: Break up "lights" query into individual queries with ids
             //  so we can be more atomic here.
+            queryClient.invalidateQueries(["lights", light.id])
+        }
+    })
+
+    // Temperature hooks
+    const [ colorTemperature, setColorTemperature ] = useState(light.status.colorTem ?? 5450)
+    const temperatureSliderChanging = useRef(false)
+    const temperatureMutation = useMutation((value: number) => changeTemperature(value), {
+        onSuccess: () => {
             queryClient.invalidateQueries(["lights", light.id])
         }
     })
