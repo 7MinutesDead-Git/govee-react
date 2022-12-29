@@ -32,6 +32,16 @@ export const multiplayer = {
         })
         this.client.send(message)
     },
+
+    broadcastTemperatureChange(id: string, sliderValue: number): void {
+        const message = JSON.stringify({
+            device: id,
+            type: "temperature",
+            value: sliderValue,
+            clientID: this.id
+        })
+        this.client.send(message)
+    }
 }
 
 multiplayer.client.onopen = () => {
