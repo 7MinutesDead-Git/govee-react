@@ -22,7 +22,15 @@ export enum temperatures {
     cool= 7900
 }
 
-const stepSize = 500
+// Note that the maximum temperature accepted by these bulbs is 8900,
+// so our max needs to be divisible by our step size or else we run into bugs with the maximum slider value.
+// Say the max is 8900 but our step size is 500. That would make the Mantine slider's max value 9000,
+// which then falls outside the accepted range, and we run into odd bugs or rejected API requests.
+const stepSize = 100
+
+if (temperatures.max % stepSize !== 0) {
+    throw new Error("temperatures.max must be divisible by stepSize")
+}
 
 
 export const TemperatureSlider = (props: ColorTemperatureProps) => {
