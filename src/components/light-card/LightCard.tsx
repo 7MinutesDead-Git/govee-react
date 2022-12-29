@@ -18,6 +18,7 @@ import { BrightnessSlider } from "./controls/BrightnessSlider"
 import { getIlluminationStatus } from "./utils/getIlluminationStatus"
 import { sendLightCommand } from "./utils/commands"
 import { durations, statusCodes, clocks } from "../../utils/constants"
+import { temperatures, TemperatureSlider } from "./controls/TemperatureSlider"
 
 
 export const LightCard = (props: LightCardProps) => {
@@ -38,6 +39,12 @@ export const LightCard = (props: LightCardProps) => {
     const clickedSwatch = useRef(false)
     // Ensures we don't send a fetch request until we have stopped moving the color picker for some time.
     const debounceTimer = useRef(setTimeout(() => {}, 0))
+    // TODO: Currently only used for swatches, as it makes color picker movements laggy for some reason.. debugging.
+    const colorMutation = useMutation((color: string) => changeColor(color), {
+        onSuccess: () => {
+            queryClient.invalidateQueries(["lights", light.id])
+        }
+    })
 
     // Brightness hooks
     const isIlluminating = getIlluminationStatus(light)
@@ -50,6 +57,15 @@ export const LightCard = (props: LightCardProps) => {
         onSuccess: () => {
             // TODO: Break up "lights" query into individual queries with ids
             //  so we can be more atomic here.
+            queryClient.invalidateQueries(["lights", light.id])
+        }
+    })
+
+    // Temperature hooks
+    const [ colorTemperature, setColorTemperature ] = useState(light.status.colorTem ?? 5450)
+    const temperatureSliderChanging = useRef(false)
+    const temperatureMutation = useMutation((value: number) => changeTemperature(value), {
+        onSuccess: () => {
             queryClient.invalidateQueries(["lights", light.id])
         }
     })
@@ -124,6 +140,43 @@ export const LightCard = (props: LightCardProps) => {
         })
     }
 
+    async function changeTemperature(inputTemperature: number) {
+        toast.dismiss()
+        if (!loggedIn) {
+            toast.error("You must be logged in to change the temperature.")
+            setColorTemperature(props.light.status.colorTem ?? 5450)
+            return
+        }
+        multiplayer.broadcastTemperatureChange(light.id, inputTemperature)
+        await toast.promise(temperatureFetch(), {
+            loading: `Changing temperature to ${inputTemperature}K for ${light.details.deviceName}`,
+            success: `${light.details.deviceName} temperature now at ${inputTemperature}K`,
+            error: "Temperature change failed!"
+        })
+
+        async function temperatureFetch() {
+            if (!await onlineCheck()) {
+                throw new Error("Device offline")
+            }
+            const response = await sendLightCommand(light, inputTemperature)
+            if (response.status === statusCodes.success) {
+                setColor("#fff")
+                flashCardOnSuccess()
+                setRateLimited(false)
+            }
+            else if (response.status === statusCodes.rateLimited) {
+                flashCardOnFailure()
+                setRateLimited(true)
+                throw new Error("Rate limited")
+            }
+            else {
+                console.log("Hmm, something went wrong.", response)
+                throw new Error("Something went wrong")
+            }
+        }
+
+    }
+
     // Sends a debounced request to the server to change the color of the light.
     // This is necessary since the color picker doesn't have an onChangeEnd() event like the slider does.
     async function changeColor(inputColor: string) {
@@ -156,11 +209,12 @@ export const LightCard = (props: LightCardProps) => {
             }
             const response = await sendLightCommand(light, inputColor)
             if (response.status === statusCodes.success) {
-                setColor(inputColor)
                 // Sending black as a color request to their API turns the light off lol.
                 inputColor === "#000000" ? updateIllumination(0) : updateIllumination(light.status.brightness)
                 flashCardOnSuccess()
                 setRateLimited(false)
+                setColorTemperature(temperatures.middle)
+                setColor(inputColor)
             }
             else if (response.status === statusCodes.rateLimited) {
                 setColor(color)
@@ -213,11 +267,15 @@ export const LightCard = (props: LightCardProps) => {
             // Receiving color input changes will be lerped to smooth out transitions despite latency.
             else if (update.type === "color") {
                 updateGrabberColorText(update.value)
+                setColorTemperature(temperatures.middle)
                 targetColor.current = update.value
                 if (targetColor.current !== lerpedColor.current) {
                     clearInterval(clocks.lerpColorInterval)
                     clocks.lerpColorInterval = setInterval(lerpNetworkColorChange, NetworkConfig.lerpUpdateRate)
                 }
+            }
+            else if (update.type === "temperature") {
+                setColorTemperature(Number(update.value))
             }
         }
 
@@ -275,10 +333,18 @@ export const LightCard = (props: LightCardProps) => {
 
             <LightCardStatusHeader
                 grabberColor={grabberColor}
-                isLoading={brightnessMutation.isLoading}
+                isLoading={brightnessMutation.isLoading || colorMutation.isLoading || temperatureMutation.isLoading}
                 light={light}
                 illuminating={illuminating}
                 rateLimited={rateLimited}
+            />
+            <SwatchesDisplay
+                light={light}
+                brightnessSliderValue={brightnessSliderValue}
+                changeBrightness={async (presetBrightness) => brightnessMutation.mutate(presetBrightness)}
+                changeColor={async (presetColor) => colorMutation.mutate(presetColor)}
+                color={color}
+                setBrightnessSliderValue={(presetBrightness: number) => setBrightnessSliderValue(presetBrightness)}
             />
             <ColorPicker
                 fullWidth={true}
@@ -288,20 +354,19 @@ export const LightCard = (props: LightCardProps) => {
                 style={cardStyles.controlSurface}
                 styles={cardStyles.colorPicker}
             />
-            <SwatchesDisplay
-                light={light}
-                brightnessSliderValue={brightnessSliderValue}
-                changeBrightness={(presetBrightness) => changeBrightness(presetBrightness)}
-                changeColor={(presetColor) => changeColor(presetColor)}
-                color={color}
-                setBrightnessSliderValue={(presetBrightness: number) => setBrightnessSliderValue(presetBrightness)}
-            />
             <BrightnessSlider
                 light={light}
                 brightnessSliderChanging={brightnessSliderChanging}
                 brightnessSliderValue={brightnessSliderValue}
                 setBrightnessSliderValue={(newValue: number) => setBrightnessSliderValue(newValue)}
                 brightnessMutation={brightnessMutation}
+            />
+            <TemperatureSlider
+                light={light}
+                setSliderValue={(newValue:number) => setColorTemperature(newValue)}
+                sliderValue={colorTemperature}
+                sliderChanging={temperatureSliderChanging}
+                mutation={temperatureMutation}
             />
             {props.children}
             <LoginOverlay/>
