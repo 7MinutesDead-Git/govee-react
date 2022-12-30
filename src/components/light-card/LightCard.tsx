@@ -232,23 +232,34 @@ export const LightCard = (props: LightCardProps) => {
                 setCardFetchStyle(cardStyles.fetchNewSync)
                 setTimeout(() => setCardFetchStyle(cardStyles.fetchReset), intervals.twoSeconds)
             }
-            if (update.type === "brightness") {
-                const num = Number(update.value)
-                setBrightnessSliderValue(num)
-                updateIllumination(num)
-            }
-            // Receiving color input changes will be lerped to smooth out transitions despite latency.
-            else if (update.type === "color") {
-                updateGrabberColorText(update.value)
-                setColorTemperature(temperatures.middle)
-                targetColor.current = update.value
-                if (targetColor.current !== lerpedColor.current) {
-                    clearInterval(clocks.lerpColorInterval)
-                    clocks.lerpColorInterval = setInterval(lerpNetworkColorChange, NetworkConfig.lerpUpdateRate)
-                }
-            }
-            else if (update.type === "temperature") {
-                setColorTemperature(Number(update.value))
+            switch (update.type) {
+                case "brightness":
+                    const num = Number(update.value)
+                    setBrightnessSliderValue(num)
+                    updateIllumination(setIlluminating, num)
+                    break
+
+                case "color":
+                    updateGrabberColorText({ debounceTimer, inputColor: update.value, setGrabberColor })
+                    setColorTemperature(temperatures.middle)
+                    // Receiving color input changes will be lerped to smooth out transitions despite latency.
+                    targetColor.current = update.value
+                    if (targetColor.current !== lerpedColor.current) {
+                        clearInterval(clocks.lerpColorInterval)
+                        // How quickly/often we recalculate the lerped color determines how smooth the movement looks.
+                        clocks.lerpColorInterval = setInterval(
+                            () => lerpNetworkColorChange({ targetColor, lerpedColor, setColor }),
+                            NetworkConfig.lerpUpdateRate
+                        )
+                    }
+                    break
+
+                case "temperature":
+                    setColorTemperature(Number(update.value))
+                    break
+
+                default:
+                    console.error(messages.unknownSocketMessageType(update.type))
             }
         }
 
