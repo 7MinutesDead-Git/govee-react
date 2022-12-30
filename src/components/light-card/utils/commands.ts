@@ -2,12 +2,9 @@ import { devicesURL } from "../../../config"
 import { goveeDeviceWithState, rgbColor } from "../../../interfaces/interfaces"
 import { hexToRGB } from "../../../utils/colorFunctions"
 import { clamp, isRgbColor } from "../../../utils/helpers"
-import { temperatures } from "../controls/TemperatureSlider"
-
-
-function inColorTemperatureRange(value: number): boolean {
-    return value >= temperatures.min && value <= temperatures.max
-}
+import { inColorTemperatureRange } from "./color"
+import toast from "react-hot-toast"
+import { QueryClient } from "@tanstack/react-query"
 
 function normalizeValue(value: string | rgbColor | number): string | rgbColor | number {
     // Convert hex color input to rgb.
@@ -20,12 +17,9 @@ function normalizeValue(value: string | rgbColor | number): string | rgbColor | 
     }
     // A valid number value means this is either a brightness command or a color temperature command.
     if (typeof value === "number") {
-        if (inColorTemperatureRange(value)) {
-            return value
-        }
-        else {
-            return clamp(value, 0, 100)
-        }
+        if (inColorTemperatureRange(value)) return value
+        // If the given number isn't a valid color temperature, clamp it to the brightness range.
+        return clamp(value, 0, 100)
     }
     return value
 }
@@ -66,4 +60,19 @@ export async function sendLightCommand(light: goveeDeviceWithState, value: strin
         headers: { 'Content-Type': 'application/json', credentials: 'include' },
         body: JSON.stringify(commandBody)
     })
+}
+
+/**
+ * A guard to ensure that the given device is online and connected.
+ * @param {goveeDeviceWithState} light - The device to check.
+ * @param {QueryClient} queryClient - The query client used to invalidate queries when a given device is found to be offline.
+ * @returns {boolean} - Returns `true` if the device is online and connected, or `false` otherwise.
+ */
+export async function onlineCheck(light: goveeDeviceWithState, queryClient: QueryClient) {
+    if (!light.status.online) {
+        toast.error(`${light.details.deviceName} is offline!`)
+        await queryClient.invalidateQueries(["lights"])
+        return false
+    }
+    return true
 }

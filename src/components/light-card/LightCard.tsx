@@ -115,8 +115,8 @@ export const LightCard = (props: LightCardProps) => {
         brightnessSliderChanging.current = false
 
         async function brightnessFetch() {
-            if (!await onlineCheck()) {
-                throw new Error("Device offline")
+            if (!await onlineCheck(light, queryClient)) {
+                throw new Error(messages.deviceOffline)
             }
             const response = await sendLightCommand(light, inputBrightness)
             if (response.status === statusCodes.success) {
@@ -158,8 +158,8 @@ export const LightCard = (props: LightCardProps) => {
         })
 
         async function temperatureFetch() {
-            if (!await onlineCheck()) {
-                throw new Error("Device offline")
+            if (!await onlineCheck(light, queryClient)) {
+                throw new Error(messages.deviceOffline)
             }
             const response = await sendLightCommand(light, inputTemperature)
             if (response.status === statusCodes.success) {
