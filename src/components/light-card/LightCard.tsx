@@ -207,6 +207,13 @@ export const LightCard = (props: LightCardProps) => {
             if (!await onlineCheck()) {
                 throw new Error("Device offline")
             }
+            // When selecting pure white as a color, the intention is often to make the light look like a normal white light bulb.
+            // Color temperature commands make a much better "white" light than sending a white color command, where the
+            // bulb ends up looking more of a dimmer blue-ish white. So in this case, we'll send a temperature command instead.
+            if (inputColor === "#ffffff") {
+                temperatureMutation.mutate(temperatures.middle)
+                return
+            }
             const response = await sendLightCommand(light, inputColor)
             if (response.status === statusCodes.success) {
                 // Sending black as a color request to their API turns the light off lol.
