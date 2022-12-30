@@ -282,9 +282,7 @@ export const LightCard = (props: LightCardProps) => {
         const flushInterval = setInterval(flush, NetworkConfig.socketUpdateRate)
         ws.onmessage = (event) => {
             // Keepalive pings don't need to be processed as commands, so don't add them to our data set.
-            if (event.data === "pong") {
-                return
-            }
+            if (event.data === "pong") return
             if (event.data === "ping") {
                 ws.send("pong")
                 return
@@ -292,10 +290,7 @@ export const LightCard = (props: LightCardProps) => {
             const command: multiplayerBroadcast = JSON.parse(event.data)
             commandBuffer.add(command)
         }
-        ws.onclose = () => {
-            ws.close()
-        }
-
+        ws.onclose = () => ws.close()
         return () => {
             clearInterval(flushInterval)
             // In development, since effects will mount then remount, this will cause a WebSocket warning
@@ -307,53 +302,41 @@ export const LightCard = (props: LightCardProps) => {
 
 
     return (
-        <Card
-            shadow="sm"
-            p="lg"
-            radius="xs"
-            withBorder
-            component="section"
-            style={{...cardFetchStyle, ...cardStyles.card}}>
-
+        <Card shadow="sm" p="lg" radius="xs" withBorder component="section" style={{...cardFetchStyle, ...cardStyles.card}}>
             <LightCardStatusHeader
                 grabberColor={grabberColor}
                 isLoading={brightnessMutation.isLoading || colorMutation.isLoading || temperatureMutation.isLoading}
                 light={light}
                 illuminating={illuminating}
-                rateLimited={rateLimited}
-            />
+                rateLimited={rateLimited}/>
             <SwatchesDisplay
                 light={light}
                 brightnessSliderValue={brightnessSliderValue}
                 changeBrightness={async (presetBrightness) => brightnessMutation.mutate(presetBrightness)}
                 changeColor={async (presetColor) => colorMutation.mutate(presetColor)}
                 color={color}
-                setBrightnessSliderValue={(presetBrightness: number) => setBrightnessSliderValue(presetBrightness)}
-            />
+                setBrightnessSliderValue={(presetBrightness: number) => setBrightnessSliderValue(presetBrightness)}/>
             <ColorPicker
                 fullWidth={true}
                 value={color}
                 size="sm"
                 onChange={(inputColor) => changeColor(inputColor)}
                 style={cardStyles.controlSurface}
-                styles={cardStyles.colorPicker}
-            />
+                styles={cardStyles.colorPicker}/>
             <BrightnessSlider
                 light={light}
                 brightnessSliderChanging={brightnessSliderChanging}
                 brightnessSliderValue={brightnessSliderValue}
                 setBrightnessSliderValue={(newValue: number) => setBrightnessSliderValue(newValue)}
-                brightnessMutation={brightnessMutation}
-            />
+                brightnessMutation={brightnessMutation}/>
             <TemperatureSlider
                 light={light}
                 setSliderValue={(newValue:number) => setColorTemperature(newValue)}
                 sliderValue={colorTemperature}
                 sliderChanging={temperatureSliderChanging}
-                mutation={temperatureMutation}
-            />
+                mutation={temperatureMutation}/>
             {props.children}
             <LoginOverlay/>
         </Card>
-    );
+    )
 }
