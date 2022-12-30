@@ -76,27 +76,11 @@ export const LightCard = (props: LightCardProps) => {
     // Flashes background of row to indicate various state updates.
     const [ cardFetchStyle, setCardFetchStyle ] = useState(cardStyles.fetchReset)
 
-    async function onlineCheck() {
-        if (!light.status.online) {
-            toast.error(`${light.details.deviceName} is offline!`)
-            await queryClient.invalidateQueries(["lights"])
-            return false
-        }
-        return true
-    }
-
-    function flashCardOnSuccess() {
-        setCardFetchStyle(cardStyles.fetchSuccess)
-        setTimeout(() => {
-            setCardFetchStyle(cardStyles.fetchReset)
-        }, durations.flashResetDelay)
-    }
-    function flashCardOnFailure() {
-        setCardFetchStyle(cardStyles.fetchFailure)
-    }
-
-    function updateIllumination(brightness: number) {
-        brightness > 0 ? setIlluminating(true) : setIlluminating(false)
+    function updateColorState(inputColor: string) {
+        setRateLimited(false)
+        setColorTemperature(temperatures.middle)
+        // Ensure setColor is called last to avoid weird jittering in the color picker.
+        setColor(inputColor)
     }
 
     async function changeBrightness(inputBrightness: number) {
