@@ -19,6 +19,9 @@ import { getIlluminationStatus } from "./utils/getIlluminationStatus"
 import { sendLightCommand } from "./utils/commands"
 import { durations, statusCodes, clocks, intervals } from "../../utils/constants"
 import { temperatures, TemperatureSlider } from "./controls/TemperatureSlider"
+import { throwUnknownFetchError } from "../../utils/api/fetch-utilities"
+import { flashCardOnSuccess, flashCardOnFailure } from "./utils/animation"
+import { lerpNetworkColorChange, updateGrabberColorText } from "./utils/color"
 
 
 export const LightCard = (props: LightCardProps) => {
@@ -203,9 +206,9 @@ export const LightCard = (props: LightCardProps) => {
 
         async function sendColorChange() {
             clickedSwatch.current = false
-            updateGrabberColorText(inputColor)
-            if (!await onlineCheck()) {
-                throw new Error("Device offline")
+            updateGrabberColorText({ debounceTimer, inputColor, setGrabberColor })
+            if (!await onlineCheck(light, queryClient)) {
+                throw new Error(messages.deviceOffline)
             }
             // When selecting pure white as a color, the intention is often to make the light look like a normal white light bulb.
             // Color temperature commands make a much better "white" light than sending a white color command, where the
@@ -235,25 +238,6 @@ export const LightCard = (props: LightCardProps) => {
             }
         }
     }
-
-    function updateGrabberColorText(inputColor: string) {
-        clearTimeout(debounceTimer.current)
-        debounceTimer.current = setTimeout(() => {
-            setGrabberColor(inputColor)
-        }, 100)
-    }
-
-    // Lerp between current color displayed in the UI, and target color received from broadcast.
-    // This helps smooth out the color change when multiple users are changing the color,
-    // and with higher latency to the server, and also allows for using a lower socket update rate
-    // while maintaining smooth UI movement.
-    function lerpNetworkColorChange() {
-        if (targetColor.current !== lerpedColor.current) {
-            lerpedColor.current = lerpColorHex(lerpedColor.current, targetColor.current, NetworkConfig.lerpScale)
-            setColor(lerpedColor.current)
-        }
-    }
-
 
     // Effect for managing UI sync with websocket updates from other users.
     // Throttles the updates according to the NetworkConfig.socketUpdateRate.
