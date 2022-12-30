@@ -27,3 +27,12 @@ export const statusCodes = {
 export const clocks = {
     lerpColorInterval: setInterval(() => {}, durations.fps90)
 }
+
+export const messages = {
+    notLoggedIn: (target: string) => `You must be logged in to change ${target}.`,
+    unknownError: (target: string) => `An unknown error occurred while changing ${target}.`,
+    unknownSocketMessageType: (type: string) => `Unknown socket message type received: ${type}`,
+    failed: (target: string) => `Failed to change ${target}!`,
+    deviceOffline: "This device is offline.",
+    rateLimited: "You are sending requests too quickly!",
+}
