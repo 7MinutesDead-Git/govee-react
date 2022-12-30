@@ -102,7 +102,7 @@ export const LightCard = (props: LightCardProps) => {
     async function changeBrightness(inputBrightness: number) {
         toast.dismiss()
         if (!loggedIn) {
-            toast.error("You must be logged in to change brightness.")
+            toast.error(messages.notLoggedIn("brightness"))
             setBrightnessSliderValue(props.light.status.brightness)
             return
         }
@@ -128,7 +128,7 @@ export const LightCard = (props: LightCardProps) => {
                 updateIllumination(inputBrightness)
                 flashCardOnFailure()
                 setRateLimited(true)
-                throw new Error("Rate limited")
+                throw new Error(messages.rateLimited)
             }
             else {
                 console.log("Hmm, something went wrong.", response)
@@ -139,14 +139,14 @@ export const LightCard = (props: LightCardProps) => {
         await toast.promise(brightnessFetch(), {
             loading: `Sending ${inputBrightness}% brightness to ${light.details.deviceName}`,
             success: `${light.details.deviceName} brightness now at ${inputBrightness}%!`,
-            error: "Brightness change failed!"
+            error: messages.failed("brightness")
         })
     }
 
     async function changeTemperature(inputTemperature: number) {
         toast.dismiss()
         if (!loggedIn) {
-            toast.error("You must be logged in to change the temperature.")
+            toast.error(messages.notLoggedIn("temperature"))
             setColorTemperature(props.light.status.colorTem ?? temperatures.middle)
             return
         }
@@ -154,7 +154,7 @@ export const LightCard = (props: LightCardProps) => {
         await toast.promise(temperatureFetch(), {
             loading: `Changing temperature to ${inputTemperature}K for ${light.details.deviceName}`,
             success: `${light.details.deviceName} temperature now at ${inputTemperature}K`,
-            error: "Temperature change failed!"
+            error: messages.failed("temperature")
         })
 
         async function temperatureFetch() {
@@ -170,7 +170,7 @@ export const LightCard = (props: LightCardProps) => {
             else if (response.status === statusCodes.rateLimited) {
                 flashCardOnFailure()
                 setRateLimited(true)
-                throw new Error("Rate limited")
+                throw new Error(messages.rateLimited)
             }
             else {
                 console.log("Hmm, something went wrong.", response)
@@ -230,7 +230,7 @@ export const LightCard = (props: LightCardProps) => {
                 setColor(color)
                 flashCardOnFailure()
                 setRateLimited(true)
-                throw new Error("Rate limit exceeded.")
+                throw new Error(messages.rateLimited)
             }
             else {
                 setColor(color)
