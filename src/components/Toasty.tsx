@@ -11,13 +11,23 @@ const toastStyles = {
             userSelect: 'none' as 'none',
         },
         duration: intervals.twoSeconds,
+        success: {
+            iconTheme: {
+                primary: "#53ffb4",
+                secondary: "#4f575a",
+            }
+        },
+        error: {
+            style: {
+                backgroundColor: "#e11d6d",
+                color: "#fff",
+            },
+            iconTheme: {
+                primary: "#fff",
+                secondary: "#e11d6d",
+            }
+        },
     },
-    error: {
-        style: {
-            backgroundColor: "#e11d6d",
-            color: "#fff",
-        }
-    }
 }
 const containerStyle = {
     top: 72,
