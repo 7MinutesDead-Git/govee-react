@@ -39,7 +39,9 @@ export const SwatchesDisplay = (props: SwatchesDisplayProps) => {
 
     function deleteSwatch(preset: Preset) {
         const newSwatches = [...swatches]
-        const index = newSwatches.findIndex((item) => item.color === preset.color)
+        const index = newSwatches.findIndex((item) => {
+            return item.color === preset.color && item.brightness === preset.brightness
+        })
         newSwatches.splice(index, 1)
 
         if (newSwatches.length === 0) {
