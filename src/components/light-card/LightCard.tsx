@@ -131,8 +131,7 @@ export const LightCard = (props: LightCardProps) => {
                 throw new Error(messages.rateLimited)
             }
             else {
-                console.log("Hmm, something went wrong.", response)
-                throw new Error("Something went wrong")
+                throwUnknownFetchError("brightness", response)
             }
         }
 
@@ -173,8 +172,7 @@ export const LightCard = (props: LightCardProps) => {
                 throw new Error(messages.rateLimited)
             }
             else {
-                console.log("Hmm, something went wrong.", response)
-                throw new Error("Something went wrong")
+                throwUnknownFetchError("temperature", response)
             }
         }
 
@@ -234,7 +232,7 @@ export const LightCard = (props: LightCardProps) => {
             }
             else {
                 setColor(color)
-                throw new Error("Something went wrong when setting color.")
+                throwUnknownFetchError("color", response)
             }
         }
     }
