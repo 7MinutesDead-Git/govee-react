@@ -1,4 +1,5 @@
 import { rgbColor } from "../interfaces/interfaces";
+import { lerp } from "./helpers";
 
 export function rgbToHex(color: rgbColor | undefined) {
     if (!color) {
@@ -21,12 +22,6 @@ export function hexToRGB(hex: string): rgbColor {
     }
 }
 
-// Linearly interpolate between two values based on a distance between the two.
-function lerp(start: number, end: number, distance: number): number {
-    const q = 1 - distance
-    return Math.round(start * q + end * distance)
-}
-
 // Linearly interpolate between two colors as RGB objects.
 export function lerpColorRGB(start: rgbColor, end: rgbColor, distance: number): rgbColor {
     return {
@@ -43,4 +38,9 @@ export function lerpColorHex(start: string, end: string, distance: number) {
     const endRGB = hexToRGB(end)
     const lerpRGB = lerpColorRGB(startRGB, endRGB, distance)
     return rgbToHex(lerpRGB)
+}
+
+// Type guard to check if a value is an rgbColor object.
+export function isRgbColor(value: string | rgbColor | number): value is rgbColor {
+    return (value as rgbColor).r !== undefined
 }
