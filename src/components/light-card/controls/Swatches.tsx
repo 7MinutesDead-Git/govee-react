@@ -5,6 +5,7 @@ import { Accordion, CloseButton, ColorSwatch, Grid, Text } from "@mantine/core"
 import { cardStyles, swatchSize } from "../LightCardStyles"
 import { motion } from "framer-motion"
 import { EmptySwatch } from "./EmptySwatch"
+import {temperatures} from "./TemperatureSlider";
 
 const swatchDefaults: Preset[] = [
     { color: '#fa5252', brightness: 100 },
@@ -22,6 +23,7 @@ interface SwatchesDisplayProps {
     setBrightnessSliderValue: (value: number) => void
     changeColor: (color: string) => Promise<void>
     changeBrightness: (brightness: number) => Promise<void>
+    changeTemperature: (temperature: number) => Promise<void>
 }
 
 
@@ -54,7 +56,12 @@ export const SwatchesDisplay = (props: SwatchesDisplayProps) => {
     async function handleSwatchClick(preset: Preset) {
         clickedSwatch.current = true
         props.setBrightnessSliderValue(preset.brightness)
-        await props.changeColor(preset.color)
+        if (preset.color === "#ffffff" || preset.color === "#fff") {
+            await props.changeTemperature(temperatures.middle)
+        }
+        else {
+            await props.changeColor(preset.color)
+        }
         await props.changeBrightness(preset.brightness)
     }
 

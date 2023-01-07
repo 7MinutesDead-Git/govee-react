@@ -314,6 +314,7 @@ export const LightCard = (props: LightCardProps) => {
                 brightnessSliderValue={brightnessSliderValue}
                 changeBrightness={async (presetBrightness) => brightnessMutation.mutate(presetBrightness)}
                 changeColor={async (presetColor) => colorMutation.mutate(presetColor)}
+                changeTemperature={async (presetTemperature) => temperatureMutation.mutate(presetTemperature)}
                 color={color}
                 setBrightnessSliderValue={(presetBrightness: number) => setBrightnessSliderValue(presetBrightness)}/>
             <ColorPicker
