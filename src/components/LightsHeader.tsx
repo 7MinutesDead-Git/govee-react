@@ -54,7 +54,7 @@ export const LightsHeader = (props: LightsHeaderProps) => {
                         bgColor="transparent"/>
                     7minutes.dev
                 </HeaderLinkButton>
-                <HeaderLinkButton href="https://www.linkedin.com/in/alex-gulikers-28256a219/" className="link-linkedin">
+                <HeaderLinkButton href="https://www.linkedin.com/in/alexgulikers/" className="link-linkedin">
                     <SocialIcon
                         network="linkedin"
                         target="_blank"
