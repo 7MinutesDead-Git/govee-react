@@ -46,7 +46,7 @@ interface goveeDeviceID {
     device: string
 }
 
-interface goveeDeviceDetails {
+export interface goveeDeviceDetails {
     model: string,
     deviceName: string,
     controllable: boolean,
