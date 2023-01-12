@@ -15,6 +15,19 @@ export function rgbToHex(color: rgbColor | undefined) {
 
 // Parse a hex color string into an RGB object.
 export function hexToRGB(hex: string): rgbColor {
+    // Add the hex prefix if it's missing.
+    if (hex[0] !== '#') {
+        hex = '#' + hex
+    }
+    // Convert shorthand hex to full hex.
+    if (hex.length === 4) {
+        // We'll duplicate each character, assuming it's not a hash character.
+        hex = hex.split('').map(x => x !== '#' ? x + x : x).join('')
+    }
+    else if (hex.length !== 7) {
+        throw new Error(`Invalid hex color: ${hex}`)
+    }
+
     return {
         "r": parseInt(hex.slice(1, 3), 16),
         "g": parseInt(hex.slice(3, 5), 16),
