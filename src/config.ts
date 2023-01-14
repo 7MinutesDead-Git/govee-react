@@ -16,9 +16,10 @@ export const loginURL = `${baseURL}auth`
 
 export class NetworkConfig {
     // 1 will be instantaneous, 0.5 is fast smoothing, 0.1 will be slow, 0.01 will be very slow
-    static lerpScale = 0.25
+    // Fast will look jittery but more accurate, while slow will look smooth but less accurate.
+    static lerpScale = 0.15
     // How quickly a new value is lerped to the current value, in milliseconds. 16.7ms is 60fps
-    static lerpUpdateRate = durations.fps120
+    static lerpUpdateRate = durations.fps144
     // How quickly commands from the server are processed by the client, in milliseconds.
     static socketUpdateRate = 50
 }
