@@ -1,4 +1,5 @@
 export const durations = {
+    lerpClear: 500,
     colorChangeDebounceDelay: 100,
     flashResetDelay: 1000,
     fps60: 1000 / 60,
@@ -25,7 +26,8 @@ export const statusCodes = {
 }
 
 export const clocks = {
-    lerpColorInterval: setInterval(() => {}, durations.fps90)
+    lerpColorInterval: setInterval(() => {}, durations.fps90),
+    lerpColorClear: setInterval(() => {}, durations.lerpClear)
 }
 
 export const messages = {
