@@ -246,11 +246,20 @@ export const LightCard = (props: LightCardProps) => {
                     targetColor.current = update.value
                     if (targetColor.current !== lerpedColor.current) {
                         clearInterval(clocks.lerpColorInterval)
+                        clearInterval(clocks.lerpColorClear)
                         // How quickly/often we recalculate the lerped color determines how smooth the movement looks.
                         clocks.lerpColorInterval = setInterval(
                             () => lerpNetworkColorChange({ targetColor, lerpedColor, setColor }),
                             NetworkConfig.lerpUpdateRate
                         )
+                        // Since our lerp function is called by interval and not by percentage, and thus we'll never
+                        // fully reach the target color, we'll need to stop the interval once we're close enough.
+                        // TODO: Setup proper lerping with a percentage-based function.
+                        // https://medium.com/swlh/youre-using-lerp-wrong-73579052a3c3
+                        clocks.lerpColorClear = setTimeout(() => {
+                            console.log("Done!")
+                            clearInterval(clocks.lerpColorInterval)
+                        }, durations.lerpClear)
                     }
                     break
 
