@@ -21,3 +21,12 @@ test('Throws an error if the hex string is invalid', () => {
     expect(() => hexToRGB("#12")).toThrowError()
     expect(() => hexToRGB("0")).toThrowError()
 })
+
+test('converts an RGB object to a hex string', () => {
+    expect(rgbToHex(blueRGB)).toEqual('#0000ff')
+    expect(rgbToHex(whiteRGB)).toEqual('#ffffff')
+    expect(rgbToHex(blackRGB)).toEqual('#000000')
+    expect(rgbToHex({ r: 18, g: 52, b: 86 })).toEqual('#123456')
+    expect(rgbToHex({ r: 17, g: 34, b: 51 })).toEqual('#112233')
+    expect(rgbToHex({ r: 17, g: 17, b: 17 })).toEqual('#111111')
+})
