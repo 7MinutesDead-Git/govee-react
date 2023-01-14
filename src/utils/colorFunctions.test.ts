@@ -12,4 +12,12 @@ test('converts a hex string to an RGB object', () => {
     expect(hexToRGB("#123456")).toEqual({ r: 18, g: 52, b: 86 })
     expect(hexToRGB("#123")).toEqual({ r: 17, g: 34, b: 51 })
     expect(hexToRGB("111")).toEqual({ r: 17, g: 17, b: 17 })
-});
+})
+
+test('Throws an error if the hex string is invalid', () => {
+    expect(() => hexToRGB("#1234567")).toThrowError()
+    expect(() => hexToRGB("#12345")).toThrowError()
+    expect(() => hexToRGB("#1234")).toThrowError()
+    expect(() => hexToRGB("#12")).toThrowError()
+    expect(() => hexToRGB("0")).toThrowError()
+})
