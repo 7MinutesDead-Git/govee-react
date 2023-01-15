@@ -46,5 +46,16 @@ test('linearly interpolates between two RGB colors', () => {
     // https://meyerweb.com/eric/tools/color-blend/#123456:DDEA0F:1:hex
     const deepBlue = hexToRGB('#123456')
     const boogerYellow = hexToRGB('#DDEA0F')
-    expect(lerpColorRGB(deepBlue, boogerYellow, 0.5)).toEqual(hexToRGB("#788F33"))
+    expect(lerpColorRGB(deepBlue, boogerYellow, 0.5)).toEqual(hexToRGB("#788f33"))
+})
+
+test('linearly interpolates between two hex colors', () => {
+    expect(rgbToHex(lerpColorRGB(blackRGB, whiteRGB, 0.5))).toEqual('#808080')
+    expect(rgbToHex(lerpColorRGB(blackRGB, whiteRGB, 1))).toEqual('#ffffff')
+    expect(rgbToHex(lerpColorRGB(blackRGB, whiteRGB, 0))).toEqual('#000000')
+
+    // https://meyerweb.com/eric/tools/color-blend/#123456:DDEA0F:1:hex
+    const deepBlue = hexToRGB('#123456')
+    const boogerYellow = hexToRGB('#DDEA0F')
+    expect(rgbToHex(lerpColorRGB(deepBlue, boogerYellow, 0.5))).toEqual('#788f33')
 })
