@@ -30,3 +30,21 @@ test('converts an RGB object to a hex string', () => {
     expect(rgbToHex({ r: 17, g: 34, b: 51 })).toEqual('#112233')
     expect(rgbToHex({ r: 17, g: 17, b: 17 })).toEqual('#111111')
 })
+
+test('linearly interpolates between two RGB colors', () => {
+
+    expect(lerpColorRGB(blackRGB, whiteRGB, 0.5)).toEqual(
+        { r: 128, g: 128, b: 128 }
+    )
+    expect(lerpColorRGB(blackRGB, whiteRGB, 1)).toEqual(
+        { r: 255, g: 255, b: 255 }
+    )
+    expect(lerpColorRGB(blackRGB, whiteRGB, 0)).toEqual(
+        { r: 0, g: 0, b: 0 }
+    )
+
+    // https://meyerweb.com/eric/tools/color-blend/#123456:DDEA0F:1:hex
+    const deepBlue = hexToRGB('#123456')
+    const boogerYellow = hexToRGB('#DDEA0F')
+    expect(lerpColorRGB(deepBlue, boogerYellow, 0.5)).toEqual(hexToRGB("#788F33"))
+})
