@@ -1,4 +1,4 @@
-import {hexToRGB, lerpColorRGB, rgbToHex} from './colorFunctions'
+import {hexToRGB, isRGBColor, lerpColorRGB, rgbToHex} from './colorFunctions'
 
 const whiteRGB = { r: 255, g: 255, b: 255 }
 const blackRGB = { r: 0, g: 0, b: 0 }
@@ -58,4 +58,9 @@ test('linearly interpolates between two hex colors', () => {
     const deepBlue = hexToRGB('#123456')
     const boogerYellow = hexToRGB('#DDEA0F')
     expect(rgbToHex(lerpColorRGB(deepBlue, boogerYellow, 0.5))).toEqual('#788f33')
+})
+
+test('Check if a input is an rgbColor object', () => {
+    expect(isRGBColor(blueRGB)).toBe(true)
+    expect(isRGBColor("#123456")).toBe(false)
 })
