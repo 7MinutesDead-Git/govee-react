@@ -1,6 +1,6 @@
 import { devicesURL } from "../../../config"
 import { goveeDeviceWithState, rgbColor } from "../../../interfaces/interfaces"
-import { hexToRGB, isRgbColor } from "../../../utils/colorFunctions"
+import { hexToRGB, isRGBColor } from "../../../utils/colorFunctions"
 import { clamp } from "../../../utils/helpers"
 import { inColorTemperatureRange } from "./color"
 import toast from "react-hot-toast"
@@ -25,7 +25,7 @@ function normalizeValue(value: string | rgbColor | number): string | rgbColor | 
 }
 
 function determineCommandName(value: string | rgbColor | number): string | null {
-    if (typeof value === "string" || isRgbColor(value)) {
+    if (typeof value === "string" || isRGBColor(value)) {
         return "color"
     }
     // A number value means this is a brightness command, so clamp brightness within acceptable range.

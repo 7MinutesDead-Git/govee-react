@@ -54,6 +54,6 @@ export function lerpColorHex(start: string, end: string, distance: number) {
 }
 
 // Type guard to check if a value is an rgbColor object.
-export function isRgbColor(value: string | rgbColor | number): value is rgbColor {
+export function isRGBColor(value: string | rgbColor | number): value is rgbColor {
     return (value as rgbColor).r !== undefined
 }
