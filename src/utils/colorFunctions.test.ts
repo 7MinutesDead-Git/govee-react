@@ -1,4 +1,4 @@
-import {hexToRGB, isRGBColor, lerpColorRGB, rgbToHex} from './colorFunctions'
+import { hexToRGB, isRGBColor, lerpColorRGB, rgbToHex } from './colorFunctions'
 
 const whiteRGB = { r: 255, g: 255, b: 255 }
 const blackRGB = { r: 0, g: 0, b: 0 }
