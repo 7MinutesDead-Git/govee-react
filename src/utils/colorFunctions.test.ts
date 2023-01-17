@@ -2,6 +2,7 @@ import {hexToRGB, isRGBColor, lerpColorRGB, rgbToHex} from './colorFunctions'
 
 const whiteRGB = { r: 255, g: 255, b: 255 }
 const blackRGB = { r: 0, g: 0, b: 0 }
+const greyRGB = { r: 128, g: 128, b: 128 }
 const blueRGB = { r: 0, g: 0, b: 255 }
 
 test('converts a hex string to an RGB object', () => {
@@ -33,15 +34,9 @@ test('converts an RGB object to a hex string', () => {
 
 test('linearly interpolates between two RGB colors', () => {
 
-    expect(lerpColorRGB(blackRGB, whiteRGB, 0.5)).toEqual(
-        { r: 128, g: 128, b: 128 }
-    )
-    expect(lerpColorRGB(blackRGB, whiteRGB, 1)).toEqual(
-        { r: 255, g: 255, b: 255 }
-    )
-    expect(lerpColorRGB(blackRGB, whiteRGB, 0)).toEqual(
-        { r: 0, g: 0, b: 0 }
-    )
+    expect(lerpColorRGB(blackRGB, whiteRGB, 0.5)).toEqual(greyRGB)
+    expect(lerpColorRGB(blackRGB, whiteRGB, 1)).toEqual(whiteRGB)
+    expect(lerpColorRGB(blackRGB, whiteRGB, 0)).toEqual(blackRGB)
 
     // https://meyerweb.com/eric/tools/color-blend/#123456:DDEA0F:1:hex
     const deepBlue = hexToRGB('#123456')
@@ -60,7 +55,7 @@ test('linearly interpolates between two hex colors', () => {
     expect(rgbToHex(lerpColorRGB(deepBlue, boogerYellow, 0.5))).toEqual('#788f33')
 })
 
-test('Check if a input is an rgbColor object', () => {
+test('Checks if a input is an rgbColor object', () => {
     expect(isRGBColor(blueRGB)).toBe(true)
     expect(isRGBColor("#123456")).toBe(false)
 })
