@@ -14,3 +14,14 @@ function LocalStorageTestComponent() {
         </div>
     )
 }
+
+describe("useLocalStorageState", () => {
+    it("should retrieve the value from localStorage if it exists", () => {
+        // Arrange
+        localStorage.setItem("key", JSON.stringify("stored value"))
+        // Act
+        const { getByTestId } = render(<LocalStorageTestComponent />)
+        // Assert
+        expect(getByTestId("value").textContent).toBe("stored value")
+    })
+})
