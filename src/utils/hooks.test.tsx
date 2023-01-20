@@ -24,4 +24,9 @@ describe("useLocalStorageState", () => {
         // Assert
         expect(getByTestId("value").textContent).toBe("stored value")
     })
+    it("should set the default value if the value does not exist in localStorage", () => {
+        localStorage.removeItem("key")
+        const { getByTestId } = render(<LocalStorageTestComponent />)
+        expect(getByTestId("value").textContent).toBe("default value")
+    })
 })
