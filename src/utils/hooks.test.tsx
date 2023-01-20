@@ -29,4 +29,16 @@ describe("useLocalStorageState", () => {
         const { getByTestId } = render(<LocalStorageTestComponent />)
         expect(getByTestId("value").textContent).toBe("default value")
     })
+    it("should update the localStorage when the value changes", () => {
+        expect(localStorage.getItem("key")).toBe(JSON.stringify("default value"))
+        // Arrange
+        const {getByTestId} = render(<LocalStorageTestComponent/>)
+        // Act
+        act(() => {
+            fireEvent.click(getByTestId("button"))
+        })
+        // Assert
+        expect(localStorage.getItem("key")).toBe(JSON.stringify("new value"))
+        expect(getByTestId("value").textContent).toBe("new value")
+    })
 })
