@@ -1,6 +1,6 @@
 import { render, act, fireEvent } from "@testing-library/react"
 import React from "react"
-import { useLocalStorageState } from "./hooks"
+import { useLocalStorageState } from "./useLocalStorageState"
 
 function LocalStorageTestComponent() {
     const [value, setValue] = useLocalStorageState("key", "default value")
