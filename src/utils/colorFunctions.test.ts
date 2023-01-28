@@ -5,7 +5,7 @@ const blackRGB = { r: 0, g: 0, b: 0 }
 const greyRGB = { r: 128, g: 128, b: 128 }
 const blueRGB = { r: 0, g: 0, b: 255 }
 
-test('converts a hex string to an RGB object', () => {
+test('Converts a hex string to an RGB object', () => {
     expect(hexToRGB('#0000FF')).toEqual(blueRGB)
     expect(hexToRGB('#0000ff')).toEqual(blueRGB)
     expect(hexToRGB('#FFFFFF')).toEqual(whiteRGB)
@@ -23,7 +23,7 @@ test('Throws an error if the hex string is invalid', () => {
     expect(() => hexToRGB("0")).toThrowError()
 })
 
-test('converts an RGB object to a hex string', () => {
+test('Converts an RGB object to a hex string', () => {
     expect(rgbToHex(blueRGB)).toEqual('#0000ff')
     expect(rgbToHex(whiteRGB)).toEqual('#ffffff')
     expect(rgbToHex(blackRGB)).toEqual('#000000')
@@ -32,7 +32,7 @@ test('converts an RGB object to a hex string', () => {
     expect(rgbToHex({ r: 17, g: 17, b: 17 })).toEqual('#111111')
 })
 
-test('linearly interpolates between two RGB colors', () => {
+test('Linearly interpolates between two RGB colors', () => {
 
     expect(lerpColorRGB(blackRGB, whiteRGB, 0.5)).toEqual(greyRGB)
     expect(lerpColorRGB(blackRGB, whiteRGB, 1)).toEqual(whiteRGB)
@@ -44,7 +44,7 @@ test('linearly interpolates between two RGB colors', () => {
     expect(lerpColorRGB(deepBlue, boogerYellow, 0.5)).toEqual(hexToRGB("#788f33"))
 })
 
-test('linearly interpolates between two hex colors', () => {
+test('Linearly interpolates between two hex colors', () => {
     expect(rgbToHex(lerpColorRGB(blackRGB, whiteRGB, 0.5))).toEqual('#808080')
     expect(rgbToHex(lerpColorRGB(blackRGB, whiteRGB, 1))).toEqual('#ffffff')
     expect(rgbToHex(lerpColorRGB(blackRGB, whiteRGB, 0))).toEqual('#000000')
