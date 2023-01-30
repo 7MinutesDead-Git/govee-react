@@ -8,7 +8,7 @@ import { QueryConfig } from "./config"
 import { getAvailableLights, getStateOfLights } from "./utils/api/fetch-utilities"
 import { LightsGrid } from "./components/LightsGrid"
 import { LoggedIn } from "./providers/session"
-import { useState } from "react";
+import { useState } from "react"
 import { LoginForm } from "./components/LoginForm"
 
 
