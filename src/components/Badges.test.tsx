@@ -12,3 +12,9 @@ test('Network badge component shows offline text when offline', () => {
     const badgeElement = getByText("Offline")
     expect(badgeElement).toBeInTheDocument()
 })
+
+test('Network badge component shows updating text when updating', () => {
+    const { getByText } = render(<BadgeNetworkStatus updating={true}/>)
+    const badgeElement = getByText("Updating")
+    expect(badgeElement).toBeInTheDocument()
+})
