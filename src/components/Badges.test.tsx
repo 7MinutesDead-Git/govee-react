@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react'
-import { BadgeNetworkStatus } from './Badges'
+import {BadgeIlluminationStatus, BadgeNetworkStatus} from './Badges'
 
 test('Network badge component shows online text when online', () => {
     const { getByText } = render(<BadgeNetworkStatus online={true}/>)
@@ -16,5 +16,12 @@ test('Network badge component shows offline text when offline', () => {
 test('Network badge component shows updating text when updating', () => {
     const { getByText } = render(<BadgeNetworkStatus updating={true}/>)
     const badgeElement = getByText("Updating")
+    expect(badgeElement).toBeInTheDocument()
+})
+
+
+test('Illumination badge component is dark when not illuminating', () => {
+    const { getByText } = render(<BadgeIlluminationStatus illuminating={false} online={true}/>)
+    const badgeElement = getByText("Dark")
     expect(badgeElement).toBeInTheDocument()
 })
