@@ -19,9 +19,14 @@ test('Network badge component shows updating text when updating', () => {
     expect(badgeElement).toBeInTheDocument()
 })
 
-
 test('Illumination badge component is dark when not illuminating', () => {
     const { getByText } = render(<BadgeIlluminationStatus illuminating={false} online={true}/>)
     const badgeElement = getByText("Dark")
+    expect(badgeElement).toBeInTheDocument()
+})
+
+test('Illumination badge component is illuminating', () => {
+    const { getByText } = render(<BadgeIlluminationStatus illuminating={true} online={true}/>)
+    const badgeElement = getByText("Illuminating")
     expect(badgeElement).toBeInTheDocument()
 })
