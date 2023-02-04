@@ -30,3 +30,9 @@ test('Illumination badge component is illuminating', () => {
     const badgeElement = getByText("Illuminating")
     expect(badgeElement).toBeInTheDocument()
 })
+
+test('Illumination badge component is rate limited', () => {
+    const { getByText } = render(<BadgeIlluminationStatus rateLimited={true} online={true}/>)
+    const badgeElement = getByText("Rate Limited")
+    expect(badgeElement).toBeInTheDocument()
+})
