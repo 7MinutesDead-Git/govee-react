@@ -24,7 +24,7 @@ export const LightsGrid = (props: LightsGridProps) => {
     if (props.isLoading) {
         return (
             <Center style={{minHeight: "80vh"}}>
-                <Loader color="violet" size="xl" variant="bars"/>
+                <Loader color="#6a0dff" size="xl" variant="bars"/>
             </Center>
         )
     }
