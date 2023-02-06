@@ -8,7 +8,7 @@ import { QueryConfig } from "./config"
 import { getAvailableLights, getStateOfLights } from "./utils/api/fetch-utilities"
 import { LightsGrid } from "./components/LightsGrid"
 import { LoggedIn } from "./providers/session"
-import { useState } from "react"
+import {useEffect, useState} from "react"
 import { LoginForm } from "./components/LoginForm"
 
 
@@ -34,6 +34,16 @@ export default function App() {
             refetchIntervalInBackground: true,
             staleTime: QueryConfig.staleTime,
         })
+
+    useEffect(() => {
+        // Slow speed spinner is created purely in CSS, so it can indicate loading for very slow connections
+        // on initial load.
+        // This means we'll need to hide the spinner once js is downloaded to render React components.
+        const slowSpeedSpinner = document.querySelector(".slow-speed-spinner") as HTMLElement
+        if (slowSpeedSpinner) {
+            slowSpeedSpinner.style.display = "none"
+        }
+    }, [])
 
     // Render
     if (isError) {
@@ -64,7 +74,7 @@ export default function App() {
                     <BadgeConnectionStatus online={!isLoading} error={false}/>
                 </LightsHeader>
                 <Center style={{minHeight: "80vh"}}>
-                    <Loader color="white" size="xl" variant="bars"/>
+                    <Loader color="#e11d6d" size="xl" variant="bars"/>
                 </Center>
             </MantineProvider>
         )
