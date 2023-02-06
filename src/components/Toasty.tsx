@@ -8,7 +8,7 @@ const toastStyles = {
             borderRadius: '10px',
             background: '#333',
             color: '#fff',
-            userSelect: 'none' as 'none',
+            userSelect: 'none' as const,
         },
         duration: intervals.twoSeconds,
         success: {
