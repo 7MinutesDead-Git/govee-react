@@ -21,7 +21,7 @@ export class NetworkConfig {
     // How quickly a new value is lerped to the current value, in milliseconds. 16.7ms is 60fps
     static lerpUpdateRate = durations.fps144
     // How quickly commands from the server are processed by the client, in milliseconds.
-    static socketUpdateRate = 50
+    static socketUpdateRate = 15
 }
 export class QueryConfig {
     static staleTime = intervals.thirtySeconds
