@@ -257,7 +257,6 @@ export const LightCard = (props: LightCardProps) => {
                         // TODO: Setup proper lerping with a percentage-based function.
                         // https://medium.com/swlh/youre-using-lerp-wrong-73579052a3c3
                         clocks.lerpColorClear = setTimeout(() => {
-                            console.log("Done!")
                             clearInterval(clocks.lerpColorInterval)
                         }, durations.lerpClear)
                     }

@@ -45,7 +45,6 @@ export const LoginForm = (props: LoginFormProps) => {
     })
     const authMutate = useMutation((input: LoginFormValues) => authenticate(input), {
         onSuccess: async (data) => {
-            console.log(data)
             setShowLoginForm(false)
             props.setLoggedIn(true)
             toast.success("Logged in successfully!")
