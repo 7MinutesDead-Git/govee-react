@@ -1,6 +1,6 @@
 export const durations = {
     lerpClear: 500,
-    colorChangeDebounceDelay: 100,
+    colorChangeDebounceDelay: 200,
     flashResetDelay: 1000,
     fps60: 1000 / 60,
     fps90: 1000 / 90,
