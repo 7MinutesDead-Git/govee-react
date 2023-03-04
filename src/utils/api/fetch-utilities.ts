@@ -3,9 +3,9 @@ import {
     goveeDevice,
     goveeDevicesMap,
     goveeStateProperties,
-    goveeStateResponse
+    goveeStateResponse,
+    LoginFormValues
 } from "../../interfaces/interfaces"
-import { LoginFormValues } from "../../interfaces/interfaces"
 import { multiplayer } from "./websocket-utilities"
 import { messages } from "../constants"
 
