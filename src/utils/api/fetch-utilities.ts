@@ -80,18 +80,8 @@ export async function getAvailableLights() {
     }
 }
 
-export async function getStateOfLights(onlineDevices: goveeDevice[] | undefined) {
-    if (!onlineDevices) {
-        console.error("No devices found.")
-        throw new Error("No devices found.")
-    }
-
-    // We'll use a map to store the state of each device. Easy for matching up with the list of device state queries.
+function buildCompleteDevicesMap(onlineDevices: goveeDevice[]) {
     const completeDevices: goveeDevicesMap = {}
-    const deviceStatsPromises = []
-    // But we'll return each device object in an array that can be more easily iterated over.
-    const results = []
-
     for (const device of onlineDevices) {
         completeDevices[device.device] = {
             id: device.device,
@@ -103,37 +93,60 @@ export async function getStateOfLights(onlineDevices: goveeDevice[] | undefined)
                 powerState: "off"
             }
         }
+    }
+    return completeDevices
+}
+
+async function buildDeviceStatsPromises(onlineDevices: goveeDevice[]) {
+    const deviceStatsPromises = []
+    for (const device of onlineDevices) {
         const deviceStatsPromise = fetch(`${stateURL}?device=${device.device}&model=${device.model}`)
         deviceStatsPromises.push(deviceStatsPromise)
     }
+    return deviceStatsPromises
+}
 
-    const deviceStateResponses = await Promise.allSettled(deviceStatsPromises)
+function extractAndCleanProperties(deviceStats: goveeStateResponse) {
+    const extractedStatusProperties: goveeStateProperties = {
+        brightness: 0,
+        color: { b: 0, g: 0, r: 0 },
+        online: false,
+        powerState: "off"
+    }
+    // External Govee API returns light's online status as a string for "false",
+    // but as a boolean for true. Very frustrating.
+    // So, we need to be able to convert the string "false" to a boolean false, and repack the device status object.
+    for (const lightProperty of deviceStats.data.properties) {
+        // lightProperty: { "powerState": "on" }, { "brightness": 100 }, etc.
+        const propertyKey = Object.keys(lightProperty)[0] as keyof goveeStateResponse["data"]["properties"][0]
 
-    for (const deviceState of deviceStateResponses) {
+        let propertyValue = Object.values(lightProperty)[0]
+        if (propertyValue === "false") {
+            propertyValue = false
+        }
+        extractedStatusProperties[propertyKey] = propertyValue
+    }
+    return extractedStatusProperties
+}
+
+export async function getStateOfLights(onlineDevices: goveeDevice[] | undefined) {
+    if (!onlineDevices) {
+        console.error("No devices found.")
+        throw new Error("No devices found.")
+    }
+
+    // We'll use a map to store the state of each device. Easy for matching up with the list of device state queries..
+    const completeDevices = buildCompleteDevicesMap(onlineDevices)
+    const deviceStatsPromises = await buildDeviceStatsPromises(onlineDevices)
+    // But we'll return each device object in an array that can be more easily iterated over.
+    const results = []
+    const settledDevicePromises = await Promise.allSettled(deviceStatsPromises)
+
+    for (const deviceState of settledDevicePromises) {
         if (deviceState.status === "fulfilled") {
             // We need to extract the properties from the response object and put them in a more usable format.
             const deviceFetchedStats: goveeStateResponse = await deviceState.value.json()
-            const extractedStatusProperties: goveeStateProperties = {
-                brightness: 0,
-                color: { b: 0, g: 0, r: 0 },
-                online: false,
-                powerState: "off"
-            }
-
-            // External Govee API returns light's online status as a string for "false",
-            // but as a boolean for true. Very frustrating.
-            // So, we need to be able to convert the string "false" to a boolean false, and repack the device status object.
-            for (const lightProperty of deviceFetchedStats.data.properties) {
-                // lightProperty: { "powerState": "on" }, { "brightness": 100 }, etc.
-                const propertyKey = Object.keys(lightProperty)[0] as keyof goveeStateResponse["data"]["properties"][0]
-
-                let propertyValue = Object.values(lightProperty)[0]
-                if (propertyValue === "false") {
-                    propertyValue = false
-                }
-                extractedStatusProperties[propertyKey] = propertyValue
-            }
-            completeDevices[deviceFetchedStats.data.device].status = extractedStatusProperties
+            completeDevices[deviceFetchedStats.data.device].status = extractAndCleanProperties(deviceFetchedStats)
         }
         else {
             console.error(`Couldn't get device stats for a light: `, deviceState.reason)
