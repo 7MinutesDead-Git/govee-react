@@ -1,5 +1,10 @@
 import { devicesURL, rateLimitExpireURL, stateURL, loginURL } from "../../config"
-import { goveeDevice, goveeDevicesMap, goveeStateResponse } from "../../interfaces/interfaces"
+import {
+    goveeDevice,
+    goveeDevicesMap,
+    goveeStateProperties,
+    goveeStateResponse
+} from "../../interfaces/interfaces"
 import { LoginFormValues } from "../../interfaces/interfaces"
 import { multiplayer } from "./websocket-utilities"
 import { messages } from "../constants"
@@ -101,35 +106,40 @@ export async function getStateOfLights(onlineDevices: goveeDevice[] | undefined)
         const deviceStatsPromise = fetch(`${stateURL}?device=${device.device}&model=${device.model}`)
         deviceStatsPromises.push(deviceStatsPromise)
     }
+
     const deviceStateResponses = await Promise.allSettled(deviceStatsPromises)
 
     for (const deviceState of deviceStateResponses) {
         if (deviceState.status === "fulfilled") {
+            // We need to extract the properties from the response object and put them in a more usable format.
             const deviceFetchedStats: goveeStateResponse = await deviceState.value.json()
-            const extractedStatusProperties = {}
+            const extractedStatusProperties: goveeStateProperties = {
+                brightness: 0,
+                color: { b: 0, g: 0, r: 0 },
+                online: false,
+                powerState: "off"
+            }
 
-            for (const propertyObject of deviceFetchedStats.data.properties) {
-                const propertyKey = Object.keys(propertyObject)[0]
-                // TODO: Use generics to preserve type safety
-                // @ts-ignore
-                let propertyValue = propertyObject[propertyKey]
-                // External Govee API returns light's online status as a string for "false",
-                // but as a boolean for true. Very frustrating.
+            // External Govee API returns light's online status as a string for "false",
+            // but as a boolean for true. Very frustrating.
+            // So, we need to be able to convert the string "false" to a boolean false, and repack the device status object.
+            for (const lightProperty of deviceFetchedStats.data.properties) {
+                // lightProperty: { "powerState": "on" }, { "brightness": 100 }, etc.
+                const propertyKey = Object.keys(lightProperty)[0] as keyof goveeStateResponse["data"]["properties"][0]
+
+                let propertyValue = Object.values(lightProperty)[0]
                 if (propertyValue === "false") {
                     propertyValue = false
                 }
-                // TODO: Use generics to preserve type safety
-                // @ts-ignore
                 extractedStatusProperties[propertyKey] = propertyValue
             }
-            // TODO: Use generics to preserve type safety
-            // @ts-ignore
             completeDevices[deviceFetchedStats.data.device].status = extractedStatusProperties
         }
         else {
             console.error(`Couldn't get device stats for a light: `, deviceState.reason)
         }
     }
+    // The end result is an array of device objects, each with a status object.
     for (const device in completeDevices) {
         results.push(completeDevices[device])
     }

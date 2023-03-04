@@ -34,11 +34,22 @@ export interface goveeStateResponse extends goveeResponse {
         device: string,
         model: string,
         properties: [
-            { online: boolean },
+            { online: boolean | string },
             { powerState: "on" | "off" },
             { brightness: number },
             { color: { r: number, g: number, b: number } }
         ]
+    }
+}
+
+export interface goveeStateProperties {
+    online: boolean,
+    powerState: "on" | "off",
+    brightness: number,
+    color: {
+        r: number,
+        g: number,
+        b: number
     }
 }
 
