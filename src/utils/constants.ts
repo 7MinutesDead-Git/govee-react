@@ -26,8 +26,8 @@ export const statusCodes = {
 }
 
 export const clocks = {
-    lerpColorInterval: setInterval(() => {}, durations.fps90),
-    lerpColorClear: setInterval(() => {}, durations.lerpClear)
+    lerpColorInterval: setInterval(() => null, durations.fps90),
+    lerpColorClear: setInterval(() => null, durations.lerpClear)
 }
 
 export const messages = {

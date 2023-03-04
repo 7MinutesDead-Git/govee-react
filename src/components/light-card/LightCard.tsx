@@ -41,7 +41,7 @@ export const LightCard = (props: LightCardProps) => {
     const lerpedColor = useRef(color)
     const clickedSwatch = useRef(false)
     // Ensures we don't send a fetch request until we have stopped moving the color picker for some time.
-    const debounceTimer = useRef(setTimeout(() => {}, 0))
+    const debounceTimer = useRef(setTimeout(() => null, 0))
     // TODO: Currently only used for swatches, as it makes color picker movements laggy for some reason.. debugging.
     const colorMutation = useMutation((color: string) => changeColor(color), {
         onSuccess: () => {
