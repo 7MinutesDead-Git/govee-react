@@ -37,8 +37,8 @@
     "@types/websocket": "^1.0.5",
     "jest": "^27.5.1",
     "jest-websocket-mock": "^2.4.0",
-    "react-scripts": "5.0.1",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.1",
+    "vite": "^4.2.1"
   },
   "scripts": {
     "start": "react-scripts start",
