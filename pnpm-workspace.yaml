@@ -1,0 +1,5 @@
+# Useful for monorepos, where you have multiple packages/projects in one repository.
+# https://pnpm.io/workspaces
+# Ex: https://github.com/vitejs/vite/blob/main/pnpm-workspace.yaml
+packages:
+  - 'packages/*'
