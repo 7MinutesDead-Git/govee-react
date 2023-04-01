@@ -1,4 +1,4 @@
-# Govee React
+# Govee Vite-React App
 A React+Node app originally to let my partner control my wifi LED lights remotely from anywhere, on any device (with a browser). 
   
   This project was recently converted from Create React App to **Vite** for better performance and development experience.
