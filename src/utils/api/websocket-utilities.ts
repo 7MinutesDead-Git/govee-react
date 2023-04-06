@@ -45,21 +45,22 @@ export const multiplayer = {
 }
 
 multiplayer.client.onopen = () => {
-    console.log("Socket established.")
-    try {
-        setInterval(() => {
+    // https://stackoverflow.com/a/24515576
+    function sendPing() {
+        try {
             if (multiplayer.client.readyState !== multiplayer.client.OPEN) {
                 multiplayer.client.close()
                 multiplayer.reconnect()
             }
             multiplayer.client.send("ping")
-        }, 5000)
+        }
+        catch (error) {
+            console.error("There was an error sending a ping to the server: ", error)
+            multiplayer.client.close()
+            multiplayer.reconnect()
+        }
     }
-    catch (error) {
-        console.error("There was an error sending a ping to the server: ", error)
-        multiplayer.client.close()
-        multiplayer.reconnect()
-    }
+    setInterval(sendPing, 5000)
 }
 multiplayer.client.onclose = () => {
     console.log("Websocket closed. Reconnecting...")
