@@ -221,6 +221,20 @@ export const LightCard = (props: LightCardProps) => {
         }
     }
 
+    // The problem here is we get light fetch updates from props, but we set the brightness value
+    // based on useState.
+    // This will synchronize brightness useState whenever light brightness props changes.
+    // This is a "temporary" solution since really we should not need to useEffect for
+    // synchronizing state with props. It's all internal.
+    // Then again, *technically* the updated state is coming from an external API update..
+    // TODO: Maybe something similar can be achieved with useMemo?
+    //   Probably the real solution is to rethink how we're managing state within react-query.
+    //   and handle light state at the global level, that way all we need to reference is props.
+    useEffect(() => {
+        setBrightnessSliderValue(props.light.status.brightness)
+
+    }, [props.light.status.brightness])
+
     // Effect for managing UI sync with websocket updates from other users.
     // Throttles the updates according to the NetworkConfig.socketUpdateRate.
     // https://stackoverflow.com/a/66616016/13627106
