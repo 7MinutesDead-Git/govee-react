@@ -19,6 +19,9 @@ export default function App() {
         () => getAvailableLights(),
         {
             staleTime: QueryConfig.staleTime,
+            refetchInterval: QueryConfig.refetchInterval,
+            refetchIntervalInBackground: true,
+            refetchOnWindowFocus: true,
         })
 
     // https://tanstack.com/query/v4/docs/guides/disabling-queries#isinitialloading
