@@ -31,5 +31,5 @@ export class NetworkConfig {
 }
 export class QueryConfig {
     static staleTime = intervals.thirtySeconds
-    static refetchInterval = intervals.tenMinutes * 3
+    static refetchInterval = intervals.fiveMinutes
 }
