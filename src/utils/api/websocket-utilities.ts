@@ -3,8 +3,9 @@ import { v4 as uuid } from "uuid"
 import { multiplayerBroadcast } from "../../interfaces/interfaces";
 
 export const multiplayer = {
-    // We use a unique ID per client so that a client won't respond to messages originating from itself (eg, updating the UI).
-    // This should eliminate flickering, particularly when interacting with the UI with higher latency to the server.
+    // We use a unique ID per client so that a client won't respond to messages originating from itself
+    // (eg, updating the UI). This should eliminate flickering, particularly when interacting with the
+    // UI with higher latency to the server.
     id: uuid(),
     client: new WebSocket(websocketURL!),
     commandBuffer: new Set<multiplayerBroadcast>(),
