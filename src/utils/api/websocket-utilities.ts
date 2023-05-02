@@ -56,7 +56,8 @@ multiplayer.client.onopen = () => {
             multiplayer.client.send("ping")
         }
         catch (error) {
-            console.error("There was an error sending a ping to the server: ", error)
+            console.warn("There was an error sending a ping to the server: ", error)
+            console.log("Closing the websocket and attempting to reconnect...")
             multiplayer.client.close()
             multiplayer.reconnect()
         }
