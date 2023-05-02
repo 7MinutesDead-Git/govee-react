@@ -68,7 +68,7 @@ multiplayer.client.onclose = () => {
     console.log("Websocket closed. Reconnecting...")
     setTimeout(() => {
         multiplayer.reconnect()
-    }, 1000)
+    }, 500)
 }
 multiplayer.client.onerror = (error) => {
     console.error("There was a websocket error for the multiplayer connection: ", error)
@@ -76,5 +76,5 @@ multiplayer.client.onerror = (error) => {
     setTimeout(() => {
         console.log("Attempting to reconnect..")
         multiplayer.reconnect()
-    }, 1000)
+    }, 500)
 }
