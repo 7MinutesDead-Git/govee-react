@@ -18,6 +18,7 @@ export const devicesURL = `${baseURL}devices`
 export const stateURL = `${devicesURL}/state`
 export const rateLimitExpireURL = `${devicesURL}/rate-limit`
 export const loginURL = `${baseURL}auth`
+export const sessionURL = `${loginURL}/session`
 
 
 export class NetworkConfig {
