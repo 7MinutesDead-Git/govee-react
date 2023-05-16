@@ -54,6 +54,11 @@ export default function App() {
         }
     }, [])
 
+    // Check if we already have a user session, so we can be loggedIn on load.
+    useEffect(() => {
+        sessionQuery.isSuccess ? setLoggedIn(true) : setLoggedIn(false)
+    }, [sessionQuery.status])
+
     // Render
     if (isError) {
         return (
