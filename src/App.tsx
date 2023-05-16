@@ -80,7 +80,7 @@ export default function App() {
         )
     }
 
-    if (isLoading) {
+    if (isLoading || sessionQuery.isLoading) {
         return (
             <MantineProvider theme={theme} withGlobalStyles withNormalizeCSS>
                 <Toasty />
