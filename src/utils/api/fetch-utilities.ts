@@ -1,4 +1,4 @@
-import { devicesURL, rateLimitExpireURL, stateURL, loginURL } from "../../config"
+import {devicesURL, rateLimitExpireURL, stateURL, loginURL, sessionURL} from "../../config"
 import {
     goveeDevice,
     goveeDevicesMap,
@@ -27,6 +27,22 @@ export async function authenticate(values: LoginFormValues) {
     }
     else {
         throw new Error("Please check your username and password")
+    }
+}
+
+// Method for checking to see if we already have a valid server session,
+// thus skipping login.
+export async function getSession() {
+    const response = await fetch(sessionURL, {
+        method: "GET",
+        credentials: "include",
+    })
+
+    if (response.status === (200)) {
+        return response.json()
+    }
+    else {
+        throw new Error("No session")
     }
 }
 

@@ -5,7 +5,7 @@ import { BadgeConnectionStatus } from "./components/Badges"
 import { LightsHeader } from "./components/LightsHeader"
 import { Toasty } from "./components/Toasty"
 import { QueryConfig } from "./config"
-import { getAvailableLights, getStateOfLights } from "./utils/api/fetch-utilities"
+import { getAvailableLights, getSession, getStateOfLights } from "./utils/api/fetch-utilities"
 import { LightsGrid } from "./components/LightsGrid"
 import { LoggedIn } from "./providers/session"
 import {useEffect, useState} from "react"
@@ -14,6 +14,12 @@ import { LoginForm } from "./components/LoginForm"
 
 export default function App() {
     const [loggedIn, setLoggedIn] = useState(false)
+    // Check if we already have a user session, so we can be loggedIn.
+    const sessionQuery = useQuery(["session"], getSession, {
+        retry: false,
+        refetchOnWindowFocus: false,
+    })
+    // Query to grab all lights that are connected to the Govee API.
     const { error, data: connectedLights, isError, isLoading } = useQuery(
         ["connected"],
         () => getAvailableLights(),
@@ -48,6 +54,11 @@ export default function App() {
         }
     }, [])
 
+    // Check if we already have a user session, so we can be loggedIn on load.
+    useEffect(() => {
+        sessionQuery.isSuccess ? setLoggedIn(true) : setLoggedIn(false)
+    }, [sessionQuery.status])
+
     // Render
     if (isError) {
         return (
@@ -69,7 +80,7 @@ export default function App() {
         )
     }
 
-    if (isLoading) {
+    if (isLoading || sessionQuery.isLoading) {
         return (
             <MantineProvider theme={theme} withGlobalStyles withNormalizeCSS>
                 <Toasty />

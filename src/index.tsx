@@ -10,7 +10,10 @@ import toast from 'react-hot-toast'
 const queryClient = new QueryClient({
     queryCache: new QueryCache({
         onError: (error, query) => {
-            if (query.state.error) {
+            const errorObject = query.state.error as Error
+
+            if (errorObject && errorObject.message !== "No session") {
+                console.log(query.state.error)
                 toast.error("An error occurred while fetching data. 😔")
             }
         }
