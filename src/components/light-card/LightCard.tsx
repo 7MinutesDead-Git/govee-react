@@ -324,7 +324,7 @@ export const LightCard = (props: LightCardProps) => {
 
 
     return (
-        <Card shadow="sm" p="lg" radius="xs" withBorder component="section" style={{...cardFetchStyle, ...cardStyles.card}}>
+        <Card shadow="sm" padding={"lg"} radius="xs" withBorder component="section" style={{...cardFetchStyle, ...cardStyles.card}}>
             <LightCardStatusHeader
                 grabberColor={grabberColor}
                 isLoading={brightnessMutation.isLoading || colorMutation.isLoading || temperatureMutation.isLoading}

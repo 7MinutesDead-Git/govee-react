@@ -2,7 +2,7 @@ import {Button, CopyButton, Group, Text} from "@mantine/core";
 import {BadgeIlluminationStatus, BadgeNetworkStatus} from "../Badges";
 import {motion} from "framer-motion";
 import {cardStyles} from "./LightCardStyles";
-import {IconCopy} from "@tabler/icons";
+import {IconCopy} from "@tabler/icons-react";
 import {goveeDeviceWithState} from "../../interfaces/interfaces";
 
 
